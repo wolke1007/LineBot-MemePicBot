@@ -12,6 +12,7 @@ from linebot.models import (
 )
 from linebot.models import TextSendMessage
 from linebot.exceptions import LineBotApiError
+import channel_token.py
 
 app = Flask(__name__)
 
