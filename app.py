@@ -14,8 +14,8 @@ from linebot.exceptions import LineBotApiError
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi('1587975417')
-handler = WebhookHandler('FxI3Qlfn3Mwyne/OujcIsYfOQCcIOZTUIYbDF2d41/GZAlQv2p5FGkp/ategG6xe0ErAsJCQOeHxdSM1xJ7uCejar1IGM5tDCzSFp40QmWs0BEjVec2nkacPIrL8Hh8XVvBxUgEUsGG6U+nvyGRClgdB04t89/1O/w1cDnyilFU=')
+line_bot_api = LineBotApi('FxI3Qlfn3Mwyne/OujcIsYfOQCcIOZTUIYbDF2d41/GZAlQv2p5FGkp/ategG6xe0ErAsJCQOeHxdSM1xJ7uCejar1IGM5tDCzSFp40QmWs0BEjVec2nkacPIrL8Hh8XVvBxUgEUsGG6U+nvyGRClgdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('7c2930cb70180aae136f76504fba88bd')
 
 
 @app.route("/callback", methods=['POST'])
