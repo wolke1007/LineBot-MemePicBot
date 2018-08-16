@@ -52,6 +52,7 @@ def callback():
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
     if isinstance(event.message, ImageMessage):
+        print('enter image part') #Debug log
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
         # with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
@@ -59,12 +60,18 @@ def handle_message(event):
             for chunk in message_content.iter_content():
                 tf.write(chunk)
             tempfile_path = tf.name
-
-        dist_path = tempfile_path + '.' + ext
+        print(os.getcwd()) #Debug log
+        dist_path = tempfile_path + '.jpg'
         dist_name = os.path.basename(dist_path)
         os.rename(tempfile_path, dist_path)
+        from imgurpython.helpers.error import ImgurClientError
         try:
-            client = ImgurClient(client_id, client_secret, access_token, refresh_token)
+            # this part is from imgurpython Document
+            client = ImgurClient(client_id, client_secret)
+            authorization_url = client.get_auth_url('pin')
+            credentials = client.authorize('PIN OBTAINED FROM AUTHORIZATION', 'pin')
+            client.set_user_auth(credentials['access_token'], credentials['refresh_token'])
+            # ######################################
             config = {
                 'album': album_id,
                 'name': 'Catastrophe!',
@@ -74,12 +81,17 @@ def handle_message(event):
             # path = os.path.join('static', 'tmp', dist_name)
             path = dist_name
             client.upload_from_path(path, config=config, anon=False)
+            print('before remove: '+os.getcwd()) #Debug log
             os.remove(path)
+            print('after remove: '+os.getcwd()) #Debug log
             print(path)
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text='上傳成功'))
-        except:
+        except ImgurClientError as e
+            print(e.error_message)
+            print(e.status_code)
+        else:
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text='上傳失敗'))
@@ -107,6 +119,7 @@ def handle_message(event):
                 event.reply_token, [
                     TextSendMessage(text=' yoyo'),
                     TextSendMessage(text='請傳一張圖片給我')
+                    print(os.getcwd()) #Debug log
                 ])
             return 0
 
