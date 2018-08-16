@@ -119,8 +119,8 @@ def handle_message(event):
                 event.reply_token, [
                     TextSendMessage(text=' yoyo'),
                     TextSendMessage(text='請傳一張圖片給我')
-                    print(os.getcwd()) #Debug log
                 ])
+                print(os.getcwd()) #Debug log
             return 0
 
 if __name__ == "__main__":
