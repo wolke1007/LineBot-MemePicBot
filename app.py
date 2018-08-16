@@ -88,7 +88,7 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text='上傳成功'))
-        except ImgurClientError as e
+        except ImgurClientError as e:
             print(e.error_message)
             print(e.status_code)
         else:
