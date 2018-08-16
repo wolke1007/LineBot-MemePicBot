@@ -13,8 +13,6 @@ from linebot.models import *
 
 import tempfile, os
 
-app = Flask(__name__)
-
 line_channel_access_token = 'FxI3Qlfn3Mwyne/OujcIsYfOQCcIOZTUIYbDF2d41/GZAlQv2p5FGkp/ategG6xe0ErAsJCQOeHxdSM1xJ7uCejar1IGM5tDCzSFp40QmWs0BEjVec2nkacPIrL8Hh8XVvBxUgEUsGG6U+nvyGRClgdB04t89/1O/w1cDnyilFU='
 line_channel_secret = '7c2930cb70180aae136f76504fba88bd'
 client_id = 'ef420e58e8af248'
@@ -28,6 +26,10 @@ refresh_token = 'YOUR_IMGUR_ACCESS_TOKEN'
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
 # imgur_album_id = UxgXZbe
+app = Flask(__name__)
+line_bot_api = LineBotApi(line_channel_access_token)
+handler = WebhookHandler(line_channel_secret)
+static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
 @app.route("/callback", methods=['POST'])
 def callback():
