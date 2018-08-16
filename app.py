@@ -54,7 +54,8 @@ def handle_message(event):
     if isinstance(event.message, ImageMessage):
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
-        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
+        # with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
+        with tempfile.NamedTemporaryFile(prefix=ext + '-', delete=False) as tf:
             for chunk in message_content.iter_content():
                 tf.write(chunk)
             tempfile_path = tf.name
@@ -70,7 +71,8 @@ def handle_message(event):
                 'title': 'Catastrophe!',
                 'description': 'Cute kitten being cute on '
             }
-            path = os.path.join('static', 'tmp', dist_name)
+            # path = os.path.join('static', 'tmp', dist_name)
+            path = dist_name
             client.upload_from_path(path, config=config, anon=False)
             os.remove(path)
             print(path)
