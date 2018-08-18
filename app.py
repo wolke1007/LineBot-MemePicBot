@@ -52,11 +52,12 @@ def handle_message(event):
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
         ext = 'jpg'
-        message_content = line_bot_api.get_message_content(event.message.id)
-        # with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
-            # for chunk in message_content.iter_content():
-                # tf.write(chunk)
-            # tempfile_path = tf.name
+        # message_content = line_bot_api.get_message_content(event.message.id)
+        line_bot_api.get_message_content(event.message.id) # debug
+        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
+            for chunk in message_content.iter_content():
+                tf.write(chunk)
+            tempfile_path = tf.name
 
         # dist_path = tempfile_path + '.' + ext
         # dist_name = os.path.basename(dist_path)
