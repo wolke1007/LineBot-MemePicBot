@@ -69,12 +69,11 @@ def handle_message(event):
                 'title': 'Catastrophe!',
                 'description': 'Cute kitten being cute on '
             }
-            # path = os.path.join('static', 'tmp', dist_name)
-            path = dist_name
+            path = os.path.join('static', 'tmp', dist_name)
             print('path:'+path) #debug
             client.upload_from_path(path, config=config, anon=False)
             print(os.listdir(os.getcwd())) #debug
-            os.remove(path)
+            # os.remove(path)  #debug
             print(os.listdir(os.getcwd())) #debug
             print(path)
             line_bot_api.reply_message(
@@ -85,7 +84,7 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text='上傳失敗'))
-        return 0
+        return True
 
     elif isinstance(event.message, VideoMessage):
         ext = 'mp4'
