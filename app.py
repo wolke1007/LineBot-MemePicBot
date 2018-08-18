@@ -30,6 +30,49 @@ line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
+def Upload_Pic(Pic_Name):
+    ext = 'jpg'
+    message_content = line_bot_api.get_message_content(event.message.id)
+    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
+        for chunk in message_content.iter_content():
+            tf.write(chunk)
+        tempfile_path = tf.name
+    # dist_path = tempfile_path + '.' + ext
+    dist_path = Pic_Name + '.' + ext
+    dist_name = os.path.basename(dist_path)
+    os.rename(tempfile_path, dist_path)
+    try:
+        client = ImgurClient(client_id, client_secret, access_token, refresh_token)
+        config = {
+            'album': imgur_album_id,
+            'name': 'Catastrophe!',
+            'title': 'Catastrophe!',
+            'description': 'Cute kitten being cute on '
+        }
+        path = os.path.join('static', 'tmp', dist_name)
+        print('path:'+path) #debug
+        client.upload_from_path(path, config=config, anon=False)
+        print(os.listdir(os.getcwd())) #debug
+        os.remove(path)  #debug
+        print(os.listdir(os.getcwd())) #debug
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='上傳成功'))
+    except Exception as e:
+        print(e)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='上傳失敗'))
+    return True
+
+def AskForPicName():
+    line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text='這張圖片你要叫什麼?')
+                ])
+    Pic_Name = line_bot_api.get_message_content(event.message.id)
+    return Pic_Name
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -51,64 +94,33 @@ def callback():
 def handle_message(event):
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
-        ext = 'jpg'
-        message_content = line_bot_api.get_message_content(event.message.id)
-        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
-            for chunk in message_content.iter_content():
-                tf.write(chunk)
-            tempfile_path = tf.name
-        dist_path = tempfile_path + '.' + ext
-        dist_name = os.path.basename(dist_path)
-        os.rename(tempfile_path, dist_path)
-        try:
-            client = ImgurClient(client_id, client_secret, access_token, refresh_token)
-            config = {
-                'album': imgur_album_id,
-                'name': 'Catastrophe!',
-                'title': 'Catastrophe!',
-                'description': 'Cute kitten being cute on '
-            }
-            path = os.path.join('static', 'tmp', dist_name)
-            print('path:'+path) #debug
-            client.upload_from_path(path, config=config, anon=False)
-            print(os.listdir(os.getcwd())) #debug
-            # os.remove(path)  #debug
-            print(os.listdir(os.getcwd())) #debug
-            print(path)
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳成功'))
-        except Exception as e:
-            print(e)
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳失敗'))
-        return True
+        Pic_Name = AskForPicName()
+        Upload_Pic(Pic_Name)
 
-    elif isinstance(event.message, VideoMessage):
-        ext = 'mp4'
-    elif isinstance(event.message, AudioMessage):
-        ext = 'm4a'
-    elif isinstance(event.message, TextMessage):
-        if event.message.text == "看看大家都傳了什麼圖片":
-            client = ImgurClient(client_id, client_secret)
-            images = client.get_album_images(album_id)
-            index = random.randint(0, len(images) - 1)
-            url = images[index].link
-            image_message = ImageSendMessage(
-                original_content_url=url,
-                preview_image_url=url
-            )
-            line_bot_api.reply_message(
-                event.reply_token, image_message)
-            return 0
-        else:
-            line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text=' yoyo'),
-                    TextSendMessage(text='請傳一張圖片給我')
-                ])
-            return 0
+    # elif isinstance(event.message, VideoMessage):
+        # ext = 'mp4'
+    # elif isinstance(event.message, AudioMessage):
+        # ext = 'm4a'
+    # elif isinstance(event.message, TextMessage):
+        # if event.message.text == "看看大家都傳了什麼圖片":
+            # client = ImgurClient(client_id, client_secret)
+            # images = client.get_album_images(album_id)
+            # index = random.randint(0, len(images) - 1)
+            # url = images[index].link
+            # image_message = ImageSendMessage(
+                # original_content_url=url,
+                # preview_image_url=url
+            # )
+            # line_bot_api.reply_message(
+                # event.reply_token, image_message)
+            # return 0
+        # else:
+            # line_bot_api.reply_message(
+                # event.reply_token, [
+                    # TextSendMessage(text=' yoyo'),
+                    # TextSendMessage(text='請傳一張圖片給我')
+                # ])
+            # return 0
 
 if __name__ == "__main__":
     app.run()
