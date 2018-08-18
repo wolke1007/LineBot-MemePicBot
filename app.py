@@ -65,7 +65,7 @@ def Upload_Pic(Pic_Name):
             TextSendMessage(text='上傳失敗'))
     return True
 
-def AskForPicName():
+def AskForPicName(event):
     line_bot_api.reply_message(
                 event.reply_token, [
                     TextSendMessage(text='這張圖片你要叫什麼?')
@@ -94,7 +94,7 @@ def callback():
 def handle_message(event):
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
-        Pic_Name = AskForPicName()
+        Pic_Name = AskForPicName(event)
         Upload_Pic(Pic_Name)
 
     # elif isinstance(event.message, VideoMessage):
