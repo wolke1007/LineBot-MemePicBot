@@ -25,19 +25,19 @@ from config import client_id, client_secret, album_id, access_token, refresh_tok
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
 imgur_album_id = 'UxgXZbe'
-app = Flask(__name__)
+line-app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
-@app.route("/callback", methods=['POST'])
+@line-app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
+    line-app.logger.info("Request body: " + body)
 
     # handle webhook body
     try:
@@ -109,4 +109,4 @@ def handle_message(event):
             return 0
 
 if __name__ == "__main__":
-    app.run()
+    line-app.run()
