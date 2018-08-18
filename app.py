@@ -50,10 +50,10 @@ def callback():
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
     if isinstance(event.message, ImageMessage):
+        print('debug msg') #debug
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
-        # with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
-        with tempfile.NamedTemporaryFile(prefix=ext + '-', delete=False) as tf:
+        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
             for chunk in message_content.iter_content():
                 tf.write(chunk)
             tempfile_path = tf.name
@@ -71,6 +71,7 @@ def handle_message(event):
             }
             # path = os.path.join('static', 'tmp', dist_name)
             path = dist_name
+            print('path:'+path) #debug
             client.upload_from_path(path, config=config, anon=False)
             print(os.listdir(os.getcwd())) #debug
             os.remove(path)
