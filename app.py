@@ -117,13 +117,17 @@ def handle_message(event):
         User_ID_Who_Set_Name = event.source.user_id
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
+        print('User_ID_Who_Upload_Pic:') #debug
+        print(User_ID_Who_Upload_Pic) #debug
         if event.message.text[0:1] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
             Pic_Name = event.message.text[2:]
-
+            print('Pic_Name: '+Pic_Name)
     elif isinstance(event.message, ImageMessage):
         if Pic_Name:
             print('Pic_Name exist do GetPic()') #debug
             Dist_Name, User_ID_Who_Upload_Pic = GetPic()
+            print('User_ID_Who_Set_Name:') #debug
+            print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             UploadToImgur(Dist_Name, Pic_Name)
@@ -132,6 +136,10 @@ def handle_message(event):
             User_ID_Who_Upload_Pic = None
         else:
             print('Pic_Name NOT exist do nothing') #debug
+            print('User_ID_Who_Set_Name:') #debug
+            print(User_ID_Who_Set_Name) #debug
+            print('User_ID_Who_Upload_Pic:') #debug
+            print(User_ID_Who_Upload_Pic) #debug
             line_bot_api.reply_message(
                 event.reply_token, [
                     TextSendMessage(text='沒有先設定名字，這張圖片將不被儲存')
