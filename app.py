@@ -77,7 +77,7 @@ def handle_message(event):
             config = {
                 'album': imgur_album_id,
                 'name': dist_name,
-                'title': 'test title',
+                'title': dist_name,
                 'description': 'test description'
             }
             path = os.path.join('static', 'tmp', dist_name)
@@ -86,14 +86,14 @@ def handle_message(event):
             print(os.listdir(os.getcwd())) #debug
             os.remove(path)  #debug
             print(os.listdir(os.getcwd())) #debug
-            # line_bot_api.reply_message(
-                # event.reply_token,
-                # TextSendMessage(text='上傳成功'))
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='上傳成功'))
         except Exception as e:
             print(e)
-            # line_bot_api.reply_message(
-                # event.reply_token,
-                # TextSendMessage(text='上傳失敗'))
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='上傳失敗'))
 # #################################################
 #                   判斷式開始
 # #################################################
