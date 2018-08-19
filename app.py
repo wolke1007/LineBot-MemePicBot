@@ -83,17 +83,25 @@ def handle_message(event):
             path = os.path.join('static', 'tmp', dist_name)
             print('path:'+path) #debug
             client.upload_from_path(path, config=config, anon=False)
-            print(os.listdir(os.getcwd())) #debug
-            os.remove(path)  #debug
-            print(os.listdir(os.getcwd())) #debug
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳成功'))
+            print(os.listdir(os.getcwd()+'/static/tmp')) #debug
+            os.remove(path)  
+            print(os.listdir(os.getcwd()+'/static/tmp')) #debug
+            print('dir:'+dir(event)) #debug
+            # line_bot_api.push_message(
+                # event.roomid,
+                # event.reply_token,
+                # TextSendMessage(text='上傳成功'))
+            # line_bot_api.reply_message(
+                # event.reply_token,
+                # TextSendMessage(text='上傳成功'))
         except Exception as e:
             print(e)
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳失敗'))
+            # line_bot_api.push_message(
+                # event.reply_token,
+                # TextSendMessage(text='上傳失敗'))
+            # line_bot_api.reply_message(
+                # event.reply_token,
+                # TextSendMessage(text='上傳失敗'))
 # #################################################
 #                   判斷式開始
 # #################################################
@@ -109,10 +117,6 @@ def handle_message(event):
             
             
             
-            
-            
-            
-        # UploadToImgur(dist_name)
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
             # message_content = line_bot_api.get_message_content(event.message.id)
