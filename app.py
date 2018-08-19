@@ -53,23 +53,23 @@ def GetPicName():
 
 def UploadToImgur(Pic_Name='Default_Pic_Name'):
     try:
-    print('UploadToImgur Pic_Name: ' + Pic_Name) #debug
-    client = ImgurClient(client_id, client_secret, access_token, refresh_token)
-    config = {
-        'album': imgur_album_id,
-        'name': 'Catastrophe!',
-        'title': 'Catastrophe!',
-        'description': 'Cute kitten being cute on '
-    }
-    path = os.path.join('static', 'tmp', dist_name)
-    print('path:'+path) #debug
-    client.upload_from_path(path, config=config, anon=False)
-    print(os.listdir(os.getcwd())) #debug
-    os.remove(path)  #debug
-    print(os.listdir(os.getcwd())) #debug
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='上傳成功'))
+        print('UploadToImgur Pic_Name: ' + Pic_Name) #debug
+        client = ImgurClient(client_id, client_secret, access_token, refresh_token)
+        config = {
+            'album': imgur_album_id,
+            'name': 'Catastrophe!',
+            'title': 'Catastrophe!',
+            'description': 'Cute kitten being cute on '
+        }
+        path = os.path.join('static', 'tmp', dist_name)
+        print('path:'+path) #debug
+        client.upload_from_path(path, config=config, anon=False)
+        print(os.listdir(os.getcwd())) #debug
+        os.remove(path)  #debug
+        print(os.listdir(os.getcwd())) #debug
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='上傳成功'))
     except Exception as e:
         print(e)
         line_bot_api.reply_message(
