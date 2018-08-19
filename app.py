@@ -62,6 +62,7 @@ def handle_message(event):
         User_ID_Who_Upload_Pic = event.source.user_id
         # 確認是否為設定名字的人上傳的圖片
         if User_ID_Who_Upload_Pic != User_ID_Who_Set_Name:
+            print('not the same people upload pic, drop it! return False!')
             return False
         print('GetPic User_ID_Who_Upload_Pic:')
         print(event.source.user_id)
@@ -71,7 +72,6 @@ def handle_message(event):
             tempfile_path = tf.name
         print("tempfile_path before rename:" + tempfile_path) #debug
         dist_path = tempfile_path + '.' + ext
-        # dist_path = Pic_Name + '.' + ext
         Dist_Name = os.path.basename(dist_path)
         os.rename(tempfile_path, dist_path)
         print("tempfile_path after rename:" + tempfile_path) #debug
@@ -79,17 +79,9 @@ def handle_message(event):
         print("Dist_Name:" + Dist_Name) #debug
         return Dist_Name
 
-    # def GetPicName():
-        # if isinstance(event.message, TextMessage):        
-            # message_content = line_bot_api.get_message_content(event.message.id)
-            # global Pic_Name
-            # Pic_Name = event.message.text
-        # print('Pic_Name: ')
-        # print(Pic_Name)
-        # return Pic_Name
-
     def UploadToImgur(dist_name, pic_name):
         if Dist_Name is None:
+            print('have not Git Pic yet! return False!')
             return False
         try:
             print('UploadToImgur Pic_Name: ' + Pic_Name)
@@ -143,8 +135,7 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(
                 event.reply_token, [
-                    TextSendMessage(text='請輸入"驚嘆號" + "一" + "圖片名稱" 來設定圖片名稱'),
-                    TextSendMessage(text='e.x. !1我是檔名')
+                    TextSendMessage(text='請輸入"驚嘆號" + "一" + "圖片名稱" 來設定圖片名稱，範例: !1我是檔名')
                 ])
     elif isinstance(event.message, ImageMessage):
         if Pic_Name:
@@ -164,7 +155,7 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token, [
                     TextSendMessage(text='沒有先設定名字，這張圖片將不被儲存')
-                ])
+                ]) #考慮之後取消，否則一般的上傳圖片也會回，會很吵
             return 0
             
     # elif isinstance(event.message, TextMessage):
