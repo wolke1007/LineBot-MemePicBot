@@ -113,6 +113,10 @@ def handle_message(event):
             line_bot_api.push_message(
                 event.source.group_id,
                 TextSendMessage(text='上傳成功'))
+            # Reset varible to default
+            User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
+            User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
+            Pic_Name = None
         except Exception as e:
             print(e)
             line_bot_api.push_message(
@@ -151,10 +155,6 @@ def handle_message(event):
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             UploadToImgur(Dist_Name, Pic_Name)
-            # Reset varible to default
-            User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
-            User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
-            Pic_Name = None
         else:
             print('Pic_Name NOT exist do nothing') #debug
             print('User_ID_Who_Set_Name:') #debug
