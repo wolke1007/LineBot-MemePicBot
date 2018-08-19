@@ -119,7 +119,7 @@ def handle_message(event):
         User_ID_Who_Set_Name = event.source.user_id
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
-        if event.message.text[0:2] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
+        if event.message.text[0:2] == "!1":
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
@@ -137,7 +137,7 @@ def handle_message(event):
                     TextSendMessage(text='e.x. !1我是檔名')
                 ])
     elif isinstance(event.message, ImageMessage):
-        if Pic_Name:
+        if Pic_Name and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
             print('Pic_Name exist do GetPic()') #debug
             Dist_Name = GetPic()
             print('User_ID_Who_Set_Name:') #debug
