@@ -24,7 +24,6 @@ from config import client_id, client_secret, album_id, access_token, refresh_tok
 # handler = WebhookHandler('')
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
-global Pic_Name
 Pic_Name = None
 imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
@@ -114,6 +113,7 @@ def handle_message(event):
 #                   判斷式開始
 # #################################################
     if isinstance(event.message, TextMessage):
+        global Pic_Name
         User_ID_Who_Set_Name = event.source.user_id
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
