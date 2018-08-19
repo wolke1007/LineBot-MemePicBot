@@ -123,6 +123,7 @@ def handle_message(event):
             Pic_Name = event.message.text[2:]
             print('Pic_Name: '+Pic_Name)
     elif isinstance(event.message, ImageMessage):
+        global Pic_Name
         if Pic_Name:
             print('Pic_Name exist do GetPic()') #debug
             Dist_Name, User_ID_Who_Upload_Pic = GetPic()
@@ -136,8 +137,6 @@ def handle_message(event):
             User_ID_Who_Upload_Pic = None
         else:
             print('Pic_Name NOT exist do nothing') #debug
-            print('User_ID_Who_Set_Name:') #debug
-            print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             line_bot_api.reply_message(
