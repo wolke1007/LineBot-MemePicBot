@@ -136,7 +136,6 @@ def handle_message(event):
                     TextSendMessage(text='請輸入 "!1"+"圖片名稱" 來設定圖片名稱，範例: !1我是檔名')
                 ])
     elif isinstance(event.message, ImageMessage):
-        global Pic_Name
         print('139 Pic_Name: ')
         print(Pic_Name)
         # if Pic_Name is not 'Pic_Name' and Pic_Name is not '':
