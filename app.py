@@ -120,6 +120,7 @@ def handle_message(event):
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
         if event.message.text[0:2] == "!1" and event.message.text[2:] is not '':
+            global Pic_Name
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
