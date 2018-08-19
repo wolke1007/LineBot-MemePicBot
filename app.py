@@ -54,7 +54,6 @@ def callback():
 def handle_message(event):
     global User_ID_Who_Set_Name
     global User_ID_Who_Upload_Pic
-    global Pic_Name
     
     def GetPic():
         ext = 'jpg'
@@ -70,16 +69,16 @@ def handle_message(event):
             for chunk in message_content.iter_content():
                 tf.write(chunk)
             tempfile_path = tf.name
-        print("tempfile_path before rename:" + tempfile_path) #debug
         dist_path = tempfile_path + '.' + ext
         Dist_Name = os.path.basename(dist_path)
         os.rename(tempfile_path, dist_path)
-        print("tempfile_path after rename:" + tempfile_path) #debug
+        print("tempfile_path :" + tempfile_path) #debug
         print("dist_path:" + dist_path) #debug
         print("Dist_Name:" + Dist_Name) #debug
         return Dist_Name
 
     def UploadToImgur(dist_name, pic_name):
+        global Pic_Name
         if Dist_Name is None:
             print('have not Git Pic yet! return False!')
             return False
@@ -96,7 +95,7 @@ def handle_message(event):
             print('path:'+path) #debug
             client.upload_from_path(path, config=config, anon=False)
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
-            os.remove(path)  
+            os.remove(path)
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
             print(dir(event.source)) #debug
             print('event.source.group_id: ')  #debug
@@ -138,6 +137,8 @@ def handle_message(event):
                     TextSendMessage(text='請輸入"驚嘆號" + "一" + "圖片名稱" 來設定圖片名稱，範例: !1我是檔名')
                 ])
     elif isinstance(event.message, ImageMessage):
+        print('Pic_Name: ')
+        print(Pic_Name)
         if Pic_Name:
             print('Pic_Name exist do GetPic()') #debug
             Dist_Name = GetPic() if GetPic() else None
