@@ -50,6 +50,7 @@ def callback():
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
+    global Pic_Name
     def GetPic():
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
@@ -113,7 +114,6 @@ def handle_message(event):
 #                   判斷式開始
 # #################################################
     if isinstance(event.message, TextMessage):
-        global Pic_Name
         User_ID_Who_Set_Name = event.source.user_id
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
@@ -123,7 +123,6 @@ def handle_message(event):
             Pic_Name = event.message.text[2:]
             print('Pic_Name: '+Pic_Name)
     elif isinstance(event.message, ImageMessage):
-        global Pic_Name
         if Pic_Name:
             print('Pic_Name exist do GetPic()') #debug
             Dist_Name, User_ID_Who_Upload_Pic = GetPic()
