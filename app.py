@@ -57,12 +57,12 @@ def handle_message(event):
     global Pic_Name
     
     def GetPic():
-        # 確認是否為設定名字的人上傳的圖片
-        if User_ID_Who_Upload_Pic != User_ID_Who_Set_Name:
-            return False
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
         User_ID_Who_Upload_Pic = event.source.user_id
+        # 確認是否為設定名字的人上傳的圖片
+        if User_ID_Who_Upload_Pic != User_ID_Who_Set_Name:
+            return False
         print('GetPic User_ID_Who_Upload_Pic:')
         print(event.source.user_id)
         with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
