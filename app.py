@@ -76,9 +76,9 @@ def handle_message(event):
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
             config = {
                 'album': imgur_album_id,
-                'name': 'Catastrophe!',
-                'title': 'Catastrophe!',
-                'description': 'Cute kitten being cute on '
+                'name': dist_name,
+                'title': 'test title',
+                'description': 'test description'
             }
             path = os.path.join('static', 'tmp', dist_name)
             print('path:'+path) #debug
@@ -86,14 +86,14 @@ def handle_message(event):
             print(os.listdir(os.getcwd())) #debug
             os.remove(path)  #debug
             print(os.listdir(os.getcwd())) #debug
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳成功'))
+            # line_bot_api.reply_message(
+                # event.reply_token,
+                # TextSendMessage(text='上傳成功'))
         except Exception as e:
             print(e)
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳失敗'))
+            # line_bot_api.reply_message(
+                # event.reply_token,
+                # TextSendMessage(text='上傳失敗'))
 # #################################################
 #                   判斷式開始
 # #################################################
@@ -105,29 +105,7 @@ def handle_message(event):
             # event.reply_token, [
                 # TextSendMessage(text='這張圖片你要叫什麼?')
             # ])
-        try:
-            # print('UploadToImgur Pic_Name: ' + Pic_Name)
-            client = ImgurClient(client_id, client_secret, access_token, refresh_token)
-            config = {
-                'album': imgur_album_id,
-                'name': 'Catastrophe!',
-                'title': 'Catastrophe!',
-                'description': 'Cute kitten being cute on '
-            }
-            path = os.path.join('static', 'tmp', dist_name)
-            print('path:'+path) #debug
-            client.upload_from_path(path, config=config, anon=False)
-            print(os.listdir(os.getcwd())) #debug
-            os.remove(path)  #debug
-            print(os.listdir(os.getcwd())) #debug
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳成功'))
-        except Exception as e:
-            print(e)
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='上傳失敗'))
+        UploadToImgur(dist_name)
             
             
             
