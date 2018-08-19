@@ -64,16 +64,22 @@ def handle_message(event):
         print("tempfile_path after rename:" + tempfile_path) #debug
         print("dist_path:" + dist_path) #debug
         print("dist_name:" + dist_name) #debug
+        line_bot_api.push_message(
+                event.source.group_id,
+                TextSendMessage(text='圖片你想叫什麼名字?'))
         return dist_name
 
     def GetPicName():
-        Pic_Name = event.message.text
-        print('Pic_Name: '+Pic_Name)
+        if isinstance(event.message, TextMessage):        
+            message_content = line_bot_api.get_message_content(event.message.id)
+            Pic_Name = event.message.text
+        print('Pic_Name: ')
+        print(Pic_Name)
         return Pic_Name
 
-    def UploadToImgur(dist_name):
+    def UploadToImgur(dist_name, Pic_Name):
         try:
-            # print('UploadToImgur Pic_Name: ' + Pic_Name)
+            print('UploadToImgur Pic_Name: ' + Pic_Name)
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
             config = {
                 'album': imgur_album_id,
@@ -106,10 +112,10 @@ def handle_message(event):
         print('debug msg') #debug
         Dist_Name = GetPic()
         Pic_Name = GetPicName()
-        UploadToImgur(Dist_Name)
+        UploadToImgur(Dist_Name, Pic_Name)
             
-            
-            
+    
+        
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
             # message_content = line_bot_api.get_message_content(event.message.id)
