@@ -117,7 +117,7 @@ def handle_message(event):
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
         if event.message.text[0:1] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
-            Pic_Name = [2:]
+            Pic_Name = event.message.text[2:]
 
     elif isinstance(event.message, ImageMessage):
         if Pic_Name:
