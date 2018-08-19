@@ -119,21 +119,23 @@ def handle_message(event):
         User_ID_Who_Set_Name = event.source.user_id
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
-        # if event.message.text[0:1] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
-        if event.message.text[0:2] == "!1":
+        if event.message.text[0:2] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             Pic_Name = event.message.text[2:]
             print('Pic_Name: '+Pic_Name)
+            line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text='圖片名字已設定完成: ' + Pic_Name)
+                ])
         else:
-            print('event.message.text:') #debug
-            print(event.message.text)
-            print('User_ID_Who_Set_Name:') #debug
-            print(User_ID_Who_Set_Name) #debug
-            print('User_ID_Who_Upload_Pic:') #debug
-            print(User_ID_Who_Upload_Pic) #debug
+            line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text='請輸入"驚嘆號" + "一" + "圖片名稱" 來設定圖片名稱'),
+                    TextSendMessage(text='e.x. !1我是檔名')
+                ])
     elif isinstance(event.message, ImageMessage):
         if Pic_Name:
             print('Pic_Name exist do GetPic()') #debug
