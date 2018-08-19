@@ -54,7 +54,6 @@ def callback():
 def handle_message(event):
     global User_ID_Who_Set_Name
     global User_ID_Who_Upload_Pic
-    global Pic_Name
     def GetPic():
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
@@ -125,6 +124,7 @@ def handle_message(event):
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             Pic_Name = event.message.text[2:]
+            global Pic_Name
             print('128 Pic_Name: '+Pic_Name)
             line_bot_api.reply_message(
                 event.reply_token, [
@@ -136,7 +136,7 @@ def handle_message(event):
                     TextSendMessage(text='請輸入 "!1"+"圖片名稱" 來設定圖片名稱，範例: !1我是檔名')
                 ])
     elif isinstance(event.message, ImageMessage):
-        
+        global Pic_Name
         print('139 Pic_Name: ')
         print(Pic_Name)
         # if Pic_Name is not 'Pic_Name' and Pic_Name is not '':
