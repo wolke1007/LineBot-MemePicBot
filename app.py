@@ -64,15 +64,15 @@ def handle_message(event):
         print("tempfile_path after rename:" + tempfile_path) #debug
         print("dist_path:" + dist_path) #debug
         print("dist_name:" + dist_name) #debug
-        return True
+        return dist_name
 
     def GetPicName():
         Pic_Name = line_bot_api.get_message_content(event.message.text)
         return Pic_Name
 
-    def UploadToImgur(Pic_Name):
+    def UploadToImgur(dist_name):
         try:
-            print('UploadToImgur Pic_Name: ' + Pic_Name)
+            # print('UploadToImgur Pic_Name: ' + Pic_Name)
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
             config = {
                 'album': imgur_album_id,
@@ -100,16 +100,20 @@ def handle_message(event):
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
         # Pic_Name = AskForPicName(event)
-        GetPic()
+        dist_name = GetPic()
         line_bot_api.reply_message(
             event.reply_token, [
                 TextSendMessage(text='這張圖片你要叫什麼?')
             ])
-    elif isinstance(event.message, TextMessage):
-        if event.message.text == "test":
-            Pic_Name = line_bot_api.get_message_content(event.message.text)
-            print('Pic_Name before function:' + Pic_Name)
-            UploadToImgur(Pic_Name)
+        UploadToImgur(dist_name)
+    # elif isinstance(event.message, TextMessage):
+        # if event.message.text == "test":
+            # message_content = line_bot_api.get_message_content(event.message.id)
+            # Pic_Name = line_bot_api.get_message_content(event.message.text)
+            # print('Pic_Name before function:' + Pic_Name)
+            # UploadToImgur(Pic_Name)
+            
+            
     # elif isinstance(event.message, VideoMessage):
         # ext = 'mp4'
     # elif isinstance(event.message, AudioMessage):
