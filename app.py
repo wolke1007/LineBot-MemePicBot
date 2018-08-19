@@ -52,8 +52,6 @@ def callback():
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
-    print('55 Pic_Name')
-    print(Pic_Name)
     global User_ID_Who_Set_Name
     global User_ID_Who_Upload_Pic
     def GetPic():
