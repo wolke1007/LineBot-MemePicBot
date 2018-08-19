@@ -68,6 +68,7 @@ def handle_message(event):
 
     def GetPicName():
         Pic_Name = event.message.text
+        print('Pic_Name: '+Pic_Name)
         return Pic_Name
 
     def UploadToImgur(dist_name):
@@ -103,13 +104,9 @@ def handle_message(event):
 # #################################################
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
-        # Pic_Name = AskForPicName(event)
-        dist_name = GetPic()
-        # line_bot_api.reply_message(
-            # event.reply_token, [
-                # TextSendMessage(text='這張圖片你要叫什麼?')
-            # ])
-        UploadToImgur(dist_name)
+        Dist_Name = GetPic()
+        Pic_Name = GetPicName()
+        UploadToImgur(Dist_Name)
             
             
             
