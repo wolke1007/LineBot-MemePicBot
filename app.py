@@ -67,7 +67,7 @@ def handle_message(event):
         return True
 
     def GetPicName():
-        Pic_Name = line_bot_api.get_message_content(event.message.id)
+        Pic_Name = line_bot_api.get_message_content(event.message.text)
         return Pic_Name
 
     def UploadToImgur(Pic_Name):
@@ -107,7 +107,8 @@ def handle_message(event):
             ])
     elif isinstance(event.message, TextMessage):
         if event.message.text == "test":
-            Pic_Name = line_bot_api.get_message_content(event.message.id)
+            Pic_Name = line_bot_api.get_message_content(event.message.text)
+            print('Pic_Name before function:' + Pic_Name)
             UploadToImgur(Pic_Name)
     # elif isinstance(event.message, VideoMessage):
         # ext = 'mp4'
