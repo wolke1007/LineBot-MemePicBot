@@ -30,51 +30,7 @@ line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
-def GetPic():
-    ext = 'jpg'
-    message_content = line_bot_api.get_message_content(event.message.id)
-    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
-        for chunk in message_content.iter_content():
-            tf.write(chunk)
-        tempfile_path = tf.name
-    print("tempfile_path before rename:" + tempfile_path) #debug
-    dist_path = tempfile_path + '.' + ext
-    # dist_path = Pic_Name + '.' + ext
-    dist_name = os.path.basename(dist_path)
-    os.rename(tempfile_path, dist_path)
-    print("tempfile_path after rename:" + tempfile_path) #debug
-    print("dist_path:" + dist_path) #debug
-    print("dist_name:" + dist_name) #debug
-    return True
 
-def GetPicName():
-    Pic_Name = line_bot_api.get_message_content(event.message.id)
-    return Pic_Name
-
-def UploadToImgur(Pic_Name='Default_Pic_Name'):
-    try:
-        print('UploadToImgur Pic_Name: ' + Pic_Name) #debug
-        client = ImgurClient(client_id, client_secret, access_token, refresh_token)
-        config = {
-            'album': imgur_album_id,
-            'name': 'Catastrophe!',
-            'title': 'Catastrophe!',
-            'description': 'Cute kitten being cute on '
-        }
-        path = os.path.join('static', 'tmp', dist_name)
-        print('path:'+path) #debug
-        client.upload_from_path(path, config=config, anon=False)
-        print(os.listdir(os.getcwd())) #debug
-        os.remove(path)  #debug
-        print(os.listdir(os.getcwd())) #debug
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='上傳成功'))
-    except Exception as e:
-        print(e)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='上傳失敗'))
         
     
     
@@ -97,6 +53,54 @@ def callback():
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
+    def GetPic():
+        ext = 'jpg'
+        message_content = line_bot_api.get_message_content(event.message.id)
+        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
+            for chunk in message_content.iter_content():
+                tf.write(chunk)
+            tempfile_path = tf.name
+        print("tempfile_path before rename:" + tempfile_path) #debug
+        dist_path = tempfile_path + '.' + ext
+        # dist_path = Pic_Name + '.' + ext
+        dist_name = os.path.basename(dist_path)
+        os.rename(tempfile_path, dist_path)
+        print("tempfile_path after rename:" + tempfile_path) #debug
+        print("dist_path:" + dist_path) #debug
+        print("dist_name:" + dist_name) #debug
+        return True
+
+    def GetPicName():
+        Pic_Name = line_bot_api.get_message_content(event.message.id)
+        return Pic_Name
+
+    def UploadToImgur(Pic_Name='Default_Pic_Name'):
+        try:
+        print('UploadToImgur Pic_Name: ' + Pic_Name)
+        client = ImgurClient(client_id, client_secret, access_token, refresh_token)
+        config = {
+            'album': imgur_album_id,
+            'name': 'Catastrophe!',
+            'title': 'Catastrophe!',
+            'description': 'Cute kitten being cute on '
+        }
+        path = os.path.join('static', 'tmp', dist_name)
+        print('path:'+path) #debug
+        client.upload_from_path(path, config=config, anon=False)
+        print(os.listdir(os.getcwd())) #debug
+        os.remove(path)  #debug
+        print(os.listdir(os.getcwd())) #debug
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='上傳成功'))
+        except Exception as e:
+            print(e)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='上傳失敗'))
+# #################################################
+#                   判斷式開始
+# #################################################
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
         # Pic_Name = AskForPicName(event)
@@ -134,6 +138,8 @@ def handle_message(event):
                     # TextSendMessage(text='請傳一張圖片給我')
                 # ])
             # return 0
+            
 
+            
 if __name__ == "__main__":
     app.run()
