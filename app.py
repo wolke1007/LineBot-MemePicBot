@@ -24,6 +24,7 @@ from config import client_id, client_secret, album_id, access_token, refresh_tok
 # handler = WebhookHandler('')
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
+global Pic_Name
 imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -71,14 +72,14 @@ def handle_message(event):
                 TextSendMessage(text='圖片你想叫什麼名字?'))
         return Dist_Name, User_ID_Who_Upload_Pic
 
-    def GetPicName():
-        if isinstance(event.message, TextMessage):        
-            message_content = line_bot_api.get_message_content(event.message.id)
-            global Pic_Name
-            Pic_Name = event.message.text
-        print('Pic_Name: ')
-        print(Pic_Name)
-        return Pic_Name
+    # def GetPicName():
+        # if isinstance(event.message, TextMessage):        
+            # message_content = line_bot_api.get_message_content(event.message.id)
+            # global Pic_Name
+            # Pic_Name = event.message.text
+        # print('Pic_Name: ')
+        # print(Pic_Name)
+        # return Pic_Name
 
     def UploadToImgur(dist_name, pic_name):
         try:
@@ -86,8 +87,8 @@ def handle_message(event):
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
             config = {
                 'album': imgur_album_id,
-                'name': dist_name,
-                'title': dist_name,
+                'name': Pic_Name,
+                'title': Pic_Name,
                 'description': 'test description'
             }
             path = os.path.join('static', 'tmp', dist_name)
@@ -111,17 +112,31 @@ def handle_message(event):
 # #################################################
 #                   判斷式開始
 # #################################################
-    if isinstance(event.message, ImageMessage):
-        print('debug msg') #debug
-        Dist_Name, User_ID_Who_Upload_Pic = GetPic()
-        print('User_ID_Who_Upload_Pic:') #debug
-        print(User_ID_Who_Upload_Pic) #debug
     if isinstance(event.message, TextMessage):
         User_ID_Who_Set_Name = event.source.user_id
-        if event.message.text[0:2] == "!1 " and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
-            Pic_Name = GetPicName()
+        print('User_ID_Who_Set_Name:') #debug
+        print(User_ID_Who_Set_Name) #debug
+        if event.message.text[0:1] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
+            Pic_Name = [2:]
+
+    elif isinstance(event.message, ImageMessage):
+        if Pic_Name:
+            print('Pic_Name exist do GetPic()') #debug
+            Dist_Name, User_ID_Who_Upload_Pic = GetPic()
+            print('User_ID_Who_Upload_Pic:') #debug
+            print(User_ID_Who_Upload_Pic) #debug
             UploadToImgur(Dist_Name, Pic_Name)
-        
+            # Reset varible to None
+            User_ID_Who_Set_Name = None
+            User_ID_Who_Upload_Pic = None
+        else:
+            print('Pic_Name NOT exist do nothing') #debug
+            line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text='沒有先設定名字，這張圖片將不被儲存')
+                ])
+            return 0
+            
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
             # message_content = line_bot_api.get_message_content(event.message.id)
