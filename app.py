@@ -88,25 +88,16 @@ def handle_message(event):
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
             print(dir(event.source)) #debug
             print('event.source.group_id: ')  #debug
-            Group_ID = event.source.group_id
-            print(Group_ID) #debug
-            print(type(Group_ID)) #debug
+            print(event.source.group_id) #debug
+            print(type(event.source.group_id)) #debug
             line_bot_api.push_message(
-                event.source,
-                event.reply_token,
+                event.source.group_id,
                 TextSendMessage(text='上傳成功'))
-            # line_bot_api.reply_message(
-                # event.reply_token,
-                # TextSendMessage(text='上傳成功'))
         except Exception as e:
             print(e)
-            # line_bot_api.push_message(
-                # event.source.group_id,
-                # event.reply_token,
-                # TextSendMessage(text='上傳失敗'))
-            # line_bot_api.reply_message(
-                # event.reply_token,
-                # TextSendMessage(text='上傳失敗'))
+            line_bot_api.push_message(
+                event.source.group_id,
+                TextSendMessage(text='上傳失敗'))
 # #################################################
 #                   判斷式開始
 # #################################################
