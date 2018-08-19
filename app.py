@@ -52,8 +52,8 @@ def callback():
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
-    global User_ID_Who_Upload_Pic
     global User_ID_Who_Set_Name
+    global User_ID_Who_Upload_Pic
     global Pic_Name
     def GetPic():
         ext = 'jpg'
@@ -73,10 +73,7 @@ def handle_message(event):
         print("tempfile_path after rename:" + tempfile_path) #debug
         print("dist_path:" + dist_path) #debug
         print("Dist_Name:" + Dist_Name) #debug
-        line_bot_api.push_message(
-                event.source.group_id,
-                TextSendMessage(text='圖片你想叫什麼名字?'))
-        return Dist_Name, User_ID_Who_Upload_Pic
+        return Dist_Name
 
     # def GetPicName():
         # if isinstance(event.message, TextMessage):        
@@ -140,7 +137,7 @@ def handle_message(event):
     elif isinstance(event.message, ImageMessage):
         if Pic_Name:
             print('Pic_Name exist do GetPic()') #debug
-            Dist_Name, User_ID_Who_Upload_Pic = GetPic()
+            Dist_Name = GetPic()
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
