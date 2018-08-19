@@ -120,7 +120,8 @@ def handle_message(event):
         User_ID_Who_Set_Name = event.source.user_id
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
-        if event.message.text[0:1] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
+        # if event.message.text[0:1] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
+        if event.message.text[0:1] == "!1":
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
@@ -130,6 +131,10 @@ def handle_message(event):
         else:
             print('event.message.text:') #debug
             print(event.message.text)
+            print('User_ID_Who_Set_Name:') #debug
+            print(User_ID_Who_Set_Name) #debug
+            print('User_ID_Who_Upload_Pic:') #debug
+            print(User_ID_Who_Upload_Pic) #debug
     elif isinstance(event.message, ImageMessage):
         if Pic_Name:
             print('Pic_Name exist do GetPic()') #debug
