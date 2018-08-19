@@ -82,12 +82,12 @@ def handle_message(event):
             print('have not Git Pic yet! return False!')
             return False
         try:
-            print('UploadToImgur Pic_Name: ' + Pic_Name)
+            print('UploadToImgur Pic_Name: ' + pic_name)
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
             config = {
                 'album': imgur_album_id,
-                'name': Pic_Name,
-                'title': Pic_Name,
+                'name': pic_name,
+                'title': pic_name,
                 'description': 'test description'
             }
             path = os.path.join('static', 'tmp', dist_name)
@@ -117,16 +117,15 @@ def handle_message(event):
 # #################################################
     if isinstance(event.message, TextMessage):
         User_ID_Who_Set_Name = event.source.user_id
-        print('User_ID_Who_Set_Name:') #debug
+        print('120 User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
         if event.message.text[0:2] == "!1" and event.message.text[2:] is not '':
-            global Pic_Name
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             Pic_Name = event.message.text[2:]
-            print('Pic_Name: '+Pic_Name)
+            print('128 Pic_Name: '+Pic_Name)
             line_bot_api.reply_message(
                 event.reply_token, [
                     TextSendMessage(text='圖片名字已設定完成: ' + Pic_Name)
@@ -137,18 +136,18 @@ def handle_message(event):
                     TextSendMessage(text='請輸入"驚嘆號" + "一" + "圖片名稱" 來設定圖片名稱，範例: !1我是檔名')
                 ])
     elif isinstance(event.message, ImageMessage):
-        print('Pic_Name: ')
+        print('139 Pic_Name: ')
         print(Pic_Name)
         if Pic_Name is not '':
             print('Pic_Name exist do GetPic()') #debug
             Dist_Name = GetPic() if GetPic() else None
-            print('User_ID_Who_Set_Name:') #debug
+            print('144 User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             UploadToImgur(Dist_Name, Pic_Name)
         else:
-            print('Pic_Name NOT exist do nothing') #debug
+            print('150 Pic_Name NOT exist do nothing') #debug
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
