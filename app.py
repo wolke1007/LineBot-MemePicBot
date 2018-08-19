@@ -123,8 +123,8 @@ def handle_message(event):
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
-            Pic_Name = event.message.text[2:]
             global Pic_Name
+            Pic_Name = event.message.text[2:]
             print('128 Pic_Name: '+Pic_Name)
             line_bot_api.reply_message(
                 event.reply_token, [
