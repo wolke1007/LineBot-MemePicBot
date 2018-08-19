@@ -59,6 +59,8 @@ def handle_message(event):
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
         User_ID_Who_Upload_Pic = event.source.user_id
+        print('GetPic User_ID_Who_Upload_Pic:')
+        print(event.source.user_id)
         with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
             for chunk in message_content.iter_content():
                 tf.write(chunk)
@@ -147,6 +149,7 @@ def handle_message(event):
             # Reset varible to default
             User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
             User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
+            Pic_Name = None
         else:
             print('Pic_Name NOT exist do nothing') #debug
             print('User_ID_Who_Set_Name:') #debug
