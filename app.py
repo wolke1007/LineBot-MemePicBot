@@ -30,7 +30,7 @@ line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
-def Upload_Pic():
+def GetPic():
     ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
     with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
@@ -45,39 +45,39 @@ def Upload_Pic():
     print("tempfile_path after rename:" + tempfile_path) #debug
     print("dist_path:" + dist_path) #debug
     print("dist_name:" + dist_name) #debug
+    return True
+
+def GetPicName():
+    Pic_Name = line_bot_api.get_message_content(event.message.id)
+    return Pic_Name
+
+def UploadToImgur(Pic_Name='Default_Pic_Name'):
     try:
-        AskForPicName()
-        client = ImgurClient(client_id, client_secret, access_token, refresh_token)
-        config = {
-            'album': imgur_album_id,
-            'name': 'Catastrophe!',
-            'title': 'Catastrophe!',
-            'description': 'Cute kitten being cute on '
-        }
-        path = os.path.join('static', 'tmp', dist_name)
-        print('path:'+path) #debug
-        client.upload_from_path(path, config=config, anon=False)
-        print(os.listdir(os.getcwd())) #debug
-        os.remove(path)  #debug
-        print(os.listdir(os.getcwd())) #debug
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='上傳成功'))
+    print('UploadToImgur Pic_Name: ' + Pic_Name) #debug
+    client = ImgurClient(client_id, client_secret, access_token, refresh_token)
+    config = {
+        'album': imgur_album_id,
+        'name': 'Catastrophe!',
+        'title': 'Catastrophe!',
+        'description': 'Cute kitten being cute on '
+    }
+    path = os.path.join('static', 'tmp', dist_name)
+    print('path:'+path) #debug
+    client.upload_from_path(path, config=config, anon=False)
+    print(os.listdir(os.getcwd())) #debug
+    os.remove(path)  #debug
+    print(os.listdir(os.getcwd())) #debug
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text='上傳成功'))
     except Exception as e:
         print(e)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='上傳失敗'))
-    return True
-
-def AskForPicName():
-    line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text='這張圖片你要叫什麼?')
-                ])
-    Pic_Name = line_bot_api.get_message_content(event.message.id)
-    return Pic_Name
-
+        
+    
+    
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -100,9 +100,16 @@ def handle_message(event):
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
         # Pic_Name = AskForPicName(event)
-
-        Upload_Pic()
-
+        GetPic()
+        line_bot_api.reply_message(
+            event.reply_token, [
+                TextSendMessage(text='這張圖片你要叫什麼?')
+            ])
+    elif isinstance(event.message, TextMessage):
+        if event.message.text == "上傳":
+            UploadToImgur(Pic_Name)
+        elif event.message.text == "test":
+            Pic_Name = GetPicName()
     # elif isinstance(event.message, VideoMessage):
         # ext = 'mp4'
     # elif isinstance(event.message, AudioMessage):
