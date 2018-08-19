@@ -70,8 +70,7 @@ def handle_message(event):
         Pic_Name = line_bot_api.get_message_content(event.message.id)
         return Pic_Name
 
-    def UploadToImgur():
-        Pic_Name = GetPicName()
+    def UploadToImgur(Pic_Name):
         try:
             print('UploadToImgur Pic_Name: ' + Pic_Name)
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
@@ -108,7 +107,8 @@ def handle_message(event):
             ])
     elif isinstance(event.message, TextMessage):
         if event.message.text == "test":
-            UploadToImgur()
+            Pic_Name = line_bot_api.get_message_content(event.message.id)
+            UploadToImgur(Pic_Name)
     # elif isinstance(event.message, VideoMessage):
         # ext = 'mp4'
     # elif isinstance(event.message, AudioMessage):
