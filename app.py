@@ -46,6 +46,7 @@ def Upload_Pic(Pic_Name):
     print("dist_path:" + dist_path) #debug
     print("dist_name:" + dist_name) #debug
     try:
+        AskForPicName()
         client = ImgurClient(client_id, client_secret, access_token, refresh_token)
         config = {
             'album': imgur_album_id,
@@ -69,13 +70,13 @@ def Upload_Pic(Pic_Name):
             TextSendMessage(text='上傳失敗'))
     return True
 
-# def AskForPicName():
-    # line_bot_api.reply_message(
-                # event.reply_token, [
-                    # TextSendMessage(text='這張圖片你要叫什麼?')
-                # ])
-    # Pic_Name = line_bot_api.get_message_content(event.message.id)
-    # return Pic_Name
+def AskForPicName():
+    line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text='這張圖片你要叫什麼?')
+                ])
+    Pic_Name = line_bot_api.get_message_content(event.message.id)
+    return Pic_Name
 
 @app.route("/callback", methods=['POST'])
 def callback():
