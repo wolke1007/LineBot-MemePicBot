@@ -25,7 +25,6 @@ from config import client_id, client_secret, album_id, access_token, refresh_tok
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
 Pic_Name = 'Pic_Name'
-print('init Pic_Name'+Pic_Name) #debug
 User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
 User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
 imgur_album_id = 'UxgXZbe'
@@ -141,25 +140,25 @@ def handle_message(event):
     elif isinstance(event.message, ImageMessage):
         print('139 Pic_Name: ') #debug
         print(Pic_Name) #debug
-        # if Pic_Name is not 'Pic_Name' and Pic_Name is not '':
-            # print('Pic_Name exist do GetPic()') #debug
-            # Dist_Name = GetPic() if GetPic() else None
-            # print('144 User_ID_Who_Set_Name:') #debug
-            # print(User_ID_Who_Set_Name) #debug
-            # print('User_ID_Who_Upload_Pic:') #debug
-            # print(User_ID_Who_Upload_Pic) #debug
-            # UploadToImgur(Dist_Name, Pic_Name)
-        # else:
-            # print('150 Pic_Name NOT exist do nothing') #debug
-            # print('User_ID_Who_Set_Name:') #debug
-            # print(User_ID_Who_Set_Name) #debug
-            # print('User_ID_Who_Upload_Pic:') #debug
-            # print(User_ID_Who_Upload_Pic) #debug
-            # line_bot_api.reply_message(
-                # event.reply_token, [
-                    # TextSendMessage(text='沒有先設定名字，這張圖片將不被儲存')
-                # ]) #考慮之後取消，否則一般的上傳圖片也會回，會很吵
-            # return 0
+        if Pic_Name is not 'Pic_Name' and Pic_Name is not '':
+            print('Pic_Name exist do GetPic()') #debug
+            Dist_Name = GetPic() if GetPic() else None
+            print('144 User_ID_Who_Set_Name:') #debug
+            print(User_ID_Who_Set_Name) #debug
+            print('User_ID_Who_Upload_Pic:') #debug
+            print(User_ID_Who_Upload_Pic) #debug
+            UploadToImgur(Dist_Name, Pic_Name)
+        else:
+            print('150 Pic_Name NOT exist do nothing') #debug
+            print('User_ID_Who_Set_Name:') #debug
+            print(User_ID_Who_Set_Name) #debug
+            print('User_ID_Who_Upload_Pic:') #debug
+            print(User_ID_Who_Upload_Pic) #debug
+            line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text='沒有先設定名字，這張圖片將不被儲存')
+                ]) #考慮之後取消，否則一般的上傳圖片也會回，會很吵
+            return 0
             
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
