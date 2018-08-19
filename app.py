@@ -88,10 +88,11 @@ def handle_message(event):
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
             print(dir(event.source)) #debug
             print('event.source.group_id: ')  #debug
-            print(event.source.group_id) #debug
-            print(type(event.source.group_id)) #debug
+            Group_ID = event.source.group_id
+            print(Group_ID) #debug
+            print(type(Group_ID)) #debug
             line_bot_api.push_message(
-                event.source.group_id,
+                Group_ID,
                 event.reply_token,
                 TextSendMessage(text='上傳成功'))
             # line_bot_api.reply_message(
