@@ -67,7 +67,7 @@ def handle_message(event):
         return dist_name
 
     def GetPicName():
-        Pic_Name = line_bot_api.get_message_content(event.message.text)
+        Pic_Name = event.message.text
         return Pic_Name
 
     def UploadToImgur(dist_name):
@@ -101,11 +101,40 @@ def handle_message(event):
         print('debug msg') #debug
         # Pic_Name = AskForPicName(event)
         dist_name = GetPic()
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text='這張圖片你要叫什麼?')
-            ])
-        UploadToImgur(dist_name)
+        # line_bot_api.reply_message(
+            # event.reply_token, [
+                # TextSendMessage(text='這張圖片你要叫什麼?')
+            # ])
+        try:
+            # print('UploadToImgur Pic_Name: ' + Pic_Name)
+            client = ImgurClient(client_id, client_secret, access_token, refresh_token)
+            config = {
+                'album': imgur_album_id,
+                'name': 'Catastrophe!',
+                'title': 'Catastrophe!',
+                'description': 'Cute kitten being cute on '
+            }
+            path = os.path.join('static', 'tmp', dist_name)
+            print('path:'+path) #debug
+            client.upload_from_path(path, config=config, anon=False)
+            print(os.listdir(os.getcwd())) #debug
+            os.remove(path)  #debug
+            print(os.listdir(os.getcwd())) #debug
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='上傳成功'))
+        except Exception as e:
+            print(e)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='上傳失敗'))
+            
+            
+            
+            
+            
+            
+        # UploadToImgur(dist_name)
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
             # message_content = line_bot_api.get_message_content(event.message.id)
