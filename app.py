@@ -92,7 +92,7 @@ def handle_message(event):
             print(Group_ID) #debug
             print(type(Group_ID)) #debug
             line_bot_api.push_message(
-                Group_ID,
+                event.source,
                 event.reply_token,
                 TextSendMessage(text='上傳成功'))
             # line_bot_api.reply_message(
