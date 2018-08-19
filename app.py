@@ -54,6 +54,7 @@ def callback():
 def handle_message(event):
     global User_ID_Who_Upload_Pic
     global User_ID_Who_Set_Name
+    global Pic_Name
     def GetPic():
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
@@ -120,12 +121,11 @@ def handle_message(event):
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
         # if event.message.text[0:1] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
-        if event.message.text[0:1] == "!1":
+        if event.message.text[0:2] == "!1":
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
-            global Pic_Name
             Pic_Name = event.message.text[2:]
             print('Pic_Name: '+Pic_Name)
         else:
