@@ -52,6 +52,8 @@ def handle_message(event):
     def GetPic():
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
+        global User_ID_Who_Upload_Pic
+        User_ID_Who_Upload_Pic = event.source.user_id
         with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
             for chunk in message_content.iter_content():
                 tf.write(chunk)
@@ -59,19 +61,20 @@ def handle_message(event):
         print("tempfile_path before rename:" + tempfile_path) #debug
         dist_path = tempfile_path + '.' + ext
         # dist_path = Pic_Name + '.' + ext
-        dist_name = os.path.basename(dist_path)
+        Dist_Name = os.path.basename(dist_path)
         os.rename(tempfile_path, dist_path)
         print("tempfile_path after rename:" + tempfile_path) #debug
         print("dist_path:" + dist_path) #debug
-        print("dist_name:" + dist_name) #debug
+        print("Dist_Name:" + Dist_Name) #debug
         line_bot_api.push_message(
                 event.source.group_id,
                 TextSendMessage(text='圖片你想叫什麼名字?'))
-        return dist_name
+        return Dist_Name, User_ID_Who_Upload_Pic
 
     def GetPicName():
         if isinstance(event.message, TextMessage):        
             message_content = line_bot_api.get_message_content(event.message.id)
+            global Pic_Name
             Pic_Name = event.message.text
         print('Pic_Name: ')
         print(Pic_Name)
@@ -110,11 +113,14 @@ def handle_message(event):
 # #################################################
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
-        Dist_Name = GetPic()
-        Pic_Name = GetPicName()
-        UploadToImgur(Dist_Name, Pic_Name)
-            
-    
+        Dist_Name, User_ID_Who_Upload_Pic = GetPic()
+        print('User_ID_Who_Upload_Pic:') #debug
+        print(User_ID_Who_Upload_Pic) #debug
+    if isinstance(event.message, TextMessage):
+        User_ID_Who_Set_Name = event.source.user_id
+        if event.message.text[0:2] == "!1 " and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
+            Pic_Name = GetPicName()
+            UploadToImgur(Dist_Name, Pic_Name)
         
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
