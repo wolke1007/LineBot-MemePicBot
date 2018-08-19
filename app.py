@@ -37,10 +37,14 @@ def Upload_Pic(Pic_Name):
         for chunk in message_content.iter_content():
             tf.write(chunk)
         tempfile_path = tf.name
-    # dist_path = tempfile_path + '.' + ext
-    dist_path = Pic_Name + '.' + ext
+    print("tempfile_path before rename:" + tempfile_path) #debug
+    dist_path = tempfile_path + '.' + ext
+    # dist_path = Pic_Name + '.' + ext
     dist_name = os.path.basename(dist_path)
     os.rename(tempfile_path, dist_path)
+    print("tempfile_path after rename:" + tempfile_path) #debug
+    print("dist_path:" + dist_path) #debug
+    print("dist_name:" + dist_name) #debug
     try:
         client = ImgurClient(client_id, client_secret, access_token, refresh_token)
         config = {
@@ -65,13 +69,13 @@ def Upload_Pic(Pic_Name):
             TextSendMessage(text='上傳失敗'))
     return True
 
-def AskForPicName(event):
-    line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text='這張圖片你要叫什麼?')
-                ])
-    Pic_Name = line_bot_api.get_message_content(event.message.id)
-    return Pic_Name
+# def AskForPicName():
+    # line_bot_api.reply_message(
+                # event.reply_token, [
+                    # TextSendMessage(text='這張圖片你要叫什麼?')
+                # ])
+    # Pic_Name = line_bot_api.get_message_content(event.message.id)
+    # return Pic_Name
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -94,8 +98,9 @@ def callback():
 def handle_message(event):
     if isinstance(event.message, ImageMessage):
         print('debug msg') #debug
-        Pic_Name = AskForPicName(event)
-        Upload_Pic(Pic_Name)
+        # Pic_Name = AskForPicName(event)
+
+        Upload_Pic()
 
     # elif isinstance(event.message, VideoMessage):
         # ext = 'mp4'
