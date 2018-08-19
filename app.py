@@ -87,18 +87,19 @@ def handle_message(event):
             os.remove(path)  
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
             print(dir(event.source)) #debug
-            # line_bot_api.push_message(
-                # event.roomid,
-                # event.reply_token,
-                # TextSendMessage(text='上傳成功'))
+            line_bot_api.push_message(
+                event.source.group_id,
+                event.reply_token,
+                TextSendMessage(text='上傳成功'))
             # line_bot_api.reply_message(
                 # event.reply_token,
                 # TextSendMessage(text='上傳成功'))
         except Exception as e:
             print(e)
-            # line_bot_api.push_message(
-                # event.reply_token,
-                # TextSendMessage(text='上傳失敗'))
+            line_bot_api.push_message(
+                event.source.group_id,
+                event.reply_token,
+                TextSendMessage(text='上傳失敗'))
             # line_bot_api.reply_message(
                 # event.reply_token,
                 # TextSendMessage(text='上傳失敗'))
