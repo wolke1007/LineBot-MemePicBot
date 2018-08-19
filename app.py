@@ -25,6 +25,8 @@ from config import client_id, client_secret, album_id, access_token, refresh_tok
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
 Pic_Name = None
+User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
+User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
 imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -51,10 +53,11 @@ def callback():
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
     global Pic_Name
+    global User_ID_Who_Upload_Pic
+    global User_ID_Who_Set_Name
     def GetPic():
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
-        global User_ID_Who_Upload_Pic
         User_ID_Who_Upload_Pic = event.source.user_id
         with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
             for chunk in message_content.iter_content():
@@ -117,9 +120,11 @@ def handle_message(event):
         User_ID_Who_Set_Name = event.source.user_id
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
-        print('User_ID_Who_Upload_Pic:') #debug
-        print(User_ID_Who_Upload_Pic) #debug
         if event.message.text[0:1] == "!1" and User_ID_Who_Upload_Pic == User_ID_Who_Set_Name:
+            print('User_ID_Who_Set_Name:') #debug
+            print(User_ID_Who_Set_Name) #debug
+            print('User_ID_Who_Upload_Pic:') #debug
+            print(User_ID_Who_Upload_Pic) #debug
             Pic_Name = event.message.text[2:]
             print('Pic_Name: '+Pic_Name)
     elif isinstance(event.message, ImageMessage):
@@ -131,11 +136,13 @@ def handle_message(event):
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             UploadToImgur(Dist_Name, Pic_Name)
-            # Reset varible to None
-            User_ID_Who_Set_Name = None
-            User_ID_Who_Upload_Pic = None
+            # Reset varible to default
+            User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
+            User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
         else:
             print('Pic_Name NOT exist do nothing') #debug
+            print('User_ID_Who_Set_Name:') #debug
+            print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
             print(User_ID_Who_Upload_Pic) #debug
             line_bot_api.reply_message(
