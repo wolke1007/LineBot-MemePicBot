@@ -127,6 +127,9 @@ def handle_message(event):
             print(User_ID_Who_Upload_Pic) #debug
             Pic_Name = event.message.text[2:]
             print('Pic_Name: '+Pic_Name)
+        else:
+            print('event.message.text:') #debug
+            print(event.message.text)
     elif isinstance(event.message, ImageMessage):
         if Pic_Name:
             print('Pic_Name exist do GetPic()') #debug
