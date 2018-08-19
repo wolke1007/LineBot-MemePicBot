@@ -25,6 +25,7 @@ from config import client_id, client_secret, album_id, access_token, refresh_tok
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
 global Pic_Name
+Pic_Name = None
 imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
