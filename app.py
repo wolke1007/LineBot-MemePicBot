@@ -24,7 +24,7 @@ from config import client_id, client_secret, album_id, access_token, refresh_tok
 # handler = WebhookHandler('')
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
-Pic_Name = None
+Pic_Name = ''
 User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
 User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
 imgur_album_id = 'UxgXZbe'
@@ -54,7 +54,7 @@ def callback():
 def handle_message(event):
     global User_ID_Who_Set_Name
     global User_ID_Who_Upload_Pic
-    
+    global Pic_Name
     def GetPic():
         ext = 'jpg'
         message_content = line_bot_api.get_message_content(event.message.id)
@@ -78,7 +78,6 @@ def handle_message(event):
         return Dist_Name
 
     def UploadToImgur(dist_name, pic_name):
-        global Pic_Name
         if Dist_Name is None:
             print('have not Git Pic yet! return False!')
             return False
@@ -107,7 +106,7 @@ def handle_message(event):
             # Reset varible to default
             User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
             User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
-            Pic_Name = None
+            Pic_Name = ''
         except Exception as e:
             print(e)
             line_bot_api.push_message(
@@ -120,7 +119,7 @@ def handle_message(event):
         User_ID_Who_Set_Name = event.source.user_id
         print('User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
-        if event.message.text[0:2] == "!1":
+        if event.message.text[0:2] == "!1" and event.message.text[2:] is not '':
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
@@ -139,7 +138,7 @@ def handle_message(event):
     elif isinstance(event.message, ImageMessage):
         print('Pic_Name: ')
         print(Pic_Name)
-        if Pic_Name:
+        if Pic_Name is not '':
             print('Pic_Name exist do GetPic()') #debug
             Dist_Name = GetPic() if GetPic() else None
             print('User_ID_Who_Set_Name:') #debug
