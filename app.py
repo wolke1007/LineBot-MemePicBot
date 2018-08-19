@@ -24,7 +24,7 @@ from config import client_id, client_secret, album_id, access_token, refresh_tok
 # handler = WebhookHandler('')
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
-Pic_Name = ''
+Pic_Name = 'Pic_Name'
 User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
 User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
 imgur_album_id = 'UxgXZbe'
@@ -52,6 +52,8 @@ def callback():
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
+    print('55 Pic_Name')
+    print(Pic_Name)
     global User_ID_Who_Set_Name
     global User_ID_Who_Upload_Pic
     def GetPic():
@@ -105,7 +107,7 @@ def handle_message(event):
             # Reset varible to default
             User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
             User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
-            Pic_Name = ''
+            Pic_Name = 'Pic_Name'
         except Exception as e:
             print(e)
             line_bot_api.push_message(
@@ -118,7 +120,7 @@ def handle_message(event):
         User_ID_Who_Set_Name = event.source.user_id
         print('120 User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
-        if event.message.text[0:2] == "!1" and event.message.text[2:] is not '':
+        if event.message.text[0:2] == "!1" and event.message.text[2:] is not 'Pic_Name':
             print('User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             print('User_ID_Who_Upload_Pic:') #debug
@@ -133,12 +135,12 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(
                 event.reply_token, [
-                    TextSendMessage(text='請輸入"驚嘆號" + "一" + "圖片名稱" 來設定圖片名稱，範例: !1我是檔名')
+                    TextSendMessage(text='請輸入 "!1"+"圖片名稱" 來設定圖片名稱，範例: !1我是檔名')
                 ])
     elif isinstance(event.message, ImageMessage):
         print('139 Pic_Name: ')
         print(Pic_Name)
-        if Pic_Name is not '':
+        if Pic_Name is not 'Pic_Name' and Pic_Name is not '':
             print('Pic_Name exist do GetPic()') #debug
             Dist_Name = GetPic() if GetPic() else None
             print('144 User_ID_Who_Set_Name:') #debug
