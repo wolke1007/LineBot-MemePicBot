@@ -86,7 +86,7 @@ def handle_message(event):
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
             os.remove(path)  
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
-            print(dir(event)) #debug
+            print(dir(event.source)) #debug
             # line_bot_api.push_message(
                 # event.roomid,
                 # event.reply_token,
