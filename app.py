@@ -77,7 +77,7 @@ def handle_message(event):
         print(Pic_Name)
         return Pic_Name
 
-    def UploadToImgur(dist_name, Pic_Name):
+    def UploadToImgur(dist_name, pic_name):
         try:
             print('UploadToImgur Pic_Name: ' + Pic_Name)
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
