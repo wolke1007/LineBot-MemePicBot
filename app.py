@@ -57,7 +57,7 @@ def handle_message(event):
         '''
         以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
         '''
-        locals()['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
+        globals()['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
         line_bot_api.reply_message(
             event.reply_token, [
             TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
@@ -73,7 +73,7 @@ def handle_message(event):
         return False
     
     def FileNameExist():
-        for file in list(locals()):
+        for file in list(globals()):
             File_Name_Exist = re.match(str(event.source.user_id), file)
             if File_Name_Exist:
                 return True
@@ -97,9 +97,9 @@ def handle_message(event):
             # return False
         print('98 GetPic User_ID_Who_Upload_Pic:')
         print(event.source.user_id)
-        print('100 locals()')
-        print(locals())
-        File_Name_Ext = locals()['WHOS_PICNAME_' + str(event.source.user_id)] + '.' + ext
+        print('100 globals()')
+        print(globals())
+        File_Name_Ext = globals()['WHOS_PICNAME_' + str(event.source.user_id)] + '.' + ext
         File_Exist = FileExists()
         if File_Exist:
             file = os.path.join('static', 'tmp', File_Name_Ext)
@@ -119,7 +119,7 @@ def handle_message(event):
         return True
 
     def UploadToImgur():
-        Pic_Name = locals()['WHOS_PICNAME_' + str(event.source.user_id)]
+        Pic_Name = globals()['WHOS_PICNAME_' + str(event.source.user_id)]
         try:
             print('UploadToImgur Pic_Name: ' + Pic_Name)
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
@@ -144,7 +144,7 @@ def handle_message(event):
                 event.source.group_id,
                 TextSendMessage(text='上傳成功'))
             # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
-            locals().pop('WHOS_PICNAME_' + str(event.source.user_id))
+            globals().pop('WHOS_PICNAME_' + str(event.source.user_id))
         except Exception as e:
             print(e)
             line_bot_api.push_message(
@@ -161,7 +161,7 @@ def handle_message(event):
             SavePicNameIntoLocals(event.message.text)
             if FileExists():
                 UploadToImgur() 
-            print('169'+str(locals())) # debug
+            print('169'+str(globals())) # debug
         elif event.message.text == "--help":
             line_bot_api.reply_message(
                 event.reply_token, [
@@ -174,7 +174,7 @@ def handle_message(event):
         GetPic()
         if FileNameExist():
             UploadToImgur() 
-        print('176'+str(locals())) # debug
+        print('176'+str(globals())) # debug
             
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
