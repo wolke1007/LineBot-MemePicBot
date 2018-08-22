@@ -155,7 +155,7 @@ def handle_message(event):
         User_ID_Who_Set_Name = event.source.user_id #debug
         print('163 User_ID_Who_Set_Name:') #debug
         print(User_ID_Who_Set_Name) #debug
-        if event.message.text[0] == "#" and event.message.text[:-1] == "#":
+        if event.message.text[0] == "#" and event.message.text[-1] == "#":
             SavePicNameIntoLocals(event.message.text)
             if FileExists():
                 UploadToImgur() 
@@ -168,7 +168,7 @@ def handle_message(event):
     elif isinstance(event.message, ImageMessage):
         User_ID_Who_Upload_Pic = event.source.user_id #debug
         print('170 User_ID_Who_Upload_Pic:') #debug
-        print(User_ID_Who_Set_Name) #debug
+        print(User_ID_Who_Upload_Pic) #debug
         GetPic()
         if FileNameExist():
             UploadToImgur() 
