@@ -60,7 +60,7 @@ def handle_message(event):
         locals()['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
         line_bot_api.reply_message(
             event.reply_token, [
-            TextSendMessage(text='圖片名字已設定完成: ' + Pic_Name)
+            TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
             ])
         return True
     
@@ -97,6 +97,8 @@ def handle_message(event):
             # return False
         print('98 GetPic User_ID_Who_Upload_Pic:')
         print(event.source.user_id)
+        print('100 locals()')
+        print(locals())
         File_Name_Ext = locals()['WHOS_PICNAME_' + str(event.source.user_id)] + '.' + ext
         File_Exist = FileExists()
         if File_Exist:
