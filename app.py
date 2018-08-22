@@ -80,6 +80,7 @@ def handle_message(event):
         return False
     
     def CreateFile():
+        message_content = line_bot_api.get_message_content(event.message.id)
         with tempfile.NamedTemporaryFile(dir=static_tmp_path, 
                                       prefix=str(event.source.user_id) + '-',
                                       delete=False) as tf:
