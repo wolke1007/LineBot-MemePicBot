@@ -53,6 +53,7 @@ def handle_message(event):
         '''
         以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
         '''
+        global PicNameDict
         PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
         print('Name Set:' + str(PicNameDict))
         line_bot_api.reply_message(
@@ -135,6 +136,7 @@ def handle_message(event):
                 event.source.group_id,
                 TextSendMessage(text='上傳成功'))
             # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
+            global PicNameDict
             PicNameDict.pop('WHOS_PICNAME_' + str(event.source.user_id))
         except Exception as e:
             print(e)
@@ -149,7 +151,6 @@ def handle_message(event):
             User_ID_Who_Set_Name = event.source.user_id #debug
             print('163 User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
-            global PicNameDict
             SavePicNameIntoDict(event.message.text)
             if FileExists():
                 UploadToImgur() 
