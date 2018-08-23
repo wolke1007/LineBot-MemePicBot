@@ -158,7 +158,6 @@ def handle_message(event):
     
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
-            global PicNameDict
             User_ID_Who_Set_Name = event.source.user_id #debug
             print('163 User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
