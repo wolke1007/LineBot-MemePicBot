@@ -57,6 +57,7 @@ def handle_message(event):
         以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
         '''
         PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
+        print('Name Set:' + str(PicNameDict))
         line_bot_api.reply_message(
             event.reply_token, [
             TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
