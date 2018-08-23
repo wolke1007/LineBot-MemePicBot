@@ -30,18 +30,18 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 
-
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
-
+    
+    PicNameDict = {}
+    global PicNameDict
+    print('default PicNameDict id: ', id(PicNameDict))
     # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
     
-    PicNameDict = {}
-    print('default PicNameDict id: ', id(PicNameDict))
     # handle webhook body
     try:
         handler.handle(body, signature)
