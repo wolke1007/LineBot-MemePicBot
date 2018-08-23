@@ -76,7 +76,7 @@ def handle_message(event):
         print('74 PicNameDict')
         print(PicNameDict)
         for file in list(PicNameDict):
-            File_Name_Exist = re.search(str(event.source.user_id), file)
+            File_Name_Exist = True if re.search(str(event.source.user_id), file) else False
             if File_Name_Exist:
                 print('File_Name_Exist:', File_Name_Exist) #debug
                 return True
