@@ -39,7 +39,9 @@ def callback():
     # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
-
+    
+    PicNameDict = {}
+    print('default PicNameDict id: ', id(PicNameDict))
     # handle webhook body
     try:
         handler.handle(body, signature)
@@ -215,6 +217,4 @@ def handle_message(event):
 
             
 if __name__ == "__main__":
-    PicNameDict = {}
-    print('default PicNameDict id: ', id(PicNameDict))
     app.run()
