@@ -53,7 +53,6 @@ def handle_message(event):
         '''
         以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
         '''
-        global PicNameDict
         PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
         print('Name Set:' + str(PicNameDict))
         line_bot_api.reply_message(
@@ -71,6 +70,8 @@ def handle_message(event):
         return False
     
     def FileNameExist():
+        print('74 PicNameDict')
+        print(PicNameDict)
         for file in list(PicNameDict):
             File_Name_Exist = re.match(str(event.source.user_id), file)
             if File_Name_Exist:
@@ -79,6 +80,8 @@ def handle_message(event):
     
     def CreateFile():
         message_content = line_bot_api.get_message_content(event.message.id)
+        print('82 PicNameDict')
+        print(PicNameDict)
         File_Name_Ext = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] + '.jpg'
         File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
         with open(File_Path, 'wb+') as tf:
@@ -146,6 +149,7 @@ def handle_message(event):
             User_ID_Who_Set_Name = event.source.user_id #debug
             print('163 User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
+            global PicNameDict
             SavePicNameIntoDict(event.message.text)
             if FileExists():
                 UploadToImgur() 
