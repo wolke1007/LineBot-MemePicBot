@@ -30,7 +30,7 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
-
+PicNameDict = P{}
     
 @app.route("/callback", methods=['POST'])
 def callback():
