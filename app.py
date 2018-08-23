@@ -47,11 +47,10 @@ def callback():
         abort(400)
     return 'OK'
 
-@handler.add(MessageEvent, message=(ImageMessage, TextMessage))
-PicNameDict = {}
-print('default PicNameDict id: ', id(PicNameDict))
+@handler.add(MessageEvent, message=(ImageMessage, TextMessage), PicNameDict = {})
 def handle_message(event):
     print('enter handle_message')
+    print('default PicNameDict id: ', id(PicNameDict))
     def SavePicNameIntoDict(Line_Msg_Text):
         print('enter SavePicNameIntoDict')
         '''
