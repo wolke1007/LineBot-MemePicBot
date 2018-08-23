@@ -131,7 +131,7 @@ def handle_message(event):
                 'title': Pic_Name,
                 'description': ' '
             }
-            path = os.path.join('static', 'tmp', str(Pic_Name)+'.jpg')
+            path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(event.source.user_id) + '.jpg')
             print('path:'+path) #debug
             client.upload_from_path(path, config=config, anon=False)
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
