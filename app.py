@@ -62,7 +62,7 @@ def handle_message(event):
             ])
         return True
     
-    def FileExists():
+    def FileExist():
         Files_In_tmp = os.listdir(os.getcwd()+'/static/tmp')
         for file_name in Files_In_tmp:
             File_Exist = True if re.match(str(event.source.user_id), file_name) else False
@@ -111,7 +111,7 @@ def handle_message(event):
         print(os.listdir(os.getcwd()+'/static/tmp'))
         line_bot_api.reply_message(
             event.reply_token, [
-                TextSendMessage(text='已儲存圖片暫存檔，將在輸入檔名後上傳，名字格式： #圖片名字#')
+                TextSendMessage(text='已儲存圖片暫存檔')
             ])
         return True
 
@@ -155,14 +155,15 @@ def handle_message(event):
 # #################################################
 #                收到訊息後的判斷
 # #################################################
-    global PicNameDict
+    
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
+            global PicNameDict
             User_ID_Who_Set_Name = event.source.user_id #debug
             print('163 User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
             SavePicNameIntoDict(event.message.text)
-            if FileExists():
+            if FileExist():
                 UploadToImgur() 
             print('165'+str(PicNameDict)) # debug
         elif event.message.text == "--help":
