@@ -89,7 +89,8 @@ def handle_message(event):
         message_content = line_bot_api.get_message_content(event.message.id)
         print('82 PicNameDict')
         print(PicNameDict)
-        File_Name_Ext = "{0}{1}".format(PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)], '.jpg')
+        strPicNameDict = str(PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)])
+        File_Name_Ext = "{0}{1}".format(strPicNameDict, '.jpg')
         File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
         with open(File_Path, 'wb+') as tf:
             for chunk in message_content.iter_content():
