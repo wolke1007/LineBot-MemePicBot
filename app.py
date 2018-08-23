@@ -71,6 +71,7 @@ def handle_message(event):
         return False
     
     def FileNameExist():
+        global PicNameDict
         print('74 PicNameDict')
         print(PicNameDict)
         for file in list(PicNameDict):
@@ -80,6 +81,7 @@ def handle_message(event):
         return False
     
     def CreateFile():
+        global PicNameDict
         message_content = line_bot_api.get_message_content(event.message.id)
         print('82 PicNameDict')
         print(PicNameDict)
@@ -92,6 +94,7 @@ def handle_message(event):
             return True
             
     def GetPic():
+        global PicNameDict
         message_content = line_bot_api.get_message_content(event.message.id)
         # 確認是否為設定名字的人上傳的圖片
         # if User_ID_Who_Upload_Pic != User_ID_Who_Set_Name:
@@ -138,6 +141,7 @@ def handle_message(event):
                 TextSendMessage(text='上傳成功'))
             # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
             PicNameDict.pop('WHOS_PICNAME_' + str(event.source.user_id))
+            print('144 make sure pop'+str(PicNameDict)) # debug
         except Exception as e:
             print(e)
             line_bot_api.push_message(
@@ -147,6 +151,7 @@ def handle_message(event):
 #                收到訊息後的判斷
 # #################################################
     if isinstance(event.message, TextMessage):
+        global PicNameDict
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             User_ID_Who_Set_Name = event.source.user_id #debug
             print('163 User_ID_Who_Set_Name:') #debug
@@ -161,6 +166,7 @@ def handle_message(event):
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #我是檔名#')
                 ])
     elif isinstance(event.message, ImageMessage):
+        global PicNameDict
         User_ID_Who_Upload_Pic = event.source.user_id #debug
         print('170 User_ID_Who_Upload_Pic:') #debug
         print(User_ID_Who_Upload_Pic) #debug
