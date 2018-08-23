@@ -25,7 +25,6 @@ import re
 # handler = WebhookHandler('')
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
-PicNameDict = {}
 imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -51,11 +50,11 @@ def callback():
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
-    global PicNameDict
-    def SavePicNameIntoLocals(Line_Msg_Text):
+    def SavePicNameIntoDict(Line_Msg_Text):
         '''
         以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
         '''
+        global PicNameDict
         PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
         print('Name Set:' + str(PicNameDict))
         line_bot_api.reply_message(
@@ -159,7 +158,7 @@ def handle_message(event):
             User_ID_Who_Set_Name = event.source.user_id #debug
             print('163 User_ID_Who_Set_Name:') #debug
             print(User_ID_Who_Set_Name) #debug
-            SavePicNameIntoLocals(event.message.text)
+            SavePicNameIntoDict(event.message.text)
             if FileExists():
                 UploadToImgur() 
             print('165'+str(PicNameDict)) # debug
@@ -175,7 +174,7 @@ def handle_message(event):
         GetPic()
         if FileNameExist():
             UploadToImgur() 
-        print('178'+str(PicNameDict)) # debug
+        print('177 make sure pop'+str(PicNameDict)) # debug
             
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
