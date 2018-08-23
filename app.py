@@ -69,7 +69,6 @@ def handle_message(event):
             if File_Exist:
                 print('File_Exist:', File_Exist) #debug
                 return True
-        print('File_Exist:', File_Exist) #debug
         return False
     
     def FileNameExist():
