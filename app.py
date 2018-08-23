@@ -67,7 +67,9 @@ def handle_message(event):
         for file_name in Files_In_tmp:
             File_Exist = True if re.match(str(event.source.user_id), file_name) else False
             if File_Exist:
+                print('File_Exist:', File_Exist) #debug
                 return True
+        print('File_Exist:', File_Exist) #debug
         return False
     
     def FileNameExist():
@@ -77,7 +79,9 @@ def handle_message(event):
         for file in list(PicNameDict):
             File_Name_Exist = re.match(str(event.source.user_id), file)
             if File_Name_Exist:
+                print('File_Name_Exist:', File_Name_Exist) #debug
                 return True
+        print('File_Name_Exist:', File_Name_Exist) #debug
         return False
     
     def CreateFile():
@@ -129,6 +133,7 @@ def handle_message(event):
             print('path:'+path) #debug
             client.upload_from_path(path, config=config, anon=False)
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
+            print('132 remove path'+path)
             # 刪除圖片檔
             os.remove(path)
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
@@ -172,7 +177,7 @@ def handle_message(event):
         GetPic()
         if FileNameExist():
             UploadToImgur() 
-        print('177 make sure pop'+str(PicNameDict)) # debug
+            print('177 make sure pop'+str(PicNameDict)) # debug
             
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
