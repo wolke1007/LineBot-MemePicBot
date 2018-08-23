@@ -35,8 +35,8 @@ def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
     
-    PicNameDict = {}
     global PicNameDict
+    PicNameDict = {}
     print('default PicNameDict id: ', id(PicNameDict))
     # get request body as text
     body = request.get_data(as_text=True)
