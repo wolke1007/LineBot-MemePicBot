@@ -23,13 +23,12 @@ import re
 
 # line_bot_api = LineBotApi()
 # handler = WebhookHandler('')
-# imgur_client_id = ef420e58e8af248
+# imgur_client_id = ef420e58e8af248 
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
 imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
-static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 PicNameDict = {}
     
 @app.route("/callback", methods=['POST'])
@@ -80,17 +79,16 @@ def handle_message(event):
     
     def CreateFile():
         message_content = line_bot_api.get_message_content(event.message.id)
-        with tempfile.NamedTemporaryFile(dir=static_tmp_path, 
-                                      prefix=str(event.source.user_id) + '-',
-                                      delete=False) as tf:
+        File_Name_Ext = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] + '.jpg'
+        File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
+        with open(File_Path, w+) as tf:
             for chunk in message_content.iter_content():
                 tf.write(chunk)
             Tempfile_Path = tf.name
-            return Tempfile_Path
+            return True
             
     def GetPic():
         message_content = line_bot_api.get_message_content(event.message.id)
-        ext = 'jpg'
         # 確認是否為設定名字的人上傳的圖片
         # if User_ID_Who_Upload_Pic != User_ID_Who_Set_Name:
             # print('not the same people upload pic, drop it! return False!')
@@ -99,19 +97,9 @@ def handle_message(event):
         print(event.source.user_id)
         print('100 PicNameDict')
         print(PicNameDict)
-        File_Name_Ext = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] + '.' + ext
-        File_Exist = FileExists()
-        if File_Exist:
-            file = os.path.join('static', 'tmp', File_Name_Ext)
-            os.remove(file)
-            Tempfile_Path = CreateFile()
-        else:
-            Tempfile_Path = CreateFile()
-        Dist_Path = Tempfile_Path + '.' + ext
-        Dist_Path = os.path.basename(Dist_Path)
-        os.rename(Tempfile_Path, Dist_Path)
-        print("Tempfile_Path :" + Tempfile_Path) #debug
-        print("Dist_Path:" + Dist_Path) #debug
+        CreateFile()
+        print("101 os.listdir(os.getcwd()+'/static/tmp')")
+        print(os.listdir(os.getcwd()+'/static/tmp'))
         line_bot_api.reply_message(
             event.reply_token, [
                 TextSendMessage(text='已儲存圖片暫存檔，將在輸入檔名後上傳，名字格式： #圖片名字#')
