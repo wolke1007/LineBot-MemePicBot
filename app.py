@@ -89,7 +89,7 @@ def handle_message(event):
         message_content = line_bot_api.get_message_content(event.message.id)
         print('82 PicNameDict')
         print(PicNameDict)
-        File_Name_Ext = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] + '.jpg'
+        File_Name_Ext = "{0}{1}".format(PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)], '.jpg')
         File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
         with open(File_Path, 'wb+') as tf:
             for chunk in message_content.iter_content():
@@ -129,7 +129,7 @@ def handle_message(event):
                 'title': Pic_Name,
                 'description': ' '
             }
-            path = os.path.join('static', 'tmp', Pic_Name+'.jpg')
+            path = os.path.join('static', 'tmp', str(Pic_Name)+'.jpg')
             print('path:'+path) #debug
             client.upload_from_path(path, config=config, anon=False)
             print(os.listdir(os.getcwd()+'/static/tmp')) #debug
