@@ -81,7 +81,7 @@ def handle_message(event):
         message_content = line_bot_api.get_message_content(event.message.id)
         File_Name_Ext = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] + '.jpg'
         File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
-        with open(File_Path, 'w+') as tf:
+        with open(File_Path, 'wb+') as tf:
             for chunk in message_content.iter_content():
                 tf.write(chunk)
             Tempfile_Path = tf.name
