@@ -25,9 +25,7 @@ import re
 # handler = WebhookHandler('')
 # imgur_client_id = ef420e58e8af248
 # imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
-Pic_Name = 'Pic_Name'
-User_ID_Who_Upload_Pic = 'User_ID_Who_Upload_Pic'
-User_ID_Who_Set_Name = 'User_ID_Who_Set_Name'
+PicNameDict = {}
 imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -57,7 +55,8 @@ def handle_message(event):
         '''
         以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
         '''
-        globals()['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
+        global PicNameDict
+        PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
         line_bot_api.reply_message(
             event.reply_token, [
             TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
@@ -73,7 +72,7 @@ def handle_message(event):
         return False
     
     def FileNameExist():
-        for file in list(globals()):
+        for file in list(PicNameDict):
             File_Name_Exist = re.match(str(event.source.user_id), file)
             if File_Name_Exist:
                 return True
@@ -98,9 +97,9 @@ def handle_message(event):
             # return False
         print('98 GetPic User_ID_Who_Upload_Pic:')
         print(event.source.user_id)
-        print('100 globals()')
-        print(globals())
-        File_Name_Ext = globals()['WHOS_PICNAME_' + str(event.source.user_id)] + '.' + ext
+        print('100 PicNameDict')
+        print(PicNameDict)
+        File_Name_Ext = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] + '.' + ext
         File_Exist = FileExists()
         if File_Exist:
             file = os.path.join('static', 'tmp', File_Name_Ext)
@@ -120,7 +119,8 @@ def handle_message(event):
         return True
 
     def UploadToImgur():
-        Pic_Name = globals()['WHOS_PICNAME_' + str(event.source.user_id)]
+        Pic_Name = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)]
+        global PicNameDict
         try:
             print('UploadToImgur Pic_Name: ' + Pic_Name)
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
@@ -145,7 +145,7 @@ def handle_message(event):
                 event.source.group_id,
                 TextSendMessage(text='上傳成功'))
             # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
-            globals().pop('WHOS_PICNAME_' + str(event.source.user_id))
+            PicNameDict.pop('WHOS_PICNAME_' + str(event.source.user_id))
         except Exception as e:
             print(e)
             line_bot_api.push_message(
@@ -155,14 +155,14 @@ def handle_message(event):
 #                收到訊息後的判斷
 # #################################################
     if isinstance(event.message, TextMessage):
-        User_ID_Who_Set_Name = event.source.user_id #debug
-        print('163 User_ID_Who_Set_Name:') #debug
-        print(User_ID_Who_Set_Name) #debug
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
+            User_ID_Who_Set_Name = event.source.user_id #debug
+            print('163 User_ID_Who_Set_Name:') #debug
+            print(User_ID_Who_Set_Name) #debug
             SavePicNameIntoLocals(event.message.text)
             if FileExists():
                 UploadToImgur() 
-            print('169'+str(globals())) # debug
+            print('165'+str(PicNameDict)) # debug
         elif event.message.text == "--help":
             line_bot_api.reply_message(
                 event.reply_token, [
@@ -175,7 +175,7 @@ def handle_message(event):
         GetPic()
         if FileNameExist():
             UploadToImgur() 
-        print('176'+str(globals())) # debug
+        print('178'+str(PicNameDict)) # debug
             
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
