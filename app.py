@@ -49,9 +49,7 @@ def callback():
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
-    print('enter handle_message')
-    PicNameDict = {}
-    print('default PicNameDict id: ', id(PicNameDict))
+    print('handle_message')
     def SavePicNameIntoDict(Line_Msg_Text):
         print('enter SavePicNameIntoDict')
         '''
@@ -217,4 +215,6 @@ def handle_message(event):
 
             
 if __name__ == "__main__":
+    PicNameDict = {}
+    print('default PicNameDict id: ', id(PicNameDict))
     app.run()
