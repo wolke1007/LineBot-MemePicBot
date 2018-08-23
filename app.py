@@ -150,8 +150,8 @@ def handle_message(event):
 # #################################################
 #                收到訊息後的判斷
 # #################################################
+    global PicNameDict
     if isinstance(event.message, TextMessage):
-        global PicNameDict
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             User_ID_Who_Set_Name = event.source.user_id #debug
             print('163 User_ID_Who_Set_Name:') #debug
@@ -166,7 +166,6 @@ def handle_message(event):
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #我是檔名#')
                 ])
     elif isinstance(event.message, ImageMessage):
-        global PicNameDict
         User_ID_Who_Upload_Pic = event.source.user_id #debug
         print('170 User_ID_Who_Upload_Pic:') #debug
         print(User_ID_Who_Upload_Pic) #debug
