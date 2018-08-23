@@ -111,6 +111,7 @@ def handle_message(event):
         return True
 
     def UploadToImgur():
+        global PicNameDict
         Pic_Name = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)]
         try:
             print('UploadToImgur Pic_Name: ' + Pic_Name)
@@ -136,7 +137,6 @@ def handle_message(event):
                 event.source.group_id,
                 TextSendMessage(text='上傳成功'))
             # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
-            global PicNameDict
             PicNameDict.pop('WHOS_PICNAME_' + str(event.source.user_id))
         except Exception as e:
             print(e)
