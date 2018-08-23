@@ -77,7 +77,7 @@ def handle_message(event):
         print('74 PicNameDict')
         print(PicNameDict)
         for file in list(PicNameDict):
-            File_Name_Exist = re.match(str(event.source.user_id), file)
+            File_Name_Exist = re.search(str(event.source.user_id), file)
             if File_Name_Exist:
                 print('File_Name_Exist:', File_Name_Exist) #debug
                 return True
@@ -94,7 +94,7 @@ def handle_message(event):
             for chunk in message_content.iter_content():
                 tf.write(chunk)
             Tempfile_Path = tf.name
-            return True
+        return True
             
     def GetPic():
         global PicNameDict
