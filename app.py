@@ -29,9 +29,8 @@ imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
-PicNameDict = {}
-print('default PicNameDict id: ', id(PicNameDict))
-    
+
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -49,6 +48,8 @@ def callback():
     return 'OK'
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
+PicNameDict = {}
+print('default PicNameDict id: ', id(PicNameDict))
 def handle_message(event):
     print('enter handle_message')
     def SavePicNameIntoDict(Line_Msg_Text):
