@@ -51,11 +51,11 @@ def callback():
 
 @handler.add(MessageEvent, message=(ImageMessage, TextMessage))
 def handle_message(event):
+    global PicNameDict
     def SavePicNameIntoLocals(Line_Msg_Text):
         '''
         以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
         '''
-        global PicNameDict
         PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
         line_bot_api.reply_message(
             event.reply_token, [
@@ -120,7 +120,6 @@ def handle_message(event):
 
     def UploadToImgur():
         Pic_Name = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)]
-        global PicNameDict
         try:
             print('UploadToImgur Pic_Name: ' + Pic_Name)
             client = ImgurClient(client_id, client_secret, access_token, refresh_token)
