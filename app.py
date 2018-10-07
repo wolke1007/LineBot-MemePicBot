@@ -29,15 +29,13 @@ imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
+PicNameDict = {}
 
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
     
-    global PicNameDict
-    PicNameDict = {}
-    print('default PicNameDict id: ', id(PicNameDict))
     # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
@@ -49,137 +47,164 @@ def callback():
         abort(400)
     return 'OK'
 
-@handler.add(MessageEvent, message=(ImageMessage, TextMessage))
-def handle_message(event):
-    print('handle_message')
-    def SavePicNameIntoDict(Line_Msg_Text):
-        print('enter SavePicNameIntoDict')
-        '''
-        以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
-        '''
-        global PicNameDict
-        PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
-        print('59 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-        line_bot_api.reply_message(
-            event.reply_token, [
-            TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
-            ])
-        return True
+# #################################################
+#                收到圖片後邏輯
+# #################################################
+@handler.add(MessageEvent, message=ImageMessage)
+#def handle_message(event):
+print('handle_message')
+#    def SavePicNameIntoDict(Line_Msg_Text):
+#        print('enter SavePicNameIntoDict')
+#        '''
+#        以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
+#        '''
+#        # global PicNameDict
+#        PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
+#        print('59 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+#        line_bot_api.reply_message(
+#            event.reply_token, [
+#            TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
+#            ])
+#        return True
     
-    def FileExist():
-        print('enter FileExist')
-        Files_In_tmp = os.listdir(os.getcwd()+'/static/tmp')
-        for file_name in Files_In_tmp:
-            File_Exist = True if re.match(str(event.source.user_id), file_name) else False
-            if File_Exist:
-                print('File_Exist:', File_Exist) #debug
-                return True
-        return False
-    
-    def FileNameExist():
-        print('enter FileNameExist')
-        global PicNameDict
-        print('80 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-        for file in list(PicNameDict):
-            File_Name_Exist = True if re.search(str(event.source.user_id), file) else False
-            if File_Name_Exist:
-                print('File_Name_Exist:', File_Name_Exist) #debug
-                return True
-        return False
-    
-    def CreateFile():
-        print('enter CreateFile')
-        global PicNameDict
-        message_content = line_bot_api.get_message_content(event.message.id)
-        print('92 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-        File_Name_Ext = "{0}{1}{2}".format('WHOS_PICNAME_', str(event.source.user_id), '.jpg')
-        File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
-        with open(File_Path, 'wb+') as tf:
-            for chunk in message_content.iter_content():
-                tf.write(chunk)
-            Tempfile_Path = tf.name
-        return True
-            
-    def GetPic():
-        print('enter GetPic')
-        global PicNameDict
-        message_content = line_bot_api.get_message_content(event.message.id)
-        # 確認是否為設定名字的人上傳的圖片
-        # if User_ID_Who_Upload_Pic != User_ID_Who_Set_Name:
-            # print('not the same people upload pic, drop it! return False!')
-            # return False
-        print('109 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-        CreateFile()
-        print("111 os.listdir(os.getcwd()+'/static/tmp')")
-        print(os.listdir(os.getcwd()+'/static/tmp'))
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text='已儲存圖片暫存檔')
-            ])
-        return True
+def FileExist(event):
+    print('enter FileExist')
+    Files_In_tmp = os.listdir(os.getcwd()+'/static/tmp')
+    for file_name in Files_In_tmp:
+        File_Exist = True if re.match(str(event.source.user_id), file_name) else False
+        if File_Exist:
+            print('File_Exist:', File_Exist) #debug
+            return True
+    return False
 
-    def UploadToImgur():
-        print('enter UploadToImgur')
-        global PicNameDict
-        print('122 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-        Pic_Name = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)]
-        try:
-            print('UploadToImgur Pic_Name: ' + Pic_Name)
-            client = ImgurClient(client_id, client_secret, access_token, refresh_token)
-            config = {
-                'album': imgur_album_id,
-                'name': Pic_Name,
-                'title': Pic_Name,
-                'description': ' '
-            }
-            path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(event.source.user_id) + '.jpg')
-            print('path:'+path) #debug
-            client.upload_from_path(path, config=config, anon=False)
-            print(os.listdir(os.getcwd()+'/static/tmp')) #debug
-            print('132 remove path'+path) #debug
-            # 刪除圖片檔
-            os.remove(path)
-            print(os.listdir(os.getcwd()+'/static/tmp')) #debug
-            print(dir(event.source)) #debug
-            print('145 event.source.group_id: ')  #debug
-            print(event.source.group_id) #debug
-            print(type(event.source.group_id)) #debug
-            line_bot_api.push_message(
-                event.source.group_id,
-                TextSendMessage(text='上傳成功'))
-            # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
-            print('149 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-            PicNameDict.pop('WHOS_PICNAME_' + str(event.source.user_id))
-            print('150 make sure pop'+str(PicNameDict)) # debug
-        except Exception as e:
-            print(e)
-            line_bot_api.push_message(
-                event.source.group_id,
-                TextSendMessage(text='上傳失敗'))
+def FileNameExist(event):
+    print('enter FileNameExist')
+    #global PicNameDict
+    print('80 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    for file in list(PicNameDict):
+        File_Name_Exist = True if re.search(str(event.source.user_id), file) else False
+        if File_Name_Exist:
+            print('File_Name_Exist:', File_Name_Exist) #debug
+            return True
+    return False
+
+def CreateFile(event):
+    print('enter CreateFile')
+    # global PicNameDict
+    message_content = line_bot_api.get_message_content(event.message.id)
+    print('92 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    File_Name_Ext = "{0}{1}{2}".format('WHOS_PICNAME_', str(event.source.user_id), '.jpg')
+    File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
+    with open(File_Path, 'wb+') as tf:
+        for chunk in message_content.iter_content():
+            tf.write(chunk)
+        Tempfile_Path = tf.name
+    return True
+        
+def GetPic(event):
+    print('enter GetPic')
+    #global PicNameDict
+    message_content = line_bot_api.get_message_content(event.message.id)
+    # 確認是否為設定名字的人上傳的圖片
+    # if User_ID_Who_Upload_Pic != User_ID_Who_Set_Name:
+        # print('not the same people upload pic, drop it! return False!')
+        # return False
+    print('109 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    CreateFile()
+    print("111 os.listdir(os.getcwd()+'/static/tmp')")
+    print(os.listdir(os.getcwd()+'/static/tmp'))
+    line_bot_api.reply_message(
+        event.reply_token, [
+            TextSendMessage(text='已儲存圖片暫存檔')
+        ])
+    return True
+
+def UploadToImgur(event):
+    print('enter UploadToImgur')
+    # global PicNameDict
+    print('122 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    Pic_Name = PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)]
+    try:
+        print('UploadToImgur Pic_Name: ' + Pic_Name)
+        client = ImgurClient(client_id, client_secret, access_token, refresh_token)
+        config = {
+            'album': imgur_album_id,
+            'name': Pic_Name,
+            'title': Pic_Name,
+            'description': ' '
+        }
+        path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(event.source.user_id) + '.jpg')
+        print('path:'+path) #debug
+        client.upload_from_path(path, config=config, anon=False)
+        print(os.listdir(os.getcwd()+'/static/tmp')) #debug
+        print('132 remove path'+path) #debug
+        # 刪除圖片檔
+        os.remove(path)
+        print(os.listdir(os.getcwd()+'/static/tmp')) #debug
+        print(dir(event.source)) #debug
+        print('145 event.source.group_id: ')  #debug
+        print(event.source.group_id) #debug
+        print(type(event.source.group_id)) #debug
+        line_bot_api.push_message(
+            event.source.group_id,
+            TextSendMessage(text='上傳成功'))
+        # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
+        print('149 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+        PicNameDict.pop('WHOS_PICNAME_' + str(event.source.user_id))
+        print('150 make sure pop'+str(PicNameDict)) # debug
+    except Exception as e:
+        print(e)
+        line_bot_api.push_message(
+            event.source.group_id,
+            TextSendMessage(text='上傳失敗'))
+
+#    elif isinstance(event.message, ImageMessage):
+    print('elif isinstance(event.message, ImageMessage)') #debug
+    GetPic(event)
+    if FileNameExist():
+        print('if FileNameExist()') #debug
+        UploadToImgur() 
+        print('177 make sure pop'+str(PicNameDict)) # debug
+
+
 # #################################################
-#                收到訊息後的判斷
+#                收到文字後邏輯
 # #################################################
-    
-    if isinstance(event.message, TextMessage):
-        if event.message.text[0] == "#" and event.message.text[-1] == "#":
-            print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
-            SavePicNameIntoDict(event.message.text)
-            if FileExist():
-                UploadToImgur() 
-            print('167 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-        elif event.message.text == "--help":
-            print('event.message.text == "--help"') #debug
-            line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #我是檔名#')
-                ])
-    elif isinstance(event.message, ImageMessage):
-        print('elif isinstance(event.message, ImageMessage)') #debug
-        GetPic()
-        if FileNameExist():
-            print('if FileNameExist()') #debug
+@handler.add(MessageEvent, message=TextMessage)    
+def SavePicNameIntoDict(event):
+    print('enter SavePicNameIntoDict')
+    '''
+    以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
+    '''
+    # global PicNameDict
+    PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
+    print('59 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    line_bot_api.reply_message(
+        event.reply_token, [
+        TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
+        ])
+    return True
+
+if isinstance(event.message, TextMessage):
+    if event.message.text[0] == "#" and event.message.text[-1] == "#":
+        print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
+        SavePicNameIntoDict(event.message.text)
+        if FileExist():
             UploadToImgur() 
-            print('177 make sure pop'+str(PicNameDict)) # debug
+        print('167 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    elif event.message.text == "--help":
+        print('event.message.text == "--help"') #debug
+        line_bot_api.reply_message(
+            event.reply_token, [
+                TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #我是檔名#')
+            ])
+#    elif isinstance(event.message, ImageMessage):
+#    print('elif isinstance(event.message, ImageMessage)') #debug
+#    GetPic()
+#    if FileNameExist():
+#        print('if FileNameExist()') #debug
+#        UploadToImgur() 
+#        print('177 make sure pop'+str(PicNameDict)) # debug
             
     # elif isinstance(event.message, TextMessage):
         # if event.message.text == "test":
