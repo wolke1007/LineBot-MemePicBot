@@ -176,6 +176,7 @@ def SavePicNameIntoDict(event):
     以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
     '''
     # global PicNameDict
+    Line_Msg_Text = event.message.text
     PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
     print('59 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     line_bot_api.reply_message(
