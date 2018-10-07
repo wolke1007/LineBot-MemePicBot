@@ -52,6 +52,7 @@ def callback():
 # #################################################
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_message(event):
+    Line_Msg_Text = event.message.text
     def SavePicNameIntoDict(Line_Msg_Text):
         print('enter SavePicNameIntoDict')
         '''
@@ -60,6 +61,10 @@ def handle_message(event):
         # global PicNameDict
         PicNameDict['WHOS_PICNAME_' + str(event.source.user_id)] = Line_Msg_Text[1:-1]
         print('59 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+        line_bot_api.reply_message(
+            event.reply_token, [
+            TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict)
+            ])
         line_bot_api.reply_message(
             event.reply_token, [
             TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
@@ -80,10 +85,18 @@ def handle_message(event):
         print('enter FileNameExist')
         #global PicNameDict
         print('80 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+        line_bot_api.reply_message(
+            event.reply_token, [
+            TextSendMessage(text='80 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict)
+            ])
         for file in list(PicNameDict):
             File_Name_Exist = True if re.search(str(event.source.user_id), file) else False
             if File_Name_Exist:
                 print('File_Name_Exist:', File_Name_Exist) #debug
+                line_bot_api.reply_message(
+                    event.reply_token, [
+                    TextSendMessage(text='File_Name_Exist:{}'.format(File_Name_Exist)
+                    ])
                 return True
         return False
     
@@ -92,6 +105,10 @@ def handle_message(event):
         # global PicNameDict
         message_content = line_bot_api.get_message_content(event.message.id)
         print('92 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+        line_bot_api.reply_message(
+            event.reply_token, [
+            TextSendMessage(text='92 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict)
+            ])
         File_Name_Ext = "{0}{1}{2}".format('WHOS_PICNAME_', str(event.source.user_id), '.jpg')
         File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
         with open(File_Path, 'wb+') as tf:
@@ -162,9 +179,16 @@ def handle_message(event):
     GetPic()
     if FileNameExist():
         print('if FileNameExist()') #debug
+        line_bot_api.reply_message(
+            event.reply_token, [
+            TextSendMessage(text='183 if FileNameExist()')
+            ])
         UploadToImgur() 
         print('177 make sure pop'+str(PicNameDict)) # debug
-
+        line_bot_api.reply_message(
+            event.reply_token, [
+            TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict)
+            ])
 
 # #################################################
 #                收到文字後邏輯
