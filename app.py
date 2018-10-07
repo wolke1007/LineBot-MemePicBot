@@ -63,7 +63,7 @@ def handle_message(event):
         print('59 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
         line_bot_api.reply_message(
             event.reply_token, [
-            TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict)
+            TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
             ])
         line_bot_api.reply_message(
             event.reply_token, [
@@ -87,7 +87,7 @@ def handle_message(event):
         print('80 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
         line_bot_api.reply_message(
             event.reply_token, [
-            TextSendMessage(text='80 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict)
+            TextSendMessage(text='80 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
             ])
         for file in list(PicNameDict):
             File_Name_Exist = True if re.search(str(event.source.user_id), file) else False
@@ -95,7 +95,7 @@ def handle_message(event):
                 print('File_Name_Exist:', File_Name_Exist) #debug
                 line_bot_api.reply_message(
                     event.reply_token, [
-                    TextSendMessage(text='File_Name_Exist:{}'.format(File_Name_Exist)
+                    TextSendMessage(text='File_Name_Exist:{}'.format(File_Name_Exist))
                     ])
                 return True
         return False
@@ -107,7 +107,7 @@ def handle_message(event):
         print('92 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
         line_bot_api.reply_message(
             event.reply_token, [
-            TextSendMessage(text='92 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict)
+            TextSendMessage(text='92 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
             ])
         File_Name_Ext = "{0}{1}{2}".format('WHOS_PICNAME_', str(event.source.user_id), '.jpg')
         File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
@@ -187,7 +187,7 @@ def handle_message(event):
         print('177 make sure pop'+str(PicNameDict)) # debug
         line_bot_api.reply_message(
             event.reply_token, [
-            TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict)
+            TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
             ])
 
 # #################################################
