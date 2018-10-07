@@ -159,7 +159,7 @@ def handle_message(event):
 
 #    elif isinstance(event.message, ImageMessage):
     print('elif isinstance(event.message, ImageMessage)') #debug
-    GetPic(event)
+    GetPic()
     if FileNameExist():
         print('if FileNameExist()') #debug
         UploadToImgur() 
