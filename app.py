@@ -113,6 +113,9 @@ def UploadToImgur(event, user_id, group_id):
         client.upload_from_path(path, config=config, anon=False)
         print(os.listdir(os.getcwd()+'/static/tmp')) #debug
         print('132 remove path'+path) #debug
+        line_bot_api.push_message(
+            group_id,
+            TextSendMessage(text='上傳成功'))
     except Exception as e:
         print(e)
         line_bot_api.push_message(
@@ -124,6 +127,7 @@ def RemovePic(event, user_id, group_id):
     刪除檔案及從 PicNameDict 中去除
     '''
     # 刪除圖片檔
+    path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(user_id) + '.jpg')
     os.remove(path)
     print(os.listdir(os.getcwd()+'/static/tmp')) #debug
     print('145 group_id: ')  #debug
