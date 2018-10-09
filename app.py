@@ -207,7 +207,7 @@ def handle_image(event):
             group_id,
             TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
             )
-        RemovePic(user_id, group_id)
+        RemovePic(event, user_id, group_id)
 
 # #################################################
 #                收到文字後邏輯
