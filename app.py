@@ -148,7 +148,7 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     若已經存在則複寫
     '''
     # PicNameDict['WHOS_PICNAME_' + str(user_id)] = Line_Msg_Text[1:-1]
-    PicNameDict.update({['WHOS_PICNAME_' + str(user_id)] : Line_Msg_Text[1:-1]})
+    PicNameDict.update({ 'WHOS_PICNAME_' + str(user_id) : Line_Msg_Text[1:-1] })
     print('59 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     line_bot_api.push_message(
         group_id,
