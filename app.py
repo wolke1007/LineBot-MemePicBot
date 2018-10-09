@@ -61,7 +61,7 @@ def isFileExist(event, user_id):
             return True
     return False
 
-def isFileNameExist(event, user_id):
+def isFileNameExist(event, user_id, group_id):
     print('enter FileNameExist')
     print('80 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     line_bot_api.push_message(
@@ -93,7 +93,7 @@ def GetPic(event, user_id, group_id, message_id):
         group_id,
         TextSendMessage(text='已儲存圖片暫存檔')
     )
-    return True if isFileNameExist(user_id) else False
+    return True if isFileNameExist(event, user_id, group_id) else False
 
 def UploadToImgur(event, user_id, group_id):
     print('enter UploadToImgur')
@@ -191,10 +191,10 @@ def handle_image(event):
             group_id,
             TextSendMessage(text='183 if isFileExist(user_id)')
             )
-        if isFileNameExist(event, user_id):
+        if isFileNameExist(event, user_id, group_id):
             UploadToImgur(event, user_id, group_id)
             RemovePic(event, user_id, group_id)
-    elif isFileNameExist(event, user_id):
+    elif isFileNameExist(event, user_id, group_id):
         print('if isFileNameExist(user_id)') #debug
         line_bot_api.push_message(
             group_id,
