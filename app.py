@@ -72,21 +72,13 @@ def isFileNameExist(event, user_id):
         File_Name_Exist = True if re.search(str(user_id), file) else False
         if File_Name_Exist:
             print('File_Name_Exist:', File_Name_Exist) #debug
-            line_bot_api.push_message(
-                group_id,
-                TextSendMessage(text='File_Name_Exist:{}'.format(File_Name_Exist))
-                ) #debug
             return True
     return False
 
-def GetPic(event, user_id, message_id):
+def GetPic(event, user_id, group_id, message_id):
     print('enter CreateFile')
     message_content = line_bot_api.get_message_content(message_id)
     print('92 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-    line_bot_api.push_message(
-        group_id,
-        TextSendMessage(text='92 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
-        ) #debug
     File_Name_Ext = "{0}{1}{2}".format('WHOS_PICNAME_', str(user_id), '.jpg')
     File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
     with open(File_Path, 'wb+') as tf:
@@ -145,7 +137,7 @@ def RemovePic(event, user_id, group_id):
         group_id,
         TextSendMessage(text='刪除圖片'))
 
-def SavePicNameIntoDict(event, user_id, Line_Msg_Text):
+def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     print('enter SavePicNameIntoDict')
     '''
     以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
@@ -194,7 +186,7 @@ def handle_image(event):
     if isFileExist(event, user_id):
         print('if isFileExist(user_id)') #debug
         RemovePic(event, user_id, group_id)
-        GetPic(event, user_id, message_id)
+        GetPic(event, user_id, group_id, message_id)
         line_bot_api.push_message(
             group_id,
             TextSendMessage(text='183 if isFileExist(user_id)')
@@ -208,7 +200,7 @@ def handle_image(event):
             group_id,
             TextSendMessage(text='183 elif isFileNameExist(user_id)')
             )
-        GetPic(event, user_id, message_id)
+        GetPic(event, user_id, group_id, message_id)
         UploadToImgur(event, user_id, group_id) 
         print('177 make sure pop'+str(PicNameDict)) # debug
         line_bot_api.push_message(
