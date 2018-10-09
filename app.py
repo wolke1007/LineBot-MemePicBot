@@ -230,7 +230,7 @@ def handle_text(event):
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
-            SavePicNameIntoDict(event.message.text)
+            SavePicNameIntoDict(event, user_id, Line_Msg_Text)
             if isFileExist(event, user_id):
                 UploadToImgur(event, user_id, group_id)
                 RemovePic(event, user_id, group_id)
