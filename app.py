@@ -47,7 +47,7 @@ def callback():
         abort(400)
     return 'OK'
 
-def isFileExist(user_id):
+def isFileExist(event, user_id):
     '''
     input = event.source.user_id
     output = Ture or False 
@@ -61,7 +61,7 @@ def isFileExist(user_id):
             return True
     return False
 
-def isFileNameExist(user_id):
+def isFileNameExist(event, user_id):
     print('enter FileNameExist')
     print('80 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     line_bot_api.reply_message(
@@ -79,7 +79,7 @@ def isFileNameExist(user_id):
             return True
     return False
 
-def GetPic(user_id, message_id):
+def GetPic(event, user_id, message_id):
     print('enter CreateFile')
     message_content = line_bot_api.get_message_content(message_id)
     print('92 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
@@ -103,7 +103,7 @@ def GetPic(user_id, message_id):
     ])
     return True if isFileNameExist(user_id) else False
 
-def UploadToImgur(user_id, group_id):
+def UploadToImgur(event, user_id, group_id):
     print('enter UploadToImgur')
     print('122 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     Pic_Name = PicNameDict['WHOS_PICNAME_' + str(user_id)]
@@ -127,7 +127,7 @@ def UploadToImgur(user_id, group_id):
             group_id,
             TextSendMessage(text='上傳失敗'))
 
-def RemovePic(user_id, group_id):
+def RemovePic(event, user_id, group_id):
     '''
     刪除檔案及從 PicNameDict 中去除
     '''
@@ -145,7 +145,7 @@ def RemovePic(user_id, group_id):
         group_id,
         TextSendMessage(text='刪除圖片'))
 
-def SavePicNameIntoDict(Line_Msg_Text):
+def SavePicNameIntoDict(event, user_id, Line_Msg_Text):
     print('enter SavePicNameIntoDict')
     '''
     以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
@@ -191,25 +191,25 @@ def handle_image(event):
 
     # elif isinstance(event.message, ImageMessage):
     # print('elif isinstance(event.message, ImageMessage)') #debug
-    if isFileExist(user_id):
+    if isFileExist(event, user_id):
         print('if isFileExist(user_id)') #debug
-        RemovePic(user_id, group_id)
-        GetPic(user_id, message_id)
+        RemovePic(event, user_id, group_id)
+        GetPic(event, user_id, message_id)
         line_bot_api.reply_message(
             event.reply_token, [
             TextSendMessage(text='183 if isFileExist(user_id)')
             ])
-        if isFileNameExist(user_id):
-            UploadToImgur(user_id, group_id)
-            RemovePic(user_id, group_id)
-    elif isFileNameExist(user_id):
+        if isFileNameExist(event, user_id):
+            UploadToImgur(event, user_id, group_id)
+            RemovePic(event, user_id, group_id)
+    elif isFileNameExist(event, user_id):
         print('if isFileNameExist(user_id)') #debug
         line_bot_api.reply_message(
             event.reply_token, [
             TextSendMessage(text='183 elif isFileNameExist(user_id)')
             ])
-        GetPic(user_id, message_id)
-        UploadToImgur(user_id, group_id) 
+        GetPic(event, user_id, message_id)
+        UploadToImgur(event, user_id, group_id) 
         print('177 make sure pop'+str(PicNameDict)) # debug
         line_bot_api.reply_message(
             event.reply_token, [
@@ -231,9 +231,9 @@ def handle_text(event):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             SavePicNameIntoDict(event.message.text)
-            if isFileExist(user_id):
-                UploadToImgur(user_id, group_id)
-                RemovePic(user_id, group_id)
+            if isFileExist(event, user_id):
+                UploadToImgur(event, user_id, group_id)
+                RemovePic(event, user_id, group_id)
                 print('167 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
