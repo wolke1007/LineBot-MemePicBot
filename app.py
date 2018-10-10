@@ -52,10 +52,10 @@ def isFileExist(event, user_id):
 
 def isFileNameExist(event, user_id, group_id):
     print('enter FileNameExist')
-    print('80 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    print('55 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     line_bot_api.push_message(
         group_id,
-        TextSendMessage(text='80 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
+        TextSendMessage(text='58 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
         ) #debug
     for file in list(PicNameDict):
         File_Name_Exist = True if re.search(str(user_id), file) else False
@@ -67,7 +67,7 @@ def isFileNameExist(event, user_id, group_id):
 def GetPic(event, user_id, group_id, message_id):
     print('enter CreateFile')
     message_content = line_bot_api.get_message_content(message_id)
-    print('92 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    print('70 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     File_Name_Ext = "{0}{1}{2}".format('WHOS_PICNAME_', str(user_id), '.jpg')
     File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
     with open(File_Path, 'wb+') as tf:
@@ -86,7 +86,7 @@ def GetPic(event, user_id, group_id, message_id):
 
 def UploadToImgur(event, user_id, group_id):
     print('enter UploadToImgur')
-    print('122 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    print('89 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     Pic_Name = PicNameDict['WHOS_PICNAME_' + str(user_id)]
     try:
         print('UploadToImgur Pic_Name: ' + Pic_Name)
@@ -101,7 +101,7 @@ def UploadToImgur(event, user_id, group_id):
         print('path:'+path) #debug
         client.upload_from_path(path, config=config, anon=False)
         print(os.listdir(os.getcwd()+'/static/tmp')) #debug
-        print('132 remove path'+path) #debug
+        print('104 remove path'+path) #debug
         line_bot_api.push_message(
             group_id,
             TextSendMessage(text='上傳成功'))
@@ -119,13 +119,13 @@ def RemovePic(event, user_id, group_id):
     path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(user_id) + '.jpg')
     os.remove(path)
     print(os.listdir(os.getcwd()+'/static/tmp')) #debug
-    print('145 group_id: ')  #debug
+    print('122 group_id: ')  #debug
     print(group_id) #debug
     print(type(group_id)) #debug
     # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
-    print('149 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    print('126 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     PicNameDict.pop('WHOS_PICNAME_' + str(user_id))
-    print('150 make sure pop'+str(PicNameDict)) # debug
+    print('128 make sure pop'+str(PicNameDict)) # debug
     line_bot_api.push_message(
         group_id,
         TextSendMessage(text='刪除圖片'))
@@ -138,10 +138,10 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     '''
     # PicNameDict['WHOS_PICNAME_' + str(user_id)] = Line_Msg_Text[1:-1]
     PicNameDict.update({ 'WHOS_PICNAME_' + str(user_id) : Line_Msg_Text[1:-1] })
-    print('59 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    print('141 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     line_bot_api.push_message(
         group_id,
-        TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
+        TextSendMessage(text='144 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
         )
     line_bot_api.push_message(
         group_id,
@@ -164,7 +164,7 @@ def handle_image(event):
         GetPic(event, user_id, group_id, message_id)
         line_bot_api.push_message(
             group_id,
-            TextSendMessage(text='183 if isFileExist(user_id)')
+            TextSendMessage(text='167 if isFileExist(user_id)')
             )
         if isFileNameExist(event, user_id, group_id):
             UploadToImgur(event, user_id, group_id)
@@ -173,14 +173,14 @@ def handle_image(event):
         print('if isFileNameExist(user_id)') #debug
         line_bot_api.push_message(
             group_id,
-            TextSendMessage(text='183 elif isFileNameExist(user_id)')
+            TextSendMessage(text='176 elif isFileNameExist(user_id)')
             )
         GetPic(event, user_id, group_id, message_id)
         UploadToImgur(event, user_id, group_id) 
-        print('177 make sure pop'+str(PicNameDict)) # debug
+        print('180 make sure pop'+str(PicNameDict)) # debug
         line_bot_api.push_message(
             group_id,
-            TextSendMessage(text='59 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
+            TextSendMessage(text='183 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
             )
         RemovePic(event, user_id, group_id)
 
@@ -201,7 +201,7 @@ def handle_text(event):
             if isFileExist(event, user_id):
                 UploadToImgur(event, user_id, group_id)
                 RemovePic(event, user_id, group_id)
-                print('167 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+                print('204 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
             line_bot_api.push_message(
