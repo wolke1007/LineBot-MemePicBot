@@ -141,7 +141,7 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     print('141 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     line_bot_api.push_message(
         group_id,
-        TextSendMessage(text='144 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
+        TextSendMessage(text='144 id, PicNameDict:{}{}, pid:{}'.format(id(PicNameDict), PicNameDict, os.getpid()))
         )
     line_bot_api.push_message(
         group_id,
