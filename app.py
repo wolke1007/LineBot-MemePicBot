@@ -13,18 +13,7 @@ import tempfile, os
 from config import client_id, client_secret, album_id, access_token, refresh_token, line_channel_access_token, \
     line_channel_secret
 import re
-# line_channel_access_token = 'FxI3Qlfn3Mwyne/OujcIsYfOQCcIOZTUIYbDF2d41/GZAlQv2p5FGkp/ategG6xe0ErAsJCQOeHxdSM1xJ7uCejar1IGM5tDCzSFp40QmWs0BEjVec2nkacPIrL8Hh8XVvBxUgEUsGG6U+nvyGRClgdB04t89/1O/w1cDnyilFU='
-# line_channel_secret = '7c2930cb70180aae136f76504fba88bd'
-# client_id = 'ef420e58e8af248'
-# client_secret = '461a057a65611590954d7692f78964920b484929'
-# album_id = 'UxgXZbe'
-# access_token = 'YOUR_IMGUR_ACCESS_TOKEN'
-# refresh_token = 'YOUR_IMGUR_ACCESS_TOKEN'
 
-# line_bot_api = LineBotApi()
-# handler = WebhookHandler('')
-# imgur_client_id = ef420e58e8af248 
-# imgur_client_secret = 461a057a65611590954d7692f78964920b484929	
 imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -160,23 +149,6 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
         )
     return True
 
-# def GetPic(user_id, message_id):
-#     print('enter GetPic')
-#     message_content = line_bot_api.get_message_content(message_id)
-#     # 確認是否為設定名字的人上傳的圖片
-#     # if User_ID_Who_Upload_Pic != User_ID_Who_Set_Name:
-#         # print('not the same people upload pic, drop it! return False!')
-#         # return False
-#     print('109 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-#     CreateFile(user_id, message_id)
-#     print("111 os.listdir(os.getcwd()+'/static/tmp')")
-#     print(os.listdir(os.getcwd()+'/static/tmp'))
-#     line_bot_api.push_message(
-#         
-#             TextSendMessage(text='已儲存圖片暫存檔')
-#         ])
-#     return True
-
 # #################################################
 #                收到圖片後邏輯
 # #################################################
@@ -186,8 +158,6 @@ def handle_image(event):
     message_id = event.message.id
     group_id = event.source.group_id
 
-    # elif isinstance(event.message, ImageMessage):
-    # print('elif isinstance(event.message, ImageMessage)') #debug
     if isFileExist(event, user_id):
         print('if isFileExist(user_id)') #debug
         RemovePic(event, user_id, group_id)
@@ -238,48 +208,7 @@ def handle_text(event):
                     group_id,
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #我是檔名#')
                 )
-#    elif isinstance(event.message, ImageMessage):
-#    print('elif isinstance(event.message, ImageMessage)') #debug
-#    GetPic()
-#    if isFileNameExist(user_id):
-#        print('if isFileNameExist(user_id)') #debug
-#        UploadToImgur() 
-#        print('177 make sure pop'+str(PicNameDict)) # debug
-            
-    # elif isinstance(event.message, TextMessage):
-        # if event.message.text == "test":
-            # message_content = line_bot_api.get_message_content(event.message.id)
-            # Pic_Name = line_bot_api.get_message_content(event.message.text)
-            # print('Pic_Name before function:' + Pic_Name)
-            # UploadToImgur(Pic_Name)
-            
-            
-    # elif isinstance(event.message, VideoMessage):
-        # ext = 'mp4'
-    # elif isinstance(event.message, AudioMessage):
-        # ext = 'm4a'
-    # elif isinstance(event.message, TextMessage):
-        # if event.message.text == "看看大家都傳了什麼圖片":
-            # client = ImgurClient(client_id, client_secret)
-            # images = client.get_album_images(album_id)
-            # index = random.randint(0, len(images) - 1)
-            # url = images[index].link
-            # image_message = ImageSendMessage(
-                # original_content_url=url,
-                # preview_image_url=url
-            # )
-            # line_bot_api.push_message(
-                # event.push_message, image_message)
-            # return 0
-        # else:
-            # line_bot_api.push_message(
-                # 
-                    # TextSendMessage(text=' yoyo'),
-                    # TextSendMessage(text='請傳一張圖片給我')
-                # ])
-            # return 0
-            
 
-            
+
 if __name__ == "__main__":
     app.run()
