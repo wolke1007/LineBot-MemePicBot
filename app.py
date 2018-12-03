@@ -97,11 +97,7 @@ def isFileExist(event, user_id):
 
 def isFileNameExist(event, user_id, group_id):
     print('enter FileNameExist')
-    # to = group_id if group_id else user_id
-    # line_bot_api.push_message(
-    #     to,
-    #     TextSendMessage(text='58 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
-    #     ) #debug
+    LoadPickleFile('pic_dict.pickle')
     for file in list(PicNameDict):
         File_Name_Exist = True if re.search(str(user_id), file) else False
         if File_Name_Exist:
