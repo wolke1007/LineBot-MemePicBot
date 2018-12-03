@@ -97,11 +97,11 @@ def isFileExist(event, user_id):
 
 def isFileNameExist(event, user_id, group_id):
     print('enter FileNameExist')
-    to = group_id if group_id else user_id
-    line_bot_api.push_message(
-        to,
-        TextSendMessage(text='58 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
-        ) #debug
+    # to = group_id if group_id else user_id
+    # line_bot_api.push_message(
+    #     to,
+    #     TextSendMessage(text='58 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
+    #     ) #debug
     for file in list(PicNameDict):
         File_Name_Exist = True if re.search(str(user_id), file) else False
         if File_Name_Exist:
@@ -121,7 +121,7 @@ def GetPic(event, user_id, group_id, message_id):
     to = group_id if group_id else user_id
     line_bot_api.push_message(
         to,
-        TextSendMessage(text='File_Path:{}, File_Name_Ext:{}'.format(File_Path, File_Name_Ext))
+        TextSendMessage(text='File_Path:{}, File_Name_Ext:{}'.format(Tempfile_Path, File_Name_Ext))
     ) #debug
     line_bot_api.push_message(
         to,
