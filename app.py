@@ -106,7 +106,7 @@ def isFileNameExist(event, user_id, group_id):
     return False
 
 def GetPic(event, user_id, group_id, message_id):
-    print('enter CreateFile')
+    print('enter GetPic')
     message_content = line_bot_api.get_message_content(message_id)
     File_Name_Ext = "{0}{1}{2}".format('WHOS_PICNAME_', str(user_id), '.jpg')
     File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
@@ -206,23 +206,26 @@ def handle_image(event):
         print("send from 1 to 1 chat room, so there's no group id")
 
     if isFileExist(event, user_id):
-        print('if isFileExist(user_id)') #debug
+        print('if isFileExist('+str(user_id)+')') #debug
         RemovePic(event, user_id, group_id)
+        print('RemovePic done')
         GetPic(event, user_id, group_id, message_id)
+        print('GetPic done')
         to = group_id if group_id else user_id
         line_bot_api.push_message(
             to,
-            TextSendMessage(text='167 if isFileExist(user_id)')
+            TextSendMessage(text='167 if isFileExist('+str(user_id)+')')
             )
         if isFileNameExist(event, user_id, group_id):
+            print('name already exist, start to upload')
             UploadToImgur(event, user_id, group_id)
             RemovePic(event, user_id, group_id)
     elif isFileNameExist(event, user_id, group_id):
-        print('if isFileNameExist(user_id)') #debug
+        print('elif isFileNameExist('+str(user_id)+')') #debug
         to = group_id if group_id else user_id
         line_bot_api.push_message(
             to,
-            TextSendMessage(text='176 elif isFileNameExist(user_id)')
+            TextSendMessage(text='176 elif isFileNameExist('+str(user_id)+')')
             )
         GetPic(event, user_id, group_id, message_id)
         UploadToImgur(event, user_id, group_id)
