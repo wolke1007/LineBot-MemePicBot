@@ -89,16 +89,17 @@ def isFileExist(event, user_id):
     print('enter FileExist')
     Files_In_tmp = os.listdir(os.getcwd()+'/static/tmp')
     for file_name in Files_In_tmp:
-        File_Exist = True if re.match(str(user_id), file_name) else False
+        File_Exist = True if re.search(str(user_id), file_name) else False
         if File_Exist:
             print('File_Exist:', File_Exist) #debug
             return True
     print('File_Exist:', File_Exist) #debug    
     return False
 
-def isFileNameExist(event, user_id, group_id):
+def isFileNameExist(event, user_id):
     print('enter FileNameExist')
     LoadPickleFile('pic_dict.pickle')
+    print('PicNameDict:'+str(PicNameDict)) #debug
     for file in list(PicNameDict):
         File_Name_Exist = True if re.search(str(user_id), file) else False
         if File_Name_Exist:
@@ -125,7 +126,7 @@ def GetPic(event, user_id, group_id, message_id):
         to,
         TextSendMessage(text='已儲存圖片暫存檔')
     )
-    return True if isFileNameExist(event, user_id, group_id) else False
+    return True if isFileNameExist(event, user_id) else False
 
 def UploadToImgur(event, user_id, group_id):
     print('enter UploadToImgur')
@@ -218,7 +219,7 @@ def handle_image(event):
             to,
             TextSendMessage(text='167 if isFileExist('+str(user_id)+')')
             )
-        if isFileNameExist(event, user_id, group_id):
+        if isFileNameExist(event, user_id):
             print('name already exist, start to upload')
             UploadToImgur(event, user_id, group_id)
             RemovePic(event, user_id, group_id)
@@ -230,7 +231,7 @@ def handle_image(event):
             TextSendMessage(text='226 else isFileNameExist('+str(user_id)+')')
             )
         GetPic(event, user_id, group_id, message_id)
-        if isFileNameExist(event, user_id, group_id):
+        if isFileNameExist(event, user_id):
             UploadToImgur(event, user_id, group_id)
             line_bot_api.push_message(
                 to,
