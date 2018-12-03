@@ -1,2 +1,3 @@
 channel_token.py
-*.swp
+*swp
+*vscode
