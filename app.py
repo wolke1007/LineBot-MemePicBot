@@ -229,7 +229,7 @@ def handle_image(event):
             TextSendMessage(text='176 elif isFileNameExist(user_id)')
             )
         GetPic(event, user_id, group_id, message_id)
-        UploadToImgur(event, user_id, group_id) 
+        UploadToImgur(event, user_id, group_id)
         line_bot_api.push_message(
             to,
             TextSendMessage(text='183 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
@@ -259,8 +259,9 @@ def handle_text(event):
                 RemovePic(event, user_id, group_id)
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
+            to = group_id if group_id else user_id
             line_bot_api.push_message(
-                    group_id,
+                    to,
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #我是檔名#')
                 )
 
