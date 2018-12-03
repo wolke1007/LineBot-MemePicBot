@@ -10,15 +10,60 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 import tempfile, os
-from config import client_id, client_secret, album_id, access_token, refresh_token, line_channel_access_token, \
-    line_channel_secret
+from config import *
 import re
+import pickle
+import lockfile
 
-imgur_album_id = 'UxgXZbe'
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
-PicNameDict = {}
+pic_dict_lock = lockfile.LockFile('pic_dict.pickle')
+
+def WritePickleFile(str_file_path, content):
+    with open (str_file_path, 'wb') as file:
+        pickle.dump(content, file)
+
+def LoadPickleFile(str_file_path):
+    with open (str_file_path, 'rb') as file:
+        global PicNameDict
+        PicNameDict = pickle.load(file)
+
+def AddToPicDict(pic_name, pic_id):
+    # check file is locked
+    LoadPickleFile('pic_dict.pickle')
+    if pic_dict_lock.is_locked() is True and PicNameDict['isLock'] is True : return False
+    # double confirm 'isLock' value is not True
+    LoadPickleFile('pic_dict.pickle')
+    if PicNameDict['isLock'] is True : return False
+    # lock the file
+    pic_dict_lock.acquire()
+    # Set isLock to True, let the other process knows that I'm editing this file
+    PicNameDict['isLock'] = True
+    WritePickleFile('pic_dict.pickle', PicNameDict) 
+    PicNameDict[pic_name] = pic_id ; PicNameDict['isLock'] = False
+    WritePickleFile('pic_dict.pickle', PicNameDict)
+    # unlock the file
+    pic_dict_lock.break_lock()
+    if pic_dict_lock.is_locked() is not True and PicNameDict['isLock'] is not True : return True
+
+def DeleteFromPicDict(pic_name):
+    # check file is locked
+    LoadPickleFile('pic_dict.pickle')
+    if pic_dict_lock.is_locked() is True and PicNameDict['isLock'] is True : return False
+    # double confirm 'isLock' value is not True
+    LoadPickleFile('pic_dict.pickle')
+    if PicNameDict['isLock'] is True : return False
+    # lock the file
+    pic_dict_lock.acquire()
+    # Set isLock to True, let the other process knows that I'm editing this file
+    PicNameDict['isLock'] = True
+    WritePickleFile('pic_dict.pickle', PicNameDict)
+    PicNameDict.pop(pic_name) ; PicNameDict['isLock'] = False
+    WritePickleFile('pic_dict.pickle', PicNameDict)
+    # unlock the file
+    pic_dict_lock.break_lock()
+    if pic_dict_lock.is_locked() is not True and PicNameDict['isLock'] is not True : return True
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -52,7 +97,6 @@ def isFileExist(event, user_id):
 
 def isFileNameExist(event, user_id, group_id):
     print('enter FileNameExist')
-    print('55 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     line_bot_api.push_message(
         group_id,
         TextSendMessage(text='58 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
@@ -67,7 +111,6 @@ def isFileNameExist(event, user_id, group_id):
 def GetPic(event, user_id, group_id, message_id):
     print('enter CreateFile')
     message_content = line_bot_api.get_message_content(message_id)
-    print('70 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     File_Name_Ext = "{0}{1}{2}".format('WHOS_PICNAME_', str(user_id), '.jpg')
     File_Path = os.path.join(os.path.dirname(__file__), 'static', 'tmp', File_Name_Ext)
     with open(File_Path, 'wb+') as tf:
@@ -86,13 +129,12 @@ def GetPic(event, user_id, group_id, message_id):
 
 def UploadToImgur(event, user_id, group_id):
     print('enter UploadToImgur')
-    print('89 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
     Pic_Name = PicNameDict['WHOS_PICNAME_' + str(user_id)]
     try:
         print('UploadToImgur Pic_Name: ' + Pic_Name)
         client = ImgurClient(client_id, client_secret, access_token, refresh_token)
         config = {
-            'album': imgur_album_id,
+            'album': Album_ID,
             'name': Pic_Name,
             'title': Pic_Name,
             'description': ' '
@@ -123,8 +165,7 @@ def RemovePic(event, user_id, group_id):
     print(group_id) #debug
     print(type(group_id)) #debug
     # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
-    print('126 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
-    PicNameDict.pop('WHOS_PICNAME_' + str(user_id))
+    DeleteFromPicDict('WHOS_PICNAME_' + str(user_id))
     print('128 make sure pop'+str(PicNameDict)) # debug
     line_bot_api.push_message(
         group_id,
@@ -137,8 +178,8 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     若已經存在則複寫
     '''
     # PicNameDict['WHOS_PICNAME_' + str(user_id)] = Line_Msg_Text[1:-1]
-    PicNameDict.update({ 'WHOS_PICNAME_' + str(user_id) : Line_Msg_Text[1:-1] })
-    print('141 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
+    AddToPicDict('WHOS_PICNAME_' + str(user_id), Line_Msg_Text[1:-1])
+    # PicNameDict.update({ 'WHOS_PICNAME_' + str(user_id) : Line_Msg_Text[1:-1] })
     line_bot_api.push_message(
         group_id,
         TextSendMessage(text='144 id, PicNameDict:{}{}, pid:{}'.format(id(PicNameDict), PicNameDict, os.getpid()))
@@ -157,7 +198,6 @@ def handle_image(event):
     user_id = event.source.user_id
     message_id = event.message.id
     group_id = event.source.group_id
-
     if isFileExist(event, user_id):
         print('if isFileExist(user_id)') #debug
         RemovePic(event, user_id, group_id)
@@ -177,7 +217,6 @@ def handle_image(event):
             )
         GetPic(event, user_id, group_id, message_id)
         UploadToImgur(event, user_id, group_id) 
-        print('180 make sure pop'+str(PicNameDict)) # debug
         line_bot_api.push_message(
             group_id,
             TextSendMessage(text='183 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
@@ -201,7 +240,6 @@ def handle_text(event):
             if isFileExist(event, user_id):
                 UploadToImgur(event, user_id, group_id)
                 RemovePic(event, user_id, group_id)
-                print('204 id, PicNameDict:',id(PicNameDict),PicNameDict) #debug
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
             line_bot_api.push_message(
