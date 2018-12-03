@@ -97,8 +97,9 @@ def isFileExist(event, user_id):
 
 def isFileNameExist(event, user_id, group_id):
     print('enter FileNameExist')
+    to = group_id if group_id else user_id
     line_bot_api.push_message(
-        group_id,
+        to,
         TextSendMessage(text='58 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
         ) #debug
     for file in list(PicNameDict):
@@ -117,12 +118,13 @@ def GetPic(event, user_id, group_id, message_id):
         for chunk in message_content.iter_content():
             tf.write(chunk)
         Tempfile_Path = tf.name
+    to = group_id if group_id else user_id
     line_bot_api.push_message(
-        group_id,
+        to,
         TextSendMessage(text='File_Path:{}, File_Name_Ext:{}'.format(File_Path, File_Name_Ext))
     ) #debug
     line_bot_api.push_message(
-        group_id,
+        to,
         TextSendMessage(text='已儲存圖片暫存檔')
     )
     return True if isFileNameExist(event, user_id, group_id) else False
@@ -144,13 +146,15 @@ def UploadToImgur(event, user_id, group_id):
         client.upload_from_path(path, config=config, anon=False)
         print(os.listdir(os.getcwd()+'/static/tmp')) #debug
         print('104 remove path'+path) #debug
+        to = group_id if group_id else user_id
         line_bot_api.push_message(
-            group_id,
+            to,
             TextSendMessage(text='上傳成功'))
     except Exception as e:
         print(e)
+        to = group_id if group_id else user_id
         line_bot_api.push_message(
-            group_id,
+            to,
             TextSendMessage(text='上傳失敗'))
 
 def RemovePic(event, user_id, group_id):
@@ -167,8 +171,9 @@ def RemovePic(event, user_id, group_id):
     # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
     DeleteFromPicDict('WHOS_PICNAME_' + str(user_id))
     print('128 make sure pop'+str(PicNameDict)) # debug
+    to = group_id if group_id else user_id
     line_bot_api.push_message(
-        group_id,
+        to,
         TextSendMessage(text='刪除圖片'))
 
 def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
@@ -180,12 +185,13 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     # PicNameDict['WHOS_PICNAME_' + str(user_id)] = Line_Msg_Text[1:-1]
     AddToPicDict('WHOS_PICNAME_' + str(user_id), Line_Msg_Text[1:-1])
     # PicNameDict.update({ 'WHOS_PICNAME_' + str(user_id) : Line_Msg_Text[1:-1] })
+    to = group_id if group_id else user_id
     line_bot_api.push_message(
-        group_id,
+        to,
         TextSendMessage(text='144 id, PicNameDict:{}{}, pid:{}'.format(id(PicNameDict), PicNameDict, os.getpid()))
         )
     line_bot_api.push_message(
-        group_id,
+        to,
         TextSendMessage(text='圖片名字已設定完成: ' + Line_Msg_Text[1:-1])
         )
     return True
@@ -197,13 +203,19 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
 def handle_image(event):
     user_id = event.source.user_id
     message_id = event.message.id
-    group_id = event.source.group_id
+    try:
+        group_id = event.source.group_id
+    except AttributeError as e:
+        group_id = None
+        print("send from 1 to 1 chat room, so there's no group id")
+
     if isFileExist(event, user_id):
         print('if isFileExist(user_id)') #debug
         RemovePic(event, user_id, group_id)
         GetPic(event, user_id, group_id, message_id)
+        to = group_id if group_id else user_id
         line_bot_api.push_message(
-            group_id,
+            to,
             TextSendMessage(text='167 if isFileExist(user_id)')
             )
         if isFileNameExist(event, user_id, group_id):
@@ -211,14 +223,15 @@ def handle_image(event):
             RemovePic(event, user_id, group_id)
     elif isFileNameExist(event, user_id, group_id):
         print('if isFileNameExist(user_id)') #debug
+        to = group_id if group_id else user_id
         line_bot_api.push_message(
-            group_id,
+            to,
             TextSendMessage(text='176 elif isFileNameExist(user_id)')
             )
         GetPic(event, user_id, group_id, message_id)
         UploadToImgur(event, user_id, group_id) 
         line_bot_api.push_message(
-            group_id,
+            to,
             TextSendMessage(text='183 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
             )
         RemovePic(event, user_id, group_id)
@@ -230,7 +243,11 @@ def handle_image(event):
 def handle_text(event):
     user_id = event.source.user_id
     message_id = event.message.id
-    group_id = event.source.group_id
+    try:
+        group_id = event.source.group_id
+    except AttributeError as e:
+        group_id = None
+        print("send from 1 to 1 chat room, so there's no group id")
     Line_Msg_Text = event.message.text
 
     if isinstance(event.message, TextMessage):
