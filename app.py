@@ -93,6 +93,7 @@ def isFileExist(event, user_id):
         if File_Exist:
             print('File_Exist:', File_Exist) #debug
             return True
+    print('File_Exist:', File_Exist) #debug    
     return False
 
 def isFileNameExist(event, user_id, group_id):
@@ -103,6 +104,7 @@ def isFileNameExist(event, user_id, group_id):
         if File_Name_Exist:
             print('File_Name_Exist:', File_Name_Exist) #debug
             return True
+    print('File_Name_Exist:', File_Name_Exist) #debug
     return False
 
 def GetPic(event, user_id, group_id, message_id):
@@ -220,20 +222,26 @@ def handle_image(event):
             print('name already exist, start to upload')
             UploadToImgur(event, user_id, group_id)
             RemovePic(event, user_id, group_id)
-    elif isFileNameExist(event, user_id, group_id):
-        print('elif isFileNameExist('+str(user_id)+')') #debug
+    else:
+        print('226 else isFileNameExist('+str(user_id)+')') #debug
         to = group_id if group_id else user_id
         line_bot_api.push_message(
             to,
-            TextSendMessage(text='176 elif isFileNameExist('+str(user_id)+')')
+            TextSendMessage(text='226 else isFileNameExist('+str(user_id)+')')
             )
         GetPic(event, user_id, group_id, message_id)
-        UploadToImgur(event, user_id, group_id)
-        line_bot_api.push_message(
-            to,
-            TextSendMessage(text='183 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
-            )
-        RemovePic(event, user_id, group_id)
+        if isFileNameExist(event, user_id, group_id):
+            UploadToImgur(event, user_id, group_id)
+            line_bot_api.push_message(
+                to,
+                TextSendMessage(text='236 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
+                )
+            RemovePic(event, user_id, group_id)
+        else:
+            line_bot_api.push_message(
+                to,
+                TextSendMessage(text='檔案已上傳，請設定圖片名稱，範例: #圖片名稱#')
+                )
 
 # #################################################
 #                收到文字後邏輯
@@ -261,7 +269,7 @@ def handle_text(event):
             to = group_id if group_id else user_id
             line_bot_api.push_message(
                     to,
-                    TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #我是檔名#')
+                    TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
                 )
 
 
