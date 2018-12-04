@@ -14,6 +14,10 @@ from config import *
 import re
 import pickle
 import lockfile
+import requests
+import base64
+import json
+from imgur_auth import ImgurClient
 
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -132,29 +136,40 @@ def UploadToImgur(event, user_id, group_id):
     print('enter UploadToImgur')
     Pic_Name = PicNameDict['WHOS_PICNAME_' + str(user_id)]
     try:
-        print('UploadToImgur Pic_Name: ' + Pic_Name)
-        client = ImgurClient(client_id, client_secret, access_token, refresh_token)
-        config = {
+        print('UploadToImgur Pic_Name: ' + Pic_Name) #debug
+        path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(user_id) + '.jpg')
+        print('path:'+path) #debug
+        ########### 嘗試改用 python requests + API 的 headers 與 auth ###########
+        with open (path, 'rb') as file:
+            byte_file = file.read()
+            payload = base64.b64encode(byte_file)
+        data = {
+            'image': payload,
             'album': Album_ID,
             'name': Pic_Name,
             'title': Pic_Name,
-            'description': ' '
+            'description': 'Upload From MemePicLineBot'
         }
-        path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(user_id) + '.jpg')
-        print('path:'+path) #debug
+        # 這邊要考慮在 description 中加入 sha256 加密過的使用者 line user id 來達到嚇阻避免使用者濫用，濫用情況類似像是 PO 違法照片等等
+        # 也要想方法公告表示不要將個人資料與非法照片上傳（類似裸照或是未成年照片等等，我不想被ＦＢＩ抓．．．）否則將依法究辦之類的
+        InstanceClient = ImgurClient(client_id, client_secret, access_token, refresh_token)
+        headers = InstanceClient.prepare_headers()
+        response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
+        pic_link = json.loads(response.text)['data']['link']
+        ########################################################################
         client.upload_from_path(path, config=config, anon=False)
         print(os.listdir(os.getcwd()+'/static/tmp')) #debug
         print('104 remove path'+path) #debug
         to = group_id if group_id else user_id
         line_bot_api.push_message(
             to,
-            TextSendMessage(text='上傳成功'))
+            TextSendMessage(text='上傳至Imgur成功'))
     except Exception as e:
         print(e)
         to = group_id if group_id else user_id
         line_bot_api.push_message(
             to,
-            TextSendMessage(text='上傳失敗'))
+            TextSendMessage(text='上傳至Imgur失敗'))
 
 def RemovePic(event, user_id, group_id):
     '''
@@ -245,7 +260,7 @@ def handle_image(event):
                 )
 
 # #################################################
-#                收到文字後邏輯
+#                   收到文字後邏輯
 # #################################################
 @handler.add(MessageEvent, message=TextMessage)    
 def handle_text(event):
