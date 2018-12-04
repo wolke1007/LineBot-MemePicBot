@@ -291,6 +291,12 @@ def handle_text(event):
             if isFileExist(event, user_id):
                 UploadToImgur(event, user_id, group_id)
                 RemovePic(event, user_id, group_id)
+            else:
+                to = group_id if group_id else user_id
+                line_bot_api.push_message(
+                    to,
+                    TextSendMessage(text='圖片名稱已設定完畢，請上傳圖片')
+                )
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
             to = group_id if group_id else user_id
