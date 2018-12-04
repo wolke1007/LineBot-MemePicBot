@@ -186,7 +186,7 @@ def RemovePic(event, user_id, group_id):
     to = group_id if group_id else user_id
     line_bot_api.push_message(
         to,
-        TextSendMessage(text='刪除圖片'))
+        TextSendMessage(text='刪除圖片暫存檔'))
 
 def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     print('enter SavePicNameIntoDict')
