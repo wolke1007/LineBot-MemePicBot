@@ -235,6 +235,11 @@ def handle_image(event):
             print('name already exist, start to upload')
             UploadToImgur(event, user_id, group_id)
             RemovePic(event, user_id, group_id)
+        else:
+            line_bot_api.push_message(
+                to,
+                TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
+                )
     else:
         print('239 File Not Exist('+str(user_id)+'), get pic directly') #debug
         to = group_id if group_id else user_id
