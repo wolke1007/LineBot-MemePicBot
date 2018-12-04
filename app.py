@@ -162,6 +162,7 @@ def UploadToImgur(event, user_id, group_id):
         line_bot_api.push_message(
             to,
             TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
+            )
     except Exception as e:
         print(e)
         to = group_id if group_id else user_id
