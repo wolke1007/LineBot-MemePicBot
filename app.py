@@ -157,7 +157,6 @@ def UploadToImgur(event, user_id, group_id):
         response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
         pic_link = json.loads(response.text)['data']['link']
         ########################################################################
-        client.upload_from_path(path, config=config, anon=False)
         print(os.listdir(os.getcwd()+'/static/tmp')) #debug
         print('104 remove path'+path) #debug
         to = group_id if group_id else user_id
