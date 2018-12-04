@@ -165,7 +165,8 @@ def UploadToImgur(event, user_id, group_id):
             )
         line_bot_api.push_message(
                     to,
-                    ImageSendMessage(preview_image_url=pic_link)
+                    ImageSendMessage(preview_image_url=pic_link,
+                                    original_content_url=pic_link)
                 )
     except Exception as e:
         print(e)
