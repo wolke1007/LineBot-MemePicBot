@@ -172,15 +172,15 @@ def UploadToImgur(event, user_id, group_id):
 
 def RemovePic(event, user_id, group_id):
     '''
-    刪除檔案及從 PicNameDict 中去除已
+    刪除檔案及從 PicNameDict 中去除
     '''
     # 刪除圖片檔
     path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(user_id) + '.jpg')
     os.remove(path)
     print(os.listdir(os.getcwd()+'/static/tmp')) #debug
     print('122 group_id: ')  #debug
-    print(group_id) #debug
-    print(type(group_id)) #debug
+    print('group_id:'+str(group_id)) #debug
+    print('type of group_id:' + str(type(group_id))) #debug
     # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
     DeleteFromPicDict('WHOS_PICNAME_' + str(user_id))
     print('128 make sure pop'+str(PicNameDict)) # debug
