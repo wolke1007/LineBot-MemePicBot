@@ -35,38 +35,38 @@ def LoadPickleFile(str_file_path):
 def AddToPicDict(pic_name, pic_id):
     # check file is locked
     LoadPickleFile('pic_dict.pickle')
-    if pic_dict_lock.is_locked() is True and PicNameDict['isLock'] is True : return False
+    if pic_dict_lock.is_locked() is True and PicNameDict.get('isLock') is True : return False
     # double confirm 'isLock' value is not True
     LoadPickleFile('pic_dict.pickle')
-    if PicNameDict['isLock'] is True : return False
+    if PicNameDict.get('isLock') is True : return False
     # lock the file
     pic_dict_lock.acquire()
     # Set isLock to True, let the other process knows that I'm editing this file
-    PicNameDict['isLock'] = True
+    PicNameDict.get('isLock') = True
     WritePickleFile('pic_dict.pickle', PicNameDict) 
-    PicNameDict[pic_name] = pic_id ; PicNameDict['isLock'] = False
+    PicNameDict.get(pic_name) = pic_id ; PicNameDict.get('isLock') = False
     WritePickleFile('pic_dict.pickle', PicNameDict)
     # unlock the file
     pic_dict_lock.break_lock()
-    if pic_dict_lock.is_locked() is not True and PicNameDict['isLock'] is not True : return True
+    if pic_dict_lock.is_locked() is not True and PicNameDict.get('isLock') is not True : return True
 
 def DeleteFromPicDict(pic_name):
     # check file is locked
     LoadPickleFile('pic_dict.pickle')
-    if pic_dict_lock.is_locked() is True and PicNameDict['isLock'] is True : return False
+    if pic_dict_lock.is_locked() is True and PicNameDict.get('isLock') is True : return False
     # double confirm 'isLock' value is not True
     LoadPickleFile('pic_dict.pickle')
-    if PicNameDict['isLock'] is True : return False
+    if PicNameDict.get('isLock') is True : return False
     # lock the file
     pic_dict_lock.acquire()
     # Set isLock to True, let the other process knows that I'm editing this file
-    PicNameDict['isLock'] = True
+    PicNameDict.get('isLock') = True
     WritePickleFile('pic_dict.pickle', PicNameDict)
-    PicNameDict.pop(pic_name) ; PicNameDict['isLock'] = False
+    PicNameDict.pop(pic_name) ; PicNameDict.get('isLock') = False
     WritePickleFile('pic_dict.pickle', PicNameDict)
     # unlock the file
     pic_dict_lock.break_lock()
-    if pic_dict_lock.is_locked() is not True and PicNameDict['isLock'] is not True : return True
+    if pic_dict_lock.is_locked() is not True and PicNameDict.get('isLock') is not True : return True
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -133,7 +133,7 @@ def GetPic(event, user_id, group_id, message_id):
 
 def UploadToImgur(event, user_id, group_id):
     print('enter UploadToImgur')
-    Pic_Name = PicNameDict['WHOS_PICNAME_' + str(user_id)]
+    Pic_Name = PicNameDict.get('WHOS_PICNAME_' + str(user_id))
     try:
         print('UploadToImgur Pic_Name: ' + Pic_Name) #debug
         path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(user_id) + '.jpg')
@@ -172,7 +172,7 @@ def UploadToImgur(event, user_id, group_id):
 
 def RemovePic(event, user_id, group_id):
     '''
-    刪除檔案及從 PicNameDict 中去除
+    刪除檔案及從 PicNameDict 中去除已
     '''
     # 刪除圖片檔
     path = os.path.join('static', 'tmp', 'WHOS_PICNAME_' + str(user_id) + '.jpg')
@@ -195,9 +195,7 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
     若已經存在則複寫
     '''
-    # PicNameDict['WHOS_PICNAME_' + str(user_id)] = Line_Msg_Text[1:-1]
     AddToPicDict('WHOS_PICNAME_' + str(user_id), Line_Msg_Text[1:-1])
-    # PicNameDict.update({ 'WHOS_PICNAME_' + str(user_id) : Line_Msg_Text[1:-1] })
     to = group_id if group_id else user_id
     line_bot_api.push_message(
         to,
@@ -255,7 +253,7 @@ def handle_image(event):
         else:
             line_bot_api.push_message(
                 to,
-                TextSendMessage(text='檔案已上傳，請設定圖片名稱，範例: #圖片名稱#')
+                TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
                 )
 
 # #################################################
