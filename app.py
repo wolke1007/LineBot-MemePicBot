@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import random
 from flask import Flask, request, abort
-from imgurpython import ImgurClient
 from linebot import (
     LineBotApi, WebhookHandler
 )
