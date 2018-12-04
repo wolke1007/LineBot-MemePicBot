@@ -181,9 +181,6 @@ def RemovePic(event, user_id, group_id):
     print('122 group_id: ')  #debug
     print('group_id:'+str(group_id)) #debug
     print('type of group_id:' + str(type(group_id))) #debug
-    # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
-    DeleteFromPicDict('WHOS_PICNAME_' + str(user_id))
-    print('128 make sure pop'+str(PicNameDict)) # debug
     to = group_id if group_id else user_id
     line_bot_api.push_message(
         to,
@@ -221,6 +218,7 @@ def handle_image(event):
         print("send from 1 to 1 chat room, so there's no group id")
 
     if isFileExist(event, user_id):
+        ''' 如果圖片暫存檔已經存在 '''
         print('File Exist('+str(user_id)+'), remove pic file') #debug
         RemovePic(event, user_id, group_id)
         print('RemovePic done')
@@ -232,15 +230,19 @@ def handle_image(event):
             TextSendMessage(text='232 if isFileExist('+str(user_id)+')')
             )
         if isFileNameExist(event, user_id):
+            ''' 檔案名稱已取好了 '''
             print('name already exist, start to upload')
             UploadToImgur(event, user_id, group_id)
             RemovePic(event, user_id, group_id)
+            DeleteFromPicDict('WHOS_PICNAME_' + str(user_id))
         else:
+            ''' 檔案名稱還沒取好 '''
             line_bot_api.push_message(
                 to,
                 TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
                 )
     else:
+        ''' 如果圖片還沒上傳過 '''
         print('239 File Not Exist('+str(user_id)+'), get pic directly') #debug
         to = group_id if group_id else user_id
         line_bot_api.push_message(
@@ -249,13 +251,18 @@ def handle_image(event):
             )
         GetPic(event, user_id, group_id, message_id)
         if isFileNameExist(event, user_id):
+            ''' 檔案名稱已取好了 '''
             UploadToImgur(event, user_id, group_id)
             line_bot_api.push_message(
                 to,
                 TextSendMessage(text='236 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
                 )
             RemovePic(event, user_id, group_id)
+            # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
+            DeleteFromPicDict('WHOS_PICNAME_' + str(user_id))
+            print('257 make sure pop'+str(PicNameDict)) # debug
         else:
+            ''' 檔案名稱還沒取好 '''
             line_bot_api.push_message(
                 to,
                 TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
