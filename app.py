@@ -42,7 +42,7 @@ def AddToPicDict(pic_name, pic_id):
     # lock the file
     pic_dict_lock.acquire()
     # Set isLock to True, let the other process knows that I'm editing this file
-    PicNameDict.get('isLock') = True
+    PicNameDict['isLock'] = True
     WritePickleFile('pic_dict.pickle', PicNameDict) 
     PicNameDict.get(pic_name) = pic_id ; PicNameDict.get('isLock') = False
     WritePickleFile('pic_dict.pickle', PicNameDict)
@@ -60,7 +60,7 @@ def DeleteFromPicDict(pic_name):
     # lock the file
     pic_dict_lock.acquire()
     # Set isLock to True, let the other process knows that I'm editing this file
-    PicNameDict.get('isLock') = True
+    PicNameDict.get['isLock'] = True
     WritePickleFile('pic_dict.pickle', PicNameDict)
     PicNameDict.pop(pic_name) ; PicNameDict.get('isLock') = False
     WritePickleFile('pic_dict.pickle', PicNameDict)
