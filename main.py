@@ -41,28 +41,26 @@ def callback(event):
 
 def AddUserIdIfNotExist(user_id):
     print('enter AddUserIdIfNotExist')
-    if user_id in PicNameDict.keys():
+    if user_id not in PicNameDict.keys():
         new_dict = {user_id: {'pic_name': '', 'pic_content': '', 'pic_link': ''}}
         PicNameDict.update(new_dict)
         return True
-    else:
-        return False
 
-def isPicContentExist(event, user_id):
+def isPicContentExist(user_id):
     print('enter isPicContentExist')
     if PicNameDict.get(user_id).get('pic_content'):
         return True
     else:
         return False
 
-def isFileNameExist(event, user_id):
+def isFileNameExist(user_id):
     print('enter isFileNameExist')
     if PicNameDict.get(user_id).get('pic_name'):
         return True
     else:
         return False
     
-def SavePicContentToDict(event, user_id, group_id, message_id):
+def SavePicContentToDict(user_id, group_id, message_id):
     print('enter SavePicContentToDict')
     message_content = line_bot_api.get_message_content(message_id)
     PicNameDict[user_id]['pic_content'] = message_content
