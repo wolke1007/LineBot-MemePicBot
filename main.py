@@ -111,11 +111,11 @@ def UploadToImgur(user_id, group_id):
             to,
             TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
             )
-        line_bot_api.push_message(
-                    to,
-                    ImageSendMessage(preview_image_url=pic_link,
-                                    original_content_url=pic_link)
-                )
+        # line_bot_api.push_message(
+        #             to,
+        #             ImageSendMessage(preview_image_url=pic_link,
+        #                             original_content_url=pic_link)
+        #         )
         return pic_link
     except Exception as e:
         print(e)
@@ -226,7 +226,7 @@ def handle_text(event):
             to = group_id if group_id else user_id
             line_bot_api.push_message(
                     to,
-                    TextSendMessage(text='PicNameDic = ' + str(UserInfoDict) + 'id UserInfoDict = ' + str(id(UserInfoDict)))
+                    TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)))
                 )
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
