@@ -1,1 +1,1 @@
-heroku
+Google Cloud Function
