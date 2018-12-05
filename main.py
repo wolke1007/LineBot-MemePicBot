@@ -10,7 +10,7 @@ from linebot.exceptions import (
 from linebot.models import *
 import tempfile, os
 from config import *
-import imgur_auth as ImgurClient
+from imgur_auth import ImgurClient
 import re
 import requests
 import base64
@@ -85,8 +85,8 @@ def UploadToImgur(user_id, group_id):
     Pic_Name = PicNameDict.get(user_id).get('pic_name')
     try:
         binary_pic = PicNameDict.get(user_id).get('pic_content')
-        print('type binary_pic: '+str(type(binary_pic)))
-        print('type binary_pic.content: '+str(type(binary_pic.content)))
+        # print('type binary_pic: '+str(type(binary_pic)))
+        # print('type binary_pic.content: '+str(type(binary_pic.content)))
         payload = base64.b64encode(binary_pic.content)
         ################################
         data = {
@@ -98,22 +98,22 @@ def UploadToImgur(user_id, group_id):
         }
         # 這邊要考慮在 description 中加入 sha256 加密過的使用者 line user id 來達到嚇阻避免使用者濫用，濫用情況類似像是 PO 違法照片等等
         # 也要想方法公告表示不要將個人資料與非法照片上傳（類似裸照或是未成年照片等等，我不想被ＦＢＩ抓．．．）否則將依法究辦之類的
-    #     InstanceClient = ImgurClient(client_id, client_secret, access_token, refresh_token)
-    #     headers = InstanceClient.prepare_headers()
-    #     response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
-    #     pic_link = json.loads(response.text)['data']['link']
-    #     ########################################################################
-    #     to = group_id if group_id else user_id
-    #     line_bot_api.push_message(
-    #         to,
-    #         TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
-    #         )
-    #     line_bot_api.push_message(
-    #                 to,
-    #                 ImageSendMessage(preview_image_url=pic_link,
-    #                                 original_content_url=pic_link)
-    #             )
-    #     return pic_link
+        InstanceClient = ImgurClient(client_id, client_secret, access_token, refresh_token)
+        headers = InstanceClient.prepare_headers()
+        response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
+        pic_link = json.loads(response.text)['data']['link']
+        ########################################################################
+        to = group_id if group_id else user_id
+        line_bot_api.push_message(
+            to,
+            TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
+            )
+        line_bot_api.push_message(
+                    to,
+                    ImageSendMessage(preview_image_url=pic_link,
+                                    original_content_url=pic_link)
+                )
+        return pic_link
     except Exception as e:
         print(e)
         to = group_id if group_id else user_id
