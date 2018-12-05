@@ -226,7 +226,7 @@ def handle_text(event):
             to = group_id if group_id else user_id
             line_bot_api.push_message(
                     to,
-                    TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)))
+                    TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict))
                 )
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
