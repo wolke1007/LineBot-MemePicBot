@@ -125,17 +125,17 @@ def UploadToImgur(user_id, group_id):
             TextSendMessage(text='上傳至Imgur失敗'))
         return None
 
-    def GetPicFromPicLink(user_id):
-        pic_link = UserInfoDict[user_id]['pic_link']
-        return pic_link
+def GetPicFromPicLink(user_id):
+    pic_link = UserInfoDict[user_id]['pic_link']
+    return pic_link
 
-    def CheckMsgContent(MsgContent):
-        for PicName in PicNameDict.keys():
-            if re.search(MsgContent, PicName):
-                global PICLINK
-                PICLINK = PicNameDict.get(PicName)
-                return True
-        return False
+def CheckMsgContent(MsgContent):
+    for PicName in PicNameDict.keys():
+        if re.search(MsgContent, PicName):
+            global PICLINK
+            PICLINK = PicNameDict.get(PicName)
+            return True
+    return False
 
 # #################################################
 #                收到圖片後邏輯
