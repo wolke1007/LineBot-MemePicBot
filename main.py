@@ -43,6 +43,7 @@ def AddUserIdIfNotExist(user_id):
     print('enter AddUserIdIfNotExist')
     if user_id in PicNameDict.keys():
         new_dict = {user_id: {'pic_name': '', 'pic_content': '', 'pic_link': ''}}
+        PicNameDict.update(new_dict)
         return True
     else:
         return False
