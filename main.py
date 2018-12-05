@@ -15,7 +15,6 @@ import re
 import requests
 import base64
 import json
-import base64
 
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -86,7 +85,7 @@ def UploadToImgur(user_id, group_id):
     Pic_Name = PicNameDict.get(str(user_id)).get('pic_name')
     try:
         binary_pic = PicNameDict.get(user_id).get('pic_content')
-        payload = binary_pic
+        payload = base64.b64encode(binary_pic)
         ################################
         data = {
             'image': payload,
@@ -191,7 +190,7 @@ def handle_text(event):
             if isPicContentExist(user_id):
                 pic_link = UploadToImgur(user_id, group_id)
                 PicNameDict[user_id]['pic_link'] = pic_link
-                print('set pic_link done')# UploadToImgur(user_id, group_id)
+                print('set pic_link done')
                 PicNameDict[user_id]['pic_content'] = None
                 print('empty pic_content done')
                 PicNameDict[user_id]['pic_name'] = None
