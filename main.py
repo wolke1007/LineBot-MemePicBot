@@ -21,9 +21,12 @@ line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
+UserInfoDict = {}
 PicNameDict = {}
-# 格式定為 { 'user_id': { 'pic_name': '圖片名稱', 'pic_content': 'binary content', 
+
+# UserInfoDict  格式定為 { 'user_id': { 'pic_name': '圖片名稱', 'pic_content': 'binary content', 
 #                       'pic_link': 'https://imgur.xxx.xxx', 'banned':False }}
+# PicNameDict   格式定為 { 'pic_name' : 'pic_link' }
 
 ###################################################
 @app.route("/callback", methods=['POST'])
@@ -41,27 +44,27 @@ def callback(event):
 
 def AddUserIdIfNotExist(user_id):
     print('enter AddUserIdIfNotExist')
-    if user_id not in PicNameDict.keys():
+    if user_id not in UserInfoDict.keys():
         new_dict = {user_id: {'pic_name': None, 'pic_content': None, 'pic_link': None, 'banned':False}}
-        PicNameDict.update(new_dict)
+        UserInfoDict.update(new_dict)
         return True
 
 def isUserIdBanned(user_id):
-    if PicNameDict.get(user_id).get('banned'):
+    if UserInfoDict.get(user_id).get('banned'):
         return True
     else:
         return False
 
 def isPicContentExist(user_id):
     print('enter isPicContentExist')
-    if PicNameDict.get(user_id).get('pic_content'):
+    if UserInfoDict.get(user_id).get('pic_content'):
         return True
     else:
         return False
 
 def isFileNameExist(user_id):
     print('enter isFileNameExist')
-    if PicNameDict.get(user_id).get('pic_name'):
+    if UserInfoDict.get(user_id).get('pic_name'):
         return True
     else:
         return False
@@ -69,7 +72,7 @@ def isFileNameExist(user_id):
 def SavePicContentToDict(user_id, group_id, message_id):
     print('enter SavePicContentToDict')
     message_content = line_bot_api.get_message_content(message_id)
-    PicNameDict[user_id]['pic_content'] = message_content
+    UserInfoDict[user_id]['pic_content'] = message_content
     to = group_id if group_id else user_id
     line_bot_api.push_message(
         to,
@@ -82,9 +85,9 @@ def SavePicContentToDict(user_id, group_id, message_id):
 
 def UploadToImgur(user_id, group_id):
     print('enter UploadToImgur')
-    Pic_Name = PicNameDict.get(user_id).get('pic_name')
+    Pic_Name = UserInfoDict.get(user_id).get('pic_name')
     try:
-        binary_pic = PicNameDict.get(user_id).get('pic_content')
+        binary_pic = UserInfoDict.get(user_id).get('pic_content')
         # print('type binary_pic: '+str(type(binary_pic)))
         # print('type binary_pic.content: '+str(type(binary_pic.content)))
         payload = base64.b64encode(binary_pic.content)
@@ -122,6 +125,18 @@ def UploadToImgur(user_id, group_id):
             TextSendMessage(text='上傳至Imgur失敗'))
         return None
 
+    def GetPicFromPicLink(user_id):
+        pic_link = UserInfoDict[user_id]['pic_link']
+        return pic_link
+
+    def CheckMsgContent(MsgContent):
+        for PicName in PicNameDict.keys():
+            if re.search(MsgContent, PicName):
+                global PICLINK
+                PICLINK = PicNameDict.get(PicName)
+                return True
+        return False
+
 # #################################################
 #                收到圖片後邏輯
 # #################################################
@@ -149,11 +164,13 @@ def handle_image(event):
         ''' 檔案名稱已取好了 '''
         print('name already exist, start to upload')
         pic_link = UploadToImgur(user_id, group_id)
-        PicNameDict[user_id]['pic_link'] = pic_link
-        print('set pic_link done')
-        PicNameDict[user_id]['pic_content'] = None
+        UserInfoDict[user_id]['pic_link'] = pic_link
+        UserInfoDict[user_id]['pic_name'] = pic_name
+        PicNameDict[pic_name] = pic_link
+        print('set PicNameDict done')
+        UserInfoDict[user_id]['pic_content'] = None
         print('empty pic_content done')
-        PicNameDict[user_id]['pic_name'] = None
+        UserInfoDict[user_id]['pic_name'] = None
         print('empty pic_name done')
     else:
         ''' 檔案名稱還沒取好 '''
@@ -188,15 +205,17 @@ def handle_text(event):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除
-            PicNameDict[user_id]['pic_name'] = Line_Msg_Text[1:-1]
+            UserInfoDict[user_id]['pic_name'] = Line_Msg_Text[1:-1]
             print('add to pic_name done')
             if isPicContentExist(user_id):
                 pic_link = UploadToImgur(user_id, group_id)
-                PicNameDict[user_id]['pic_link'] = pic_link
-                print('set pic_link done')
-                PicNameDict[user_id]['pic_content'] = None
+                UserInfoDict[user_id]['pic_link'] = pic_link
+                UserInfoDict[user_id]['pic_name'] = pic_name
+                PicNameDict[pic_name] = pic_link
+                print('set PicNameDict done')
+                UserInfoDict[user_id]['pic_content'] = None
                 print('empty pic_content done')
-                PicNameDict[user_id]['pic_name'] = None
+                UserInfoDict[user_id]['pic_name'] = None
                 print('empty pic_name done')
             else:
                 to = group_id if group_id else user_id
@@ -209,7 +228,7 @@ def handle_text(event):
             to = group_id if group_id else user_id
             line_bot_api.push_message(
                     to,
-                    TextSendMessage(text='PicNameDic = ' + str(PicNameDict) + 'id PicNameDict = ' + str(id(PicNameDict)))
+                    TextSendMessage(text='PicNameDic = ' + str(UserInfoDict) + 'id UserInfoDict = ' + str(id(UserInfoDict)))
                 )
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
@@ -223,3 +242,13 @@ def handle_text(event):
                     to,
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
                 )
+        elif CheckMsgContent(event.message.text) :
+            print('CheckMsgContent(event.message.text)') #debug
+            to = group_id if group_id else user_id
+            line_bot_api.push_message(
+                    to,
+                    ImageSendMessage(preview_image_url=PICLINK,
+                                    original_content_url=PICLINK)
+                )
+            PICLINK = None
+            print('clean PICLINK')
