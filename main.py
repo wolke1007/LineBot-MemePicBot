@@ -81,49 +81,44 @@ def SavePicContentToDict(user_id, group_id, message_id):
     )
     return True
 
-# def UploadToImgur(user_id, group_id):
-#     print('enter UploadToImgur')
-#     Pic_Name = PicNameDict.get(str(user_id)).get('pic_name')
-#     try:
-#         print('UploadToImgur Pic_Name: ' + Pic_Name) #debug
-#         path = os.path.join('static', 'tmp', str(user_id) + '.jpg')
-#         print('path:'+path) #debug
-#         ########### 嘗試改用 python requests + API 的 headers 與 auth ###########
-#         # 這邊要改寫用使用者上傳的東西直接再傳過去
-#         payload = BASE64_PIC_FILE
-#         ################################
-#         data = {
-#             'image': payload,
-#             'album': Album_ID,
-#             'name': Pic_Name,
-#             'title': Pic_Name,
-#             'description': 'Upload From MemePicLineBot'
-#         }
-#         # 這邊要考慮在 description 中加入 sha256 加密過的使用者 line user id 來達到嚇阻避免使用者濫用，濫用情況類似像是 PO 違法照片等等
-#         # 也要想方法公告表示不要將個人資料與非法照片上傳（類似裸照或是未成年照片等等，我不想被ＦＢＩ抓．．．）否則將依法究辦之類的
-#         InstanceClient = ImgurClient(client_id, client_secret, access_token, refresh_token)
-#         headers = InstanceClient.prepare_headers()
-#         response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
-#         pic_link = json.loads(response.text)['data']['link']
-#         ########################################################################
-#         print(os.listdir(os.getcwd()+'/static/tmp')) #debug
-#         print('104 remove path'+path) #debug
-#         to = group_id if group_id else user_id
-#         line_bot_api.push_message(
-#             to,
-#             TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
-#             )
-#         line_bot_api.push_message(
-#                     to,
-#                     ImageSendMessage(preview_image_url=pic_link,
-#                                     original_content_url=pic_link)
-#                 )
-#     except Exception as e:
-#         print(e)
-#         to = group_id if group_id else user_id
-#         line_bot_api.push_message(
-#             to,
-#             TextSendMessage(text='上傳至Imgur失敗'))
+def UploadToImgur(user_id, group_id):
+    print('enter UploadToImgur')
+    Pic_Name = PicNameDict.get(str(user_id)).get('pic_name')
+    try:
+        binary_pic = PicNameDict.get(user_id).get('pic_content')
+        payload = binary_pic
+        ################################
+        data = {
+            'image': payload,
+            'album': Album_ID,
+            'name': Pic_Name,
+            'title': Pic_Name,
+            'description': 'Upload From MemePicLineBot'
+        }
+        # 這邊要考慮在 description 中加入 sha256 加密過的使用者 line user id 來達到嚇阻避免使用者濫用，濫用情況類似像是 PO 違法照片等等
+        # 也要想方法公告表示不要將個人資料與非法照片上傳（類似裸照或是未成年照片等等，我不想被ＦＢＩ抓．．．）否則將依法究辦之類的
+        InstanceClient = ImgurClient(client_id, client_secret, access_token, refresh_token)
+        headers = InstanceClient.prepare_headers()
+        response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
+        pic_link = json.loads(response.text)['data']['link']
+        ########################################################################
+        to = group_id if group_id else user_id
+        line_bot_api.push_message(
+            to,
+            TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
+            )
+        line_bot_api.push_message(
+                    to,
+                    ImageSendMessage(preview_image_url=pic_link,
+                                    original_content_url=pic_link)
+                )
+        return pic_link
+    except Exception as e:
+        print(e)
+        to = group_id if group_id else user_id
+        line_bot_api.push_message(
+            to,
+            TextSendMessage(text='上傳至Imgur失敗'))
 
 # #################################################
 #                收到圖片後邏輯
@@ -151,7 +146,9 @@ def handle_image(event):
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
         print('name already exist, start to upload')
-        # UploadToImgur(user_id, group_id)
+        pic_link = UploadToImgur(user_id, group_id)
+        PicNameDict[user_id]['pic_link'] = pic_link
+        print('set pic_link done')
         PicNameDict[user_id]['pic_content'] = None
         print('empty pic_content done')
         PicNameDict[user_id]['pic_name'] = None
@@ -192,7 +189,9 @@ def handle_text(event):
             PicNameDict[user_id]['pic_name'] = Line_Msg_Text[1:-1]
             print('add to pic_name done')
             if isPicContentExist(user_id):
-                # UploadToImgur(user_id, group_id)
+                pic_link = UploadToImgur(user_id, group_id)
+                PicNameDict[user_id]['pic_link'] = pic_link
+                print('set pic_link done')# UploadToImgur(user_id, group_id)
                 PicNameDict[user_id]['pic_content'] = None
                 print('empty pic_content done')
                 PicNameDict[user_id]['pic_name'] = None
@@ -202,6 +201,13 @@ def handle_text(event):
                 line_bot_api.push_message(
                     to,
                     TextSendMessage(text='圖片名稱已設定完畢，請上傳圖片')
+                )
+        elif event.message.text == "--debug":
+            print('event.message.text == "--debug"') #debug
+            to = group_id if group_id else user_id
+            line_bot_api.push_message(
+                    to,
+                    TextSendMessage(text='PicNameDic = ' + str(PicNameDict) + 'id PicNameDict = ' + str(id(PicNameDict)))
                 )
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
