@@ -25,7 +25,7 @@ pic_dict_lock = lockfile.LockFile('pic_dict.pickle')
 API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 
-原 imgur_auth 的內容 # 
+# 原 imgur_auth 的內容 # 
 class AuthWrapper(object):
     def __init__(self, access_token, refresh_token, client_id, client_secret):
         self.current_access_token = access_token
