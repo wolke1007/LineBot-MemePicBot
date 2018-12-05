@@ -137,8 +137,11 @@ def handle_image(event):
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
     if isUserIdBanned(user_id):
-        exit_code = 87
-        return exit_code
+        try:
+            raise Exception('This user id' + str(user_id) + 'got banned, refuse to do anything!')
+        except Exception:
+            print('This user id' + str(user_id) + 'got banned, refuse to do anything!')
+        return True
 
     if isPicContentExist(user_id):
         ''' 如果圖片暫存檔已經存在 '''
@@ -208,8 +211,11 @@ def handle_text(event):
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
     if isUserIdBanned(user_id):
-        exit_code = 87
-        return exit_code
+        try:
+            raise Exception('This user id' + str(user_id) + 'got banned, refuse to do anything!')
+        except Exception:
+            print('This user id' + str(user_id) + 'got banned, refuse to do anything!')
+        return True
 
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
