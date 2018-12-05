@@ -11,8 +11,6 @@ from linebot.models import *
 import tempfile, os
 from config import *
 import re
-import pickle
-import lockfile
 import requests
 import base64
 import json
@@ -21,10 +19,9 @@ import base64
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
-pic_dict_lock = lockfile.LockFile('pic_dict.pickle')
 API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
-
+PicNameDict = {}
 # 原 imgur_auth 的內容 # 
 class AuthWrapper(object):
     def __init__(self, access_token, refresh_token, client_id, client_secret):
@@ -188,50 +185,11 @@ class ImgurClient(object):
             account_data['pro_expiration'],
         )
 ###################################################
-def WritePickleFile(str_file_path, content):
-    with open (str_file_path, 'wb') as file:
-        pickle.dump(content, file)
+def AddToPicNameDict(pic_name, pic_id):
+    PicNameDict[pic_name] = pic_id
 
-def LoadPickleFile(str_file_path):
-    with open (str_file_path, 'rb') as file:
-        global PicNameDict
-        PicNameDict = pickle.load(file)
-
-def AddToPicDict(pic_name, pic_id):
-    # check file is locked
-    LoadPickleFile('pic_dict.pickle')
-    if pic_dict_lock.is_locked() is True and PicNameDict.get('isLock') is True : return False
-    # double confirm 'isLock' value is not True
-    LoadPickleFile('pic_dict.pickle')
-    if PicNameDict.get('isLock') is True : return False
-    # lock the file
-    pic_dict_lock.acquire()
-    # Set isLock to True, let the other process knows that I'm editing this file
-    PicNameDict['isLock'] = True
-    WritePickleFile('pic_dict.pickle', PicNameDict) 
-    PicNameDict[pic_name] = pic_id ; PicNameDict['isLock'] = False
-    WritePickleFile('pic_dict.pickle', PicNameDict)
-    # unlock the file
-    pic_dict_lock.break_lock()
-    if pic_dict_lock.is_locked() is not True and PicNameDict.get('isLock') is not True : return True
-
-def DeleteFromPicDict(pic_name):
-    # check file is locked
-    LoadPickleFile('pic_dict.pickle')
-    if pic_dict_lock.is_locked() is True and PicNameDict.get('isLock') is True : return False
-    # double confirm 'isLock' value is not True
-    LoadPickleFile('pic_dict.pickle')
-    if PicNameDict.get('isLock') is True : return False
-    # lock the file
-    pic_dict_lock.acquire()
-    # Set isLock to True, let the other process knows that I'm editing this file
-    PicNameDict['isLock'] = True
-    WritePickleFile('pic_dict.pickle', PicNameDict)
-    PicNameDict.pop(pic_name) ; PicNameDict['isLock'] = False
-    WritePickleFile('pic_dict.pickle', PicNameDict)
-    # unlock the file
-    pic_dict_lock.break_lock()
-    if pic_dict_lock.is_locked() is not True and PicNameDict.get('isLock') is not True : return True
+def DeleteFromPicNameDict(pic_name):
+    PicNameDict.pop(pic_name)
 
 @app.route("/callback", methods=['POST'])
 def callback(event):
@@ -266,7 +224,6 @@ def isFileExist(event, user_id):
 
 def isFileNameExist(event, user_id):
     print('enter FileNameExist')
-    LoadPickleFile('pic_dict.pickle')
     print('PicNameDict:'+str(PicNameDict)) #debug
     for file in list(PicNameDict):
         File_Name_Exist = True if re.search(str(user_id), file) else False
@@ -362,7 +319,7 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
     以 WHOS_PICNAME_user_id 的格式儲存圖片名稱
     若已經存在則複寫
     '''
-    AddToPicDict('WHOS_PICNAME_' + str(user_id), Line_Msg_Text[1:-1])
+    AddToPicNameDict('WHOS_PICNAME_' + str(user_id), Line_Msg_Text[1:-1])
     to = group_id if group_id else user_id
     line_bot_api.push_message(
         to,
@@ -404,7 +361,7 @@ def handle_image(event):
             print('name already exist, start to upload')
             UploadToImgur(event, user_id, group_id)
             RemovePic(event, user_id, group_id)
-            DeleteFromPicDict('WHOS_PICNAME_' + str(user_id))
+            DeleteFromPicNameDict('WHOS_PICNAME_' + str(user_id))
         else:
             ''' 檔案名稱還沒取好 '''
             line_bot_api.push_message(
@@ -429,7 +386,7 @@ def handle_image(event):
                 )
             RemovePic(event, user_id, group_id)
             # 刪除 WHOS_PICNAME_user_id 變成未命名狀態
-            DeleteFromPicDict('WHOS_PICNAME_' + str(user_id))
+            DeleteFromPicNameDict('WHOS_PICNAME_' + str(user_id))
             print('257 make sure pop'+str(PicNameDict)) # debug
         else:
             ''' 檔案名稱還沒取好 '''
@@ -457,7 +414,7 @@ def handle_text(event):
             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text)
             # 因為會覆寫，所以直接在 Add 一次不用刪除
-            AddToPicDict('WHOS_PICNAME_' + str(user_id), Line_Msg_Text[1:-1])
+            AddToPicNameDict('WHOS_PICNAME_' + str(user_id), Line_Msg_Text[1:-1])
             if isFileExist(event, user_id):
                 UploadToImgur(event, user_id, group_id)
                 RemovePic(event, user_id, group_id)
