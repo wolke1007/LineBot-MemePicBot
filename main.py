@@ -234,7 +234,7 @@ MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 #     if pic_dict_lock.is_locked() is not True and PicNameDict.get('isLock') is not True : return True
 
 @app.route("/callback", methods=['POST'])
-def callback(event, context):
+def callback(event):
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
     
