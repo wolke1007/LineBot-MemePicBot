@@ -84,7 +84,7 @@ def UploadToImgur(user_id, group_id):
     print('enter UploadToImgur')
     Pic_Name = PicNameDict.get(str(user_id)).get('pic_name')
     try:
-        binary_pic = PicNameDict.get(user_id).get('pic_content')
+        binary_pic = PicNameDict.get(user_id).get('pic_content').content
         payload = base64.b64encode(binary_pic)
         ################################
         data = {
