@@ -201,8 +201,9 @@ def handle_text(event):
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
-            # 因為會覆寫，所以直接在 Add 一次不用刪除
-            AddToPicNameDict(str(user_id), Line_Msg_Text[1:-1])
+            # 因為會覆寫，所以直接再 Add 一次不用刪除
+            PicNameDict[user_id]['pic_name'] = Line_Msg_Text[1:-1]
+            print('add to pic_name done')
             if isPicContentExist(event, user_id):
                 # UploadToImgur(event, user_id, group_id)
                 PicNameDict[user_id]['pic_content'] = ''
