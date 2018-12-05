@@ -23,7 +23,8 @@ handler = WebhookHandler(line_channel_secret)
 API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 PicNameDict = {}
-# 格式定為 {'user_id': {'pic_name': '圖片名稱', 'pic_content': 'binary content', 'pic_link': 'https://imgur.xxx.xxx'}}
+# 格式定為 { 'user_id': { 'pic_name': '圖片名稱', 'pic_content': 'binary content', 
+#                       'pic_link': 'https://imgur.xxx.xxx', 'banned':False }}
 
 ###################################################
 @app.route("/callback", methods=['POST'])
@@ -42,9 +43,15 @@ def callback(event):
 def AddUserIdIfNotExist(user_id):
     print('enter AddUserIdIfNotExist')
     if user_id not in PicNameDict.keys():
-        new_dict = {user_id: {'pic_name': '', 'pic_content': '', 'pic_link': ''}}
+        new_dict = {user_id: {'pic_name': None, 'pic_content': None, 'pic_link': None, 'banned':False}}
         PicNameDict.update(new_dict)
         return True
+
+def isUserIdBanned(user_id):
+    if PicNameDict.get(user_id).get('banned'):
+        return True
+    else:
+        return False
 
 def isPicContentExist(user_id):
     print('enter isPicContentExist')
@@ -128,10 +135,14 @@ def handle_image(event):
         group_id = None
         print("send from 1 to 1 chat room, so there's no group id")
     AddUserIdIfNotExist(user_id)
+    # 檢查該 user 是否已經被 banned
+    if isUserIdBanned(user_id):
+        exit_code = 87
+        return exit_code
 
     if isPicContentExist(user_id):
         ''' 如果圖片暫存檔已經存在 '''
-        PicNameDict[user_id]['pic_content'] = ''
+        PicNameDict[user_id]['pic_content'] = None
         print('empty pic_content done')
         SavePicContentToDict(user_id, group_id, message_id)
         print('SavePicContentToDict done')
@@ -144,9 +155,9 @@ def handle_image(event):
             ''' 檔案名稱已取好了 '''
             print('name already exist, start to upload')
             # UploadToImgur(user_id, group_id)
-            PicNameDict[user_id]['pic_content'] = ''
+            PicNameDict[user_id]['pic_content'] = None
             print('empty pic_content done')
-            PicNameDict[user_id]['pic_name'] = ''
+            PicNameDict[user_id]['pic_name'] = None
             print('empty pic_name done')
         else:
             ''' 檔案名稱還沒取好 '''
@@ -170,9 +181,9 @@ def handle_image(event):
                 to,
                 TextSendMessage(text='236 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
                 )
-            PicNameDict[user_id]['pic_content'] = ''
+            PicNameDict[user_id]['pic_content'] = None
             print('empty pic_content done')
-            PicNameDict[user_id]['pic_name'] = ''
+            PicNameDict[user_id]['pic_name'] = None
             print('empty pic_name done')
         else:
             ''' 檔案名稱還沒取好 '''
@@ -195,6 +206,10 @@ def handle_text(event):
         print("send from 1 to 1 chat room, so there's no group id")
     Line_Msg_Text = event.message.text
     AddUserIdIfNotExist(user_id)
+    # 檢查該 user 是否已經被 banned
+    if isUserIdBanned(user_id):
+        exit_code = 87
+        return exit_code
 
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
@@ -204,9 +219,9 @@ def handle_text(event):
             print('add to pic_name done')
             if isPicContentExist(user_id):
                 # UploadToImgur(user_id, group_id)
-                PicNameDict[user_id]['pic_content'] = ''
+                PicNameDict[user_id]['pic_content'] = None
                 print('empty pic_content done')
-                PicNameDict[user_id]['pic_name'] = ''
+                PicNameDict[user_id]['pic_name'] = None
                 print('empty pic_name done')
             else:
                 to = group_id if group_id else user_id
