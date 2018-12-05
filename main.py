@@ -9,7 +9,7 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 import tempfile, os
-# from config import *
+from config import *
 import re
 import pickle
 import lockfile
