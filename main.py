@@ -441,20 +441,20 @@ def callback(event):
 # # #################################################
 # #                   收到文字後邏輯
 # # #################################################
-# @handler.add(MessageEvent, message=TextMessage)    
-# def handle_text(event):
-#     user_id = event.source.user_id
-#     message_id = event.message.id
-#     try:
-#         group_id = event.source.group_id
-#     except AttributeError as e:
-#         group_id = None
-#         print("send from 1 to 1 chat room, so there's no group id")
-#     Line_Msg_Text = event.message.text
+@handler.add(MessageEvent, message=TextMessage)    
+def handle_text(event):
+    user_id = event.source.user_id
+    message_id = event.message.id
+    try:
+        group_id = event.source.group_id
+    except AttributeError as e:
+        group_id = None
+        print("send from 1 to 1 chat room, so there's no group id")
+    Line_Msg_Text = event.message.text
 
-#     if isinstance(event.message, TextMessage):
-#         if event.message.text[0] == "#" and event.message.text[-1] == "#":
-#             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
+    if isinstance(event.message, TextMessage):
+        if event.message.text[0] == "#" and event.message.text[-1] == "#":
+            print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
 #             # SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text)
 #             # 因為會覆寫，所以直接在 Add 一次不用刪除
 #             AddToPicDict('WHOS_PICNAME_' + str(user_id), Line_Msg_Text[1:-1])
@@ -467,15 +467,15 @@ def callback(event):
 #                     to,
 #                     TextSendMessage(text='圖片名稱已設定完畢，請上傳圖片')
 #                 )
-#         elif event.message.text == "--help":
-#             print('event.message.text == "--help"') #debug
-#             to = group_id if group_id else user_id
-#             line_bot_api.push_message(
-#                     to,
-#                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
-#                 )
-#             line_bot_api.push_message(
-#                     to,
-#                     ImageSendMessage(preview_image_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png',
-#                                     original_content_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png')
-#                 )
+        elif event.message.text == "--help":
+            print('event.message.text == "--help"') #debug
+            to = group_id if group_id else user_id
+            line_bot_api.push_message(
+                    to,
+                    TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
+                )
+            line_bot_api.push_message(
+                    to,
+                    ImageSendMessage(preview_image_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png',
+                                    original_content_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png')
+                )
