@@ -74,7 +74,7 @@ def SavePicContentToDict(user_id, group_id, message_id):
     to = group_id if group_id else user_id
     line_bot_api.push_message(
         to,
-        TextSendMessage(text='已儲存圖片暫存檔, type of message_content: ' + str(type(message_content)))
+        TextSendMessage(text='已儲存圖片暫存檔, dir of message_content: ' + str(dir(message_content)))
     )
     return True
 
