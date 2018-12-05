@@ -71,7 +71,7 @@ def SavePicContentToDict(user_id, group_id, message_id):
     )
     return True
 
-# def UploadToImgur(event, user_id, group_id):
+# def UploadToImgur(user_id, group_id):
 #     print('enter UploadToImgur')
 #     Pic_Name = PicNameDict.get(str(user_id)).get('pic_name')
 #     try:
@@ -129,21 +129,21 @@ def handle_image(event):
         print("send from 1 to 1 chat room, so there's no group id")
     AddUserIdIfNotExist(user_id)
 
-    if isPicContentExist(event, user_id):
+    if isPicContentExist(user_id):
         ''' 如果圖片暫存檔已經存在 '''
         PicNameDict[user_id]['pic_content'] = ''
         print('empty pic_content done')
-        SavePicContentToDict(event, user_id, group_id, message_id)
+        SavePicContentToDict(user_id, group_id, message_id)
         print('SavePicContentToDict done')
         to = group_id if group_id else user_id
         line_bot_api.push_message(
             to,
             TextSendMessage(text='232 if isPicContentExist('+str(user_id)+')')
             )
-        if isFileNameExist(event, user_id):
+        if isFileNameExist(user_id):
             ''' 檔案名稱已取好了 '''
             print('name already exist, start to upload')
-            # UploadToImgur(event, user_id, group_id)
+            # UploadToImgur(user_id, group_id)
             PicNameDict[user_id]['pic_content'] = ''
             print('empty pic_content done')
             PicNameDict[user_id]['pic_name'] = ''
@@ -162,10 +162,10 @@ def handle_image(event):
             to,
             TextSendMessage(text='243 else isPicContentExist('+str(user_id)+')')
             )
-        SavePicContentToDict(event, user_id, group_id, message_id)
-        if isFileNameExist(event, user_id):
+        SavePicContentToDict(user_id, group_id, message_id)
+        if isFileNameExist(user_id):
             ''' 檔案名稱已取好了 '''
-            # UploadToImgur(event, user_id, group_id)
+            # UploadToImgur(user_id, group_id)
             line_bot_api.push_message(
                 to,
                 TextSendMessage(text='236 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
@@ -202,8 +202,8 @@ def handle_text(event):
             # 因為會覆寫，所以直接再 Add 一次不用刪除
             PicNameDict[user_id]['pic_name'] = Line_Msg_Text[1:-1]
             print('add to pic_name done')
-            if isPicContentExist(event, user_id):
-                # UploadToImgur(event, user_id, group_id)
+            if isPicContentExist(user_id):
+                # UploadToImgur(user_id, group_id)
                 PicNameDict[user_id]['pic_content'] = ''
                 print('empty pic_content done')
                 PicNameDict[user_id]['pic_name'] = ''
