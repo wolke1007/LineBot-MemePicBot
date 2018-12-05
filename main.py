@@ -146,57 +146,22 @@ def handle_image(event):
             print('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return True
 
-    if isPicContentExist(user_id):
-        ''' 如果圖片暫存檔已經存在 '''
+    SavePicContentToDict(user_id, group_id, message_id)
+
+    if isFileNameExist(user_id):
+        ''' 檔案名稱已取好了 '''
+        print('name already exist, start to upload')
+        # UploadToImgur(user_id, group_id)
         PicNameDict[user_id]['pic_content'] = None
         print('empty pic_content done')
-        SavePicContentToDict(user_id, group_id, message_id)
-        print('SavePicContentToDict done')
-        to = group_id if group_id else user_id
-        line_bot_api.push_message(
-            to,
-            TextSendMessage(text='232 if isPicContentExist('+str(user_id)+')')
-            )
-        if isFileNameExist(user_id):
-            ''' 檔案名稱已取好了 '''
-            print('name already exist, start to upload')
-            # UploadToImgur(user_id, group_id)
-            PicNameDict[user_id]['pic_content'] = None
-            print('empty pic_content done')
-            PicNameDict[user_id]['pic_name'] = None
-            print('empty pic_name done')
-        else:
-            ''' 檔案名稱還沒取好 '''
-            line_bot_api.push_message(
-                to,
-                TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
-                )
+        PicNameDict[user_id]['pic_name'] = None
+        print('empty pic_name done')
     else:
-        ''' 如果圖片還沒上傳過 '''
-        print('239 File Not Exist('+str(user_id)+'), get pic directly') #debug
-        to = group_id if group_id else user_id
+        ''' 檔案名稱還沒取好 '''
         line_bot_api.push_message(
             to,
-            TextSendMessage(text='243 else isPicContentExist('+str(user_id)+')')
+            TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
             )
-        SavePicContentToDict(user_id, group_id, message_id)
-        if isFileNameExist(user_id):
-            ''' 檔案名稱已取好了 '''
-            # UploadToImgur(user_id, group_id)
-            line_bot_api.push_message(
-                to,
-                TextSendMessage(text='236 id, PicNameDict:{}{}'.format(id(PicNameDict),PicNameDict))
-                )
-            PicNameDict[user_id]['pic_content'] = None
-            print('empty pic_content done')
-            PicNameDict[user_id]['pic_name'] = None
-            print('empty pic_name done')
-        else:
-            ''' 檔案名稱還沒取好 '''
-            line_bot_api.push_message(
-                to,
-                TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
-                )
 
 # #################################################
 #                   收到文字後邏輯
