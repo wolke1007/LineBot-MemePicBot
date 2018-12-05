@@ -164,8 +164,7 @@ def handle_image(event):
         ''' 檔案名稱已取好了 '''
         print('name already exist, start to upload')
         pic_link = UploadToImgur(user_id, group_id)
-        UserInfoDict[user_id]['pic_link'] = pic_link
-        UserInfoDict[user_id]['pic_name'] = pic_name
+        pic_name = UserInfoDict.get(user_id).get('pic_name')
         PicNameDict[pic_name] = pic_link
         print('set PicNameDict done')
         UserInfoDict[user_id]['pic_content'] = None
@@ -209,8 +208,7 @@ def handle_text(event):
             print('add to pic_name done')
             if isPicContentExist(user_id):
                 pic_link = UploadToImgur(user_id, group_id)
-                UserInfoDict[user_id]['pic_link'] = pic_link
-                UserInfoDict[user_id]['pic_name'] = pic_name
+                pic_name = UserInfoDict.get(user_id).get('pic_name')
                 PicNameDict[pic_name] = pic_link
                 print('set PicNameDict done')
                 UserInfoDict[user_id]['pic_content'] = None
