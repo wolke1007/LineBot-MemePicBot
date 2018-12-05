@@ -25,15 +25,6 @@ pic_dict_lock = lockfile.LockFile('pic_dict.pickle')
 API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 
-# 原 config 的內容 #
-client_id = Client_ID
-client_secret = Client_Secret
-album_id = Album_ID
-
-# line bot key
-line_channel_access_token = line_channel_access_token
-line_channel_secret = line_channel_secret
-
 # 原 imgur_auth 的內容 # 
 class AuthWrapper(object):
     def __init__(self, access_token, refresh_token, client_id, client_secret):
@@ -243,7 +234,7 @@ def DeleteFromPicDict(pic_name):
     if pic_dict_lock.is_locked() is not True and PicNameDict.get('isLock') is not True : return True
 
 @app.route("/callback", methods=['POST'])
-def callback():
+def callback(event, context):
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
     
