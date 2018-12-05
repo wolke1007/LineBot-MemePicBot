@@ -383,10 +383,6 @@ def SavePicNameIntoDict(event, user_id, group_id, Line_Msg_Text):
         )
     return True
 
-def ChooseFunc(message):
-    
-
-
 # #################################################
 #                收到圖片後邏輯
 # #################################################
