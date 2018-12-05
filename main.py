@@ -23,7 +23,7 @@ API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 UserInfoDict = {}
 PicNameDict = {}
-global PICLINK
+PICLINK = None
 
 # UserInfoDict  格式定為 { 'user_id': { 'pic_name': '圖片名稱', 'pic_content': 'binary content', 
 #                       'pic_link': 'https://imgur.xxx.xxx', 'banned':False }}
@@ -133,6 +133,7 @@ def GetPicFromPicLink(user_id):
 def CheckMsgContent(MsgContent):
     for PicName in PicNameDict.keys():
         if re.search(MsgContent, PicName):
+            global PICLINK
             PICLINK = PicNameDict.get(PicName)
             return True
     return False
