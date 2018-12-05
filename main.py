@@ -23,7 +23,6 @@ API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 UserInfoDict = {}
 PicNameDict = {}
-PICLINK = None
 
 # UserInfoDict  格式定為 { 'user_id': { 'pic_name': '圖片名稱', 'pic_content': 'binary content', 
 #                       'pic_link': 'https://imgur.xxx.xxx', 'banned':False }}
@@ -133,9 +132,7 @@ def GetPicFromPicLink(user_id):
 def CheckMsgContent(MsgContent):
     for PicName in PicNameDict.keys():
         if re.search(MsgContent, PicName):
-            global PICLINK
-            PICLINK = PicNameDict.get(PicName)
-            return True
+            return PicNameDict.get(PicName)
     return False
 
 # #################################################
@@ -241,13 +238,15 @@ def handle_text(event):
                     to,
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
                 )
-        elif CheckMsgContent(event.message.text) :
+        else:
             print('CheckMsgContent(event.message.text)') #debug
-            to = group_id if group_id else user_id
-            line_bot_api.push_message(
-                    to,
-                    ImageSendMessage(preview_image_url=PICLINK,
-                                    original_content_url=PICLINK)
-                )
+            PICLINK = CheckMsgContent(event.message.text)
+            if PICLINK:
+                to = group_id if group_id else user_id
+                line_bot_api.push_message(
+                        to,
+                        ImageSendMessage(preview_image_url=PICLINK,
+                                        original_content_url=PICLINK)
+                    )
             PICLINK = None
             print('clean PICLINK')
