@@ -84,8 +84,10 @@ def UploadToImgur(user_id, group_id):
     print('enter UploadToImgur')
     Pic_Name = PicNameDict.get(str(user_id)).get('pic_name')
     try:
-        binary_pic = PicNameDict.get(user_id).get('pic_content').content
-        payload = base64.b64encode(binary_pic)
+        binary_pic = PicNameDict.get(user_id).get('pic_content')
+        print('type binary_pic: '+str(type(binary_pic)))
+        print('type binary_pic.content: '+str(type(binary_pic.content)))
+        payload = base64.b64encode(binary_pic.content)
         ################################
         data = {
             'image': payload,
@@ -118,6 +120,7 @@ def UploadToImgur(user_id, group_id):
         line_bot_api.push_message(
             to,
             TextSendMessage(text='上傳至Imgur失敗'))
+        return False
 
 # #################################################
 #                收到圖片後邏輯
