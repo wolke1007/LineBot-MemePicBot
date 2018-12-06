@@ -134,16 +134,16 @@ def SavePicContentToDict(user_id, group_id, message_id):
     print('enter SavePicContentToDict')
     message_content = line_bot_api.get_message_content(message_id)
     UserInfoDict[user_id]['pic_content'] = message_content
-    to = group_id if group_id else user_id
-    # line_bot_api.push_message(
+    # to = group_id if group_id else user_id
+    # line_bot_api.reply_message(
     #     to,
     #     TextSendMessage(text='已儲存圖片暫存檔, type(message_content.content): ' + str(type(message_content.content)) +
     #                         ', message_content.response: ' + str(message_content.response) +
     #                         ', message_content.content_type: ' + str(message_content.content_type)
     #                         )
     # )
-    line_bot_api.push_message(
-        to,
+    line_bot_api.reply_message(
+        event.reply_token,
         TextSendMessage(text='已儲存圖片暫存檔')
     )
     return True
@@ -171,12 +171,12 @@ def UploadToImgur(user_id, group_id):
         response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
         pic_link = json.loads(response.text)['data']['link']
         ########################################################################
-        to = group_id if group_id else user_id
-        line_bot_api.push_message(
-            to,
+        # to = group_id if group_id else user_id
+        line_bot_api.reply_message(
+            event.reply_token,
             TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
             )
-        # line_bot_api.push_message(
+        # line_bot_api.reply_message(
         #             to,
         #             ImageSendMessage(preview_image_url=pic_link,
         #                             original_content_url=pic_link)
@@ -184,9 +184,9 @@ def UploadToImgur(user_id, group_id):
         return pic_link
     except Exception as e:
         print(e)
-        to = group_id if group_id else user_id
-        line_bot_api.push_message(
-            to,
+        # to = group_id if group_id else user_id
+        line_bot_api.reply_message(
+            event.reply_token,
             TextSendMessage(text='上傳至Imgur失敗'))
         return None
 
@@ -236,8 +236,8 @@ def handle_image(event):
         print('empty pic_name done')
     else:
         ''' 檔案名稱還沒取好 '''
-        line_bot_api.push_message(
-            to,
+        line_bot_api.reply_message(
+            event.reply_token,
             TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
             )
 
@@ -279,27 +279,29 @@ def handle_text(event):
                 UserInfoDict[user_id]['pic_name'] = None
                 print('empty pic_name done')
             else:
-                to = group_id if group_id else user_id
-                line_bot_api.push_message(
-                    to,
+                # to = group_id if group_id else user_id
+                line_bot_api.reply_message(
+                    event.reply_token,
                     TextSendMessage(text='圖片名稱已設定完畢，請上傳圖片')
                 )
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         elif event.message.text == "--debug":
             print('event.message.text == "--debug"') #debug
             to = group_id if group_id else user_id
-            line_bot_api.push_message(
+            line_bot_api.push(
                     to,
-                    TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict))
+                    TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)
+                    + 'to: ' + str(to)
+                    )
                 )
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
-            to = group_id if group_id else user_id
-            line_bot_api.push_message(
-                    to,
-                    ImageSendMessage(preview_image_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png',
-                                    original_content_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png')
-                )
+            # to = group_id if group_id else user_id
+            # line_bot_api.reply_message(
+            #         to,
+            #         ImageSendMessage(preview_image_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png',
+            #                         original_content_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png')
+            #     )
             line_bot_api.reply_message(
                     event.reply_token,
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
