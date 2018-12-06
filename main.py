@@ -195,6 +195,7 @@ def GetPicFromPicLink(user_id):
     return pic_link
 
 def CheckMsgContent(MsgContent):
+    MsgContent = MsgContent.lower()
     for PicName in PicNameDict.keys():
         if re.search(PicName, MsgContent):
             return PicNameDict.get(PicName)
@@ -266,8 +267,8 @@ def handle_text(event):
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
-            # 因為會覆寫，所以直接再 Add 一次不用刪除
-            UserInfoDict[user_id]['pic_name'] = Line_Msg_Text[1:-1]
+            # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
+            UserInfoDict[user_id]['pic_name'] = Line_Msg_Text[1:-1].lower()
             print('add to pic_name done')
             if isPicContentExist(user_id):
                 pic_link = UploadToImgur(user_id, group_id)
