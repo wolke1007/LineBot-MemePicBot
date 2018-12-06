@@ -131,7 +131,7 @@ def GetPicFromPicLink(user_id):
 
 def CheckMsgContent(MsgContent):
     for PicName in PicNameDict.keys():
-        if re.search(MsgContent, PicName):
+        if re.search(PicName, MsgContent):
             return PicNameDict.get(PicName)
     return False
 
