@@ -300,8 +300,8 @@ def handle_text(event):
                     ImageSendMessage(preview_image_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png',
                                     original_content_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png')
                 )
-            line_bot_api.push_message(
-                    to,
+            line_bot_api.reply_message(
+                    event.reply_token,
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
                 )
         else:
