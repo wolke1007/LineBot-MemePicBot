@@ -221,10 +221,11 @@ def handle_image(event):
         return True
 
     SavePicContentToDict(user_id, group_id, message_id)
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='已儲存圖片暫存檔')
-    )
+    print('已儲存圖片暫存檔')
+    # line_bot_api.reply_message(
+    #     event.reply_token,
+    #     TextSendMessage(text='已儲存圖片暫存檔')
+    # )
     
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
