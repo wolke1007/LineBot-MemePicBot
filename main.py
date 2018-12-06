@@ -274,7 +274,17 @@ def handle_text(event):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
-            UserInfoDict[user_id]['pic_name'] = Line_Msg_Text[1:-1].lower()
+            # 圖片名稱長度在此設定門檻，目前設定為４個字
+            pic_name = Line_Msg_Text[1:-1].lower()
+            if len(pic_name) >= 4:
+                UserInfoDict[user_id]['pic_name'] = pic_name
+            else:
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text='圖片名稱長度至少4個字（中英文或數字皆可)')
+                )
+                return False
+
             print('add to pic_name done')
             if isPicContentExist(user_id):
                 pic_link = UploadToImgur(user_id, group_id)
