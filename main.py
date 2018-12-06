@@ -142,10 +142,6 @@ def SavePicContentToDict(user_id, group_id, message_id):
     #                         ', message_content.content_type: ' + str(message_content.content_type)
     #                         )
     # )
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='已儲存圖片暫存檔')
-    )
     return True
 
 def UploadToImgur(user_id, group_id):
@@ -223,7 +219,11 @@ def handle_image(event):
         return True
 
     SavePicContentToDict(user_id, group_id, message_id)
-
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text='已儲存圖片暫存檔')
+    )
+    
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
         print('name already exist, start to upload')
