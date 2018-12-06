@@ -168,23 +168,25 @@ def UploadToImgur(user_id, group_id):
         pic_link = json.loads(response.text)['data']['link']
         ########################################################################
         # to = group_id if group_id else user_id
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
-            )
+        # line_bot_api.reply_message(
+        #     event.reply_token,
+        #     TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
+        #     )
         # line_bot_api.reply_message(
         #             to,
         #             ImageSendMessage(preview_image_url=pic_link,
         #                             original_content_url=pic_link)
         #         )
-        return pic_link
+        reply_msg = '上傳至Imgur成功'
+        return pic_link, reply_msg
     except Exception as e:
         print(e)
         # to = group_id if group_id else user_id
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='上傳至Imgur失敗'))
-        return None
+        # line_bot_api.reply_message(
+        #     event.reply_token,
+        #     TextSendMessage(text='上傳至Imgur失敗'))
+        reply_msg = '上傳至Imgur失敗'
+        return '', reply_msg
 
 def GetPicFromPicLink(user_id):
     pic_link = UserInfoDict[user_id]['pic_link']
@@ -227,7 +229,7 @@ def handle_image(event):
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
         print('name already exist, start to upload')
-        pic_link = UploadToImgur(user_id, group_id)
+        pic_link, reply_msg = UploadToImgur(user_id, group_id)
         pic_name = UserInfoDict.get(user_id).get('pic_name')
         PicNameDict[pic_name] = pic_link
         print('set PicNameDict done')
@@ -235,6 +237,9 @@ def handle_image(event):
         print('empty pic_content done')
         UserInfoDict[user_id]['pic_name'] = None
         print('empty pic_name done')
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply_msg))
     else:
         ''' 檔案名稱還沒取好 '''
         line_bot_api.reply_message(
