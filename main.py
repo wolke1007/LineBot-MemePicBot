@@ -294,7 +294,7 @@ def handle_text(event):
         elif event.message.text == "--debug":
             print('event.message.text == "--debug"') #debug
             to = group_id if group_id else user_id
-            line_bot_api.push(
+            line_bot_api.push_message(
                     to,
                     TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)
                     + 'to: ' + str(to)
