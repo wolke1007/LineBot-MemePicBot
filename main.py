@@ -190,6 +190,11 @@ def LineReplyMsg(to, content, content_type):
             ImageSendMessage(preview_image_url=content,
                             original_content_url=content)       
             )
+def LinePushTextMsg(to, content):
+    line_bot_api.push_message(
+            to,
+            TextSendMessage(text=content)
+            )
 # #################################################
 #                收到圖片後邏輯
 # #################################################
@@ -287,38 +292,23 @@ def handle_text(event):
             print('event.message.text == "--debug"') #debug
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             command = event.message.text[8:]
+            to = group_id if group_id else user_id
             if not command :
-                to = group_id if group_id else user_id
-                line_bot_api.push_message(
-                        to,
-                        TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)
-                        + 'to: ' + str(to)
-                        )
-                    )
+                LinePushTextMsg(to, 'UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)
+                        + 'to: ' + str(to))
             elif command is 'help' :
-                to = group_id if group_id else user_id
-                line_bot_api.push_message(
-                        to,
-                        TextSendMessage(text='\
+                LinePushTextMsg(to, '\
                         -q : quiet mode, for not talk back.\n \
                         -q : quiet mode, for not talk back.\n \
                         ')
-                    )
             elif command[5:] is '-q 0' :
                 System['talk_mode'] = False
-                to = group_id if group_id else user_id
-                line_bot_api.push_message(
-                        to,
-                        TextSendMessage(text='set talk_mode to Quiet Mode')
-                    )
+                LinePushTextMsg(to, 'set talk_mode to Quiet Mode')
+
             # 這邊要改寫成判斷最後一個字元來決定要做什麼事
             elif command[5:] is '-q 1' :
                 System['talk_mode'] = True
-                to = group_id if group_id else user_id
-                line_bot_api.push_message(
-                        to,
-                        TextSendMessage(text='set talk_mode to Quiet Mode')
-                    )
+                LinePushTextMsg(to, 'set talk_mode to Quiet Mode')
 
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
