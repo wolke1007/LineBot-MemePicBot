@@ -18,6 +18,7 @@ import json
 from os import getenv
 import pymysql
 from pymysql.err import OperationalError
+import logging
 
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -105,7 +106,7 @@ def callback(event):
     return 'OK'
 
 def AddUserIdIfNotExist(user_id):
-    print('enter AddUserIdIfNotExist')
+    logging.debug('enter AddUserIdIfNotExist')
     if user_id not in UserInfoDict.keys():
         new_dict = {user_id: {'pic_name': None, 'pic_content': None, 'pic_link': None, 'banned':False}}
         UserInfoDict.update(new_dict)
@@ -118,32 +119,32 @@ def isUserIdBanned(user_id):
         return False
 
 def isPicContentExist(user_id):
-    print('enter isPicContentExist')
+    logging.debug('enter isPicContentExist')
     if UserInfoDict.get(user_id).get('pic_content'):
         return True
     else:
         return False
 
 def isFileNameExist(user_id):
-    print('enter isFileNameExist')
+    logging.debug('enter isFileNameExist')
     if UserInfoDict.get(user_id).get('pic_name'):
         return True
     else:
         return False
     
 def SavePicContentToDict(user_id, group_id, message_id):
-    print('enter SavePicContentToDict')
+    logging.debug('enter SavePicContentToDict')
     message_content = line_bot_api.get_message_content(message_id)
     UserInfoDict[user_id]['pic_content'] = message_content
     return True
 
 def UploadToImgur(user_id, group_id):
-    print('enter UploadToImgur')
+    logging.debug('enter UploadToImgur')
     Pic_Name = UserInfoDict.get(user_id).get('pic_name')
     try:
         binary_pic = UserInfoDict.get(user_id).get('pic_content')
-        # print('type binary_pic: '+str(type(binary_pic)))
-        # print('type binary_pic.content: '+str(type(binary_pic.content)))
+        # logging.debug('type binary_pic: '+str(type(binary_pic)))
+        # logging.debug('type binary_pic.content: '+str(type(binary_pic.content)))
         payload = base64.b64encode(binary_pic.content)
         ################################
         data = {
@@ -163,7 +164,7 @@ def UploadToImgur(user_id, group_id):
         reply_msg = '上傳至Imgur成功'
         return pic_link, reply_msg
     except Exception as e:
-        print(e)
+        logging.debug(e)
         reply_msg = '上傳至Imgur失敗'
         return '', reply_msg
 
@@ -182,21 +183,19 @@ def LineReplyMsg(to, content, content_type):
     if content_type is 'text':
         line_bot_api.reply_message(
             to,
-            TextSendMessage(text=content)
-            )
+            TextSendMessage(text=content))
     elif content_type is 'image':
         line_bot_api.reply_message(
             to,
             ImageSendMessage(preview_image_url=content,
-                            original_content_url=content)       
-            )
+                            original_content_url=content))
+
 def LinePushTextMsg(to, content):
     line_bot_api.push_message(
             to,
-            TextSendMessage(text=content)
-            )
+            TextSendMessage(text=content))
 # #################################################
-#                收到圖片後邏輯
+#                收到圖片後邏輯                     #
 # #################################################
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image(event):
@@ -206,7 +205,7 @@ def handle_image(event):
         group_id = event.source.group_id
     except AttributeError as e:
         group_id = None
-        print("send from 1 to 1 chat room, so there's no group id")
+        logging.debug("send from 1 to 1 chat room, so there's no group id")
     # 將 user 建檔管理
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
@@ -214,31 +213,31 @@ def handle_image(event):
         try:
             raise Exception('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         except Exception:
-            print('This user id' + str(user_id) + 'got banned, refuse to do anything!')
+            logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return True
     
     # 直接再儲存一次，已經存在的話就覆蓋過去
     SavePicContentToDict(user_id, group_id, message_id)
-    print('已儲存圖片暫存檔')
+    logging.debug('已儲存圖片暫存檔')
     
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
-        print('name already exist, start to upload')
+        logging.debug('name already exist, start to upload')
         pic_link, reply_msg = UploadToImgur(user_id, group_id)
         pic_name = UserInfoDict.get(user_id).get('pic_name')
         PicNameDict[pic_name] = pic_link
-        print('set PicNameDict done')
+        logging.debug('set PicNameDict done')
         UserInfoDict[user_id]['pic_content'] = None
-        print('empty pic_content done')
+        logging.debug('empty pic_content done')
         UserInfoDict[user_id]['pic_name'] = None
-        print('empty pic_name done')
+        logging.debug('empty pic_name done')
         LineReplyMsg(event.reply_token, reply_msg, content_type='text')
     else:
         ''' 檔案名稱還沒取好 '''
         LineReplyMsg(event.reply_token, '檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#', content_type='text')
 
 # #################################################
-#                   收到文字後邏輯
+#                   收到文字後邏輯                  #
 # #################################################
 @handler.add(MessageEvent, message=TextMessage)    
 def handle_text(event):
@@ -248,7 +247,7 @@ def handle_text(event):
         group_id = event.source.group_id
     except AttributeError as e:
         group_id = None
-        print("send from 1 to 1 chat room, so there's no group id")
+        logging.debug("send from 1 to 1 chat room, so there's no group id")
     # 將 user 建檔管理
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
@@ -256,13 +255,13 @@ def handle_text(event):
         try:
             raise Exception('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         except Exception:
-            print('This user id' + str(user_id) + 'got banned, refuse to do anything!')
+            logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return True
     
     Line_Msg_Text = event.message.text
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
-            print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
+            logging.debug('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
             # 圖片名稱長度在此設定門檻，目前設定為４個字
             pic_name = Line_Msg_Text[1:-1].lower()
@@ -272,16 +271,16 @@ def handle_text(event):
                 LineReplyMsg(event.reply_token, '圖片名稱長度至少4個字（中英文或數字皆可)', content_type='text')
                 return
 
-            print('add to pic_name done')
+            logging.debug('add to pic_name done')
             if isPicContentExist(user_id):
                 pic_link = UploadToImgur(user_id, group_id)
                 pic_name = UserInfoDict.get(user_id).get('pic_name')
                 PicNameDict[pic_name] = pic_link
-                print('set PicNameDict done')
+                logging.debug('set PicNameDict done')
                 UserInfoDict[user_id]['pic_content'] = None
-                print('empty pic_content done')
+                logging.debug('empty pic_content done')
                 UserInfoDict[user_id]['pic_name'] = None
-                print('empty pic_name done')
+                logging.debug('empty pic_name done')
             else:
                 # to = group_id if group_id else user_id
                 LineReplyMsg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
@@ -289,7 +288,7 @@ def handle_text(event):
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
         elif event.message.text[0:7] == "--debug":
-            print('event.message.text == "--debug"') #debug
+            logging.debug('event.message.text == "--debug"') #debug
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             command = event.message.text[8:]
             to = group_id if group_id else user_id
@@ -311,19 +310,19 @@ def handle_text(event):
                 LinePushTextMsg(to, 'set talk_mode to Quiet Mode')
 
         elif event.message.text == "--help":
-            print('event.message.text == "--help"') #debug
+            logging.debug('event.message.text == "--help"') #debug
             LineReplyMsg(event.reply_token, '請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱', content_type='text')
 
         elif event.message.text == "--mode":
-            print('event.message.text == "--mode"') #debug
+            logging.debug('event.message.text == "--mode"') #debug
             LineReplyMsg(event.reply_token, '當前模式為: ' + System.get('mode'), content_type='text')
 
         else:
             # 根據模式決定要不要回話
             if System.get('talk_mode') is False: return          
-            print('CheckMsgContent(event.message.text)') #debug
+            logging.debug('CheckMsgContent(event.message.text)') #debug
             PICLINK = CheckMsgContent(event.message.text)
             if PICLINK:
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
-            print('clean PICLINK')
+            logging.debug('clean PICLINK')
