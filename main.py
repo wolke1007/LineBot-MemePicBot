@@ -24,6 +24,7 @@ line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
+System = {'talk_mode':True, 'retrieve_pic_mode':True, }
 UserInfoDict = {}
 PicNameDict = {}
 
@@ -211,6 +212,7 @@ def handle_image(event):
     except AttributeError as e:
         group_id = None
         print("send from 1 to 1 chat room, so there's no group id")
+    # 將 user 建檔管理
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
     if isUserIdBanned(user_id):
@@ -219,7 +221,8 @@ def handle_image(event):
         except Exception:
             print('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return True
-
+    
+    # 直接再儲存一次，已經存在的話就覆蓋過去
     SavePicContentToDict(user_id, group_id, message_id)
     print('已儲存圖片暫存檔')
     # line_bot_api.reply_message(
@@ -260,7 +263,7 @@ def handle_text(event):
     except AttributeError as e:
         group_id = None
         print("send from 1 to 1 chat room, so there's no group id")
-    Line_Msg_Text = event.message.text
+    # 將 user 建檔管理
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
     if isUserIdBanned(user_id):
@@ -269,7 +272,8 @@ def handle_text(event):
         except Exception:
             print('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return True
-
+    
+    Line_Msg_Text = event.message.text
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
@@ -283,7 +287,7 @@ def handle_text(event):
                     event.reply_token,
                     TextSendMessage(text='圖片名稱長度至少4個字（中英文或數字皆可)')
                 )
-                return False
+                return
 
             print('add to pic_name done')
             if isPicContentExist(user_id):
@@ -302,15 +306,45 @@ def handle_text(event):
                     TextSendMessage(text='圖片名稱已設定完畢，請上傳圖片')
                 )
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
-        elif event.message.text == "--debug":
+        # 或是看看有沒有辦法只回覆擁有者
+        # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
+        elif event.message.text[0:7] == "--debug":
             print('event.message.text == "--debug"') #debug
-            to = group_id if group_id else user_id
-            line_bot_api.push_message(
-                    to,
-                    TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)
-                    + 'to: ' + str(to)
+            # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
+            command = event.message.text[8:]
+            if not command :
+                to = group_id if group_id else user_id
+                line_bot_api.push_message(
+                        to,
+                        TextSendMessage(text='UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)
+                        + 'to: ' + str(to)
+                        )
                     )
-                )
+            elif command is 'help' :
+                to = group_id if group_id else user_id
+                line_bot_api.push_message(
+                        to,
+                        TextSendMessage(text='\
+                        -q : quiet mode, for not talk back.\n \
+                        -q : quiet mode, for not talk back.\n \
+                        ')
+                    )
+            elif command[5:] is '-q 0' :
+                System['talk_mode'] = False
+                to = group_id if group_id else user_id
+                line_bot_api.push_message(
+                        to,
+                        TextSendMessage(text='set talk_mode to Quiet Mode')
+                    )
+            # 這邊要改寫成判斷最後一個字元來決定要做什麼事
+            elif command[5:] is '-q 1' :
+                System['talk_mode'] = True
+                to = group_id if group_id else user_id
+                line_bot_api.push_message(
+                        to,
+                        TextSendMessage(text='set talk_mode to Quiet Mode')
+                    )
+
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
             # to = group_id if group_id else user_id
@@ -323,7 +357,15 @@ def handle_text(event):
                     event.reply_token,
                     TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
                 )
+        elif event.message.text == "--mode":
+            print('event.message.text == "--mode"') #debug
+            line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text='當前模式為: ' + System.get('mode'))
+                )
         else:
+            # 根據模式決定要不要回話
+            if System.get('talk_mode') is False: return          
             print('CheckMsgContent(event.message.text)') #debug
             PICLINK = CheckMsgContent(event.message.text)
             if PICLINK:
