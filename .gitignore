@@ -3,3 +3,5 @@ channel_token.py
 *vscode
 *DS_Store
 *pycache*
+sql-test.py
+*.pyc

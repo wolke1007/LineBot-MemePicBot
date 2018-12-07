@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+create table user_info(
+    user_id CHAR(200),
+    pic_name 
+
+
 CONNECTION_NAME = getenv(
   'INSTANCE_CONNECTION_NAME',
   '<YOUR INSTANCE CONNECTION NAME>')
