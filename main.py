@@ -135,14 +135,6 @@ def SavePicContentToDict(user_id, group_id, message_id):
     print('enter SavePicContentToDict')
     message_content = line_bot_api.get_message_content(message_id)
     UserInfoDict[user_id]['pic_content'] = message_content
-    # to = group_id if group_id else user_id
-    # line_bot_api.reply_message(
-    #     to,
-    #     TextSendMessage(text='已儲存圖片暫存檔, type(message_content.content): ' + str(type(message_content.content)) +
-    #                         ', message_content.response: ' + str(message_content.response) +
-    #                         ', message_content.content_type: ' + str(message_content.content_type)
-    #                         )
-    # )
     return True
 
 def UploadToImgur(user_id, group_id):
@@ -168,24 +160,10 @@ def UploadToImgur(user_id, group_id):
         response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
         pic_link = json.loads(response.text)['data']['link']
         ########################################################################
-        # to = group_id if group_id else user_id
-        # line_bot_api.reply_message(
-        #     event.reply_token,
-        #     TextSendMessage(text='上傳至Imgur成功, pic link: '+str(pic_link))
-        #     )
-        # line_bot_api.reply_message(
-        #             to,
-        #             ImageSendMessage(preview_image_url=pic_link,
-        #                             original_content_url=pic_link)
-        #         )
         reply_msg = '上傳至Imgur成功'
         return pic_link, reply_msg
     except Exception as e:
         print(e)
-        # to = group_id if group_id else user_id
-        # line_bot_api.reply_message(
-        #     event.reply_token,
-        #     TextSendMessage(text='上傳至Imgur失敗'))
         reply_msg = '上傳至Imgur失敗'
         return '', reply_msg
 
@@ -200,6 +178,18 @@ def CheckMsgContent(MsgContent):
             return PicNameDict.get(PicName)
     return False
 
+def LineReplyMsg(to, content, content_type):
+    if content_type is 'text':
+        line_bot_api.reply_message(
+            to,
+            TextSendMessage(text=content)
+            )
+    elif content_type is 'image':
+        line_bot_api.reply_message(
+            to,
+            ImageSendMessage(preview_image_url=content,
+                            original_content_url=content)       
+            )
 # #################################################
 #                收到圖片後邏輯
 # #################################################
@@ -225,10 +215,6 @@ def handle_image(event):
     # 直接再儲存一次，已經存在的話就覆蓋過去
     SavePicContentToDict(user_id, group_id, message_id)
     print('已儲存圖片暫存檔')
-    # line_bot_api.reply_message(
-    #     event.reply_token,
-    #     TextSendMessage(text='已儲存圖片暫存檔')
-    # )
     
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
@@ -241,15 +227,10 @@ def handle_image(event):
         print('empty pic_content done')
         UserInfoDict[user_id]['pic_name'] = None
         print('empty pic_name done')
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=reply_msg))
+        LineReplyMsg(event.reply_token, reply_msg, content_type='text')
     else:
         ''' 檔案名稱還沒取好 '''
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#')
-            )
+        LineReplyMsg(event.reply_token, '檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#', content_type='text')
 
 # #################################################
 #                   收到文字後邏輯
@@ -283,10 +264,7 @@ def handle_text(event):
             if len(pic_name) >= 4:
                 UserInfoDict[user_id]['pic_name'] = pic_name
             else:
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text='圖片名稱長度至少4個字（中英文或數字皆可)')
-                )
+                LineReplyMsg(event.reply_token, '圖片名稱長度至少4個字（中英文或數字皆可)', content_type='text')
                 return
 
             print('add to pic_name done')
@@ -301,10 +279,7 @@ def handle_text(event):
                 print('empty pic_name done')
             else:
                 # to = group_id if group_id else user_id
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text='圖片名稱已設定完畢，請上傳圖片')
-                )
+                LineReplyMsg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
@@ -347,32 +322,18 @@ def handle_text(event):
 
         elif event.message.text == "--help":
             print('event.message.text == "--help"') #debug
-            # to = group_id if group_id else user_id
-            # line_bot_api.reply_message(
-            #         to,
-            #         ImageSendMessage(preview_image_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png',
-            #                         original_content_url='https://steemitimages.com/DQmPfGvYUqg9TUsaK8EUegqL2gVGR8FSS67FtYRs86UfUP1/help-and-support.png')
-            #     )
-            line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text='請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱#')
-                )
+            LineReplyMsg(event.reply_token, '請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱', content_type='text')
+
         elif event.message.text == "--mode":
             print('event.message.text == "--mode"') #debug
-            line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text='當前模式為: ' + System.get('mode'))
-                )
+            LineReplyMsg(event.reply_token, '當前模式為: ' + System.get('mode'), content_type='text')
+
         else:
             # 根據模式決定要不要回話
             if System.get('talk_mode') is False: return          
             print('CheckMsgContent(event.message.text)') #debug
             PICLINK = CheckMsgContent(event.message.text)
             if PICLINK:
-                line_bot_api.reply_message(
-                        event.reply_token,
-                        ImageSendMessage(preview_image_url=PICLINK,
-                                        original_content_url=PICLINK)
-                    )
+                LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
             print('clean PICLINK')
