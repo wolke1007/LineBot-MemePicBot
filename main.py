@@ -263,12 +263,12 @@ def handle_text(event):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             logging.debug('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
-            # 圖片名稱長度在此設定門檻，目前設定為４個字
+            # 圖片名稱長度在此設定門檻，目前設定為４~10 個字
             pic_name = Line_Msg_Text[1:-1].lower()
-            if len(pic_name) >= 4:
+            if len(pic_name) >= 4 and len(pic_name) <=10 :
                 UserInfoDict[user_id]['pic_name'] = pic_name
             else:
-                LineReplyMsg(event.reply_token, '圖片名稱長度至少4個字（中英文或數字皆可)', content_type='text')
+                LineReplyMsg(event.reply_token, '圖片名稱長度需介於 4~10 個字（中英文或數字皆可)', content_type='text')
                 return
 
             logging.debug('add to pic_name done')

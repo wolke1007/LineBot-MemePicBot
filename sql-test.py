@@ -2,7 +2,7 @@
 
 create table user_info(
     user_id CHAR(200),
-    pic_name 
+    pic_name CHAR(30),
 
 
 CONNECTION_NAME = getenv(
