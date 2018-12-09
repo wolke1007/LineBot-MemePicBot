@@ -331,12 +331,13 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, CURDATE()")
-            data = ('test_123',False)
-            cursor.executemany(insert, data)
-            connection.commit()
+            with __get_cursor() as cursor:
+                insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, CURDATE()")
+                data = ('test_123',False)
+                cursor.executemany(insert, data)
+                connection.commit()
 
-            
+
         else:
             # 根據模式決定要不要回話
             if System.get('talk_mode') is False: return          
