@@ -345,8 +345,8 @@ def handle_text(event):
                     return mysql_conn.cursor()
 
             with __get_cursor() as cursor:
-                insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, CURDATE()")
-                data = ('test_123',False)
+                insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, %s")
+                data = ('test_123', '0', 'CURDATE()')
                 cursor.executemany(insert, data)
                 connection.commit()
 
