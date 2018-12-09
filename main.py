@@ -48,41 +48,41 @@ mysql_config = {
 
 # Create SQL connection globally to enable reuse
 # PyMySQL does not include support for connection pooling
-# mysql_conn = None
+mysql_conn = None
 
-# def __get_cursor():
-#     """
-#     Helper function to get a cursor
-#       PyMySQL does NOT automatically reconnect,
-#       so we must reconnect explicitly using ping()
-#     """
-#     try:
-#         return mysql_conn.cursor()
-#     except OperationalError:
-#         mysql_conn.ping(reconnect=True)
-#         return mysql_conn.cursor()
+def __get_cursor():
+    """
+    Helper function to get a cursor
+      PyMySQL does NOT automatically reconnect,
+      so we must reconnect explicitly using ping()
+    """
+    try:
+        return mysql_conn.cursor()
+    except OperationalError:
+        mysql_conn.ping(reconnect=True)
+        return mysql_conn.cursor()
 
 
-# def mysql_demo(request):
-#     global mysql_conn
+def mysql_demo(request):
+    global mysql_conn
 
-#     # Initialize connections lazily, in case SQL access isn't needed for this
-#     # GCF instance. Doing so minimizes the number of active SQL connections,
-#     # which helps keep your GCF instances under SQL connection limits.
-#     if not mysql_conn:
-#         try:
-#             mysql_conn = pymysql.connect(**mysql_config)
-#         except OperationalError:
-#             # If production settings fail, use local development ones
-#             mysql_config['unix_socket'] = f'/cloudsql/{CONNECTION_NAME}'
-#             mysql_conn = pymysql.connect(**mysql_config)
+    # Initialize connections lazily, in case SQL access isn't needed for this
+    # GCF instance. Doing so minimizes the number of active SQL connections,
+    # which helps keep your GCF instances under SQL connection limits.
+    if not mysql_conn:
+        try:
+            mysql_conn = pymysql.connect(**mysql_config)
+        except OperationalError:
+            # If production settings fail, use local development ones
+            mysql_config['unix_socket'] = f'/cloudsql/{CONNECTION_NAME}'
+            mysql_conn = pymysql.connect(**mysql_config)
 
-#     # Remember to close SQL resources declared while running this function.
-#     # Keep any declared in global scope (e.g. mysql_conn) for later reuse.
-#     with __get_cursor() as cursor:
-#         cursor.execute('SELECT NOW() as now')
-#         results = cursor.fetchone()
-#         return str(results['now'])
+    # Remember to close SQL resources declared while running this function.
+    # Keep any declared in global scope (e.g. mysql_conn) for later reuse.
+    with __get_cursor() as cursor:
+        cursor.execute('SELECT NOW() as now')
+        results = cursor.fetchone()
+        return str(results['now'])
 
 
 ######### SQL 相關的 code #########
@@ -143,8 +143,8 @@ def UploadToImgur(user_id, group_id):
     Pic_Name = UserInfoDict.get(user_id).get('pic_name')
     try:
         binary_pic = UserInfoDict.get(user_id).get('pic_content')
-        # logging.debug('type binary_pic: '+str(type(binary_pic)))
-        # logging.debug('type binary_pic.content: '+str(type(binary_pic.content)))
+        logging.debug('type binary_pic: '+str(type(binary_pic)))
+        logging.debug('type binary_pic.content: '+str(type(binary_pic.content)))
         payload = base64.b64encode(binary_pic.content)
         ################################
         data = {
@@ -338,3 +338,10 @@ def handle_text(event):
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
             logging.debug('clean PICLINK')
+
+        
+        elif event.message.text == "sql-test insert user_id":
+            insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, CURDATE()")
+            data = ('test_123',False)
+            cursor.executemany(insert, data)
+            connection.commit()
