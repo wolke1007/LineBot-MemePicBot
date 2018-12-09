@@ -331,6 +331,15 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
+            global mysql_conn
+            if not mysql_conn:
+                try:
+                    mysql_conn = pymysql.connect(**mysql_config)
+                except OperationalError:
+                    # If production settings fail, use local development ones
+                    mysql_config['unix_socket'] = f'/cloudsql/{CONNECTION_NAME}'
+                    mysql_conn = pymysql.connect(**mysql_config)
+
             with __get_cursor() as cursor:
                 insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, CURDATE()")
                 data = ('test_123',False)
