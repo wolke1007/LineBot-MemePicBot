@@ -37,6 +37,10 @@ DB_USER = getenv('MYSQL_USER', '<YOUR DB USER>')
 DB_PASSWORD = getenv('MYSQL_PASSWORD', '<YOUR DB PASSWORD>')
 DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 
+print(CONNECTION_NAME)
+print(DB_USER)
+print(DB_PASSWORD)
+print(DB_NAME)
 mysql_config = {
   'user': DB_USER,
   'password': DB_PASSWORD,
