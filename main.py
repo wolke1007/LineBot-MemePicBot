@@ -272,10 +272,11 @@ def handle_text(event):
             metadata = MetaData(engine)
             table = Table('user_info', metadata, autoload=True)
             # insert = table.insert()
-            select = table.select()
             s = select([table])
+            print(s)
             result = conn.execute(s)
             # conn.execute(insert, user_id='sqlalchemy test', banned=0)
+            print(result)
             for row in result:
                 print (row['user_id'], row['banned'])
                 result.close()
