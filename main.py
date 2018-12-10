@@ -40,7 +40,7 @@ DB_USER = getenv('MYSQL_USER', '<YOUR DB USER>')
 DB_PASSWORD = getenv('MYSQL_PASSWORD', '<YOUR DB PASSWORD>')
 DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 
-sql_connect = 'mysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ user_info
+sql_connect = 'mysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ 'user_info'
 
 def InitDBSession():
     engine = create_engine(sql_connect)
