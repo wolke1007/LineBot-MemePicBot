@@ -42,7 +42,7 @@ user_info_connect = 'mysql+pymysql://root:'+DB_PASSWORD+'@/'+DB_NAME+'?unix_sock
 # mysql+pymysql://<USER>:<PASSWORD>@/<DATABASE_NAME>?unix_socket=/cloudsql/<PUT-SQL-INSTANCE-CONNECTION-NAME-HERE>
 
 # def GetMetadata(sql_connect):
-engine = create_engine(sql_connect)
+engine = create_engine(user_info_connect)
 conn = engine.connect()
 # DBSession = sessionmaker(bind=engine)
 metadata = MetaData(engine)
