@@ -18,10 +18,7 @@ import json
 from os import getenv
 import logging
 import pymysql
-from sqlalchemy import Column, create_engine
-from sqlalchemy.types import *
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import *
 
 
 app = Flask(__name__)
@@ -46,7 +43,8 @@ user_info_connect = 'mysql+pymysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ 'us
 def InitDBSession(sql_connect):
     engine = create_engine(sql_connect)
     DBSession = sessionmaker(bind=engine)
-    return DBSession()
+    metadata = MetaData(db)
+    return DBSession(), metadata
 
 ######### SQL 相關的 code #########
 
@@ -274,10 +272,14 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            session = InitDBSession(sql_connect=user_info_connect)
-            new_user = user_id(user_id='sqlalchemy test', banned=0)
-            session.add(new_user)
-            session.commit()
+            session, metadata = InitDBSession(sql_connect=user_info_connect)
+            
+            table = Table('user_info', metadata, autoload=True)
+            insert = table.insert()
+            session.execute(insert, user_id='sqlalchemy test', banned=0)
+            # new_user = user_id(user_id='sqlalchemy test', banned=0)
+            # session.add(new_user)
+            # session.commit()
             logging.debug('sqlalchemy test pass')
 
         else:
