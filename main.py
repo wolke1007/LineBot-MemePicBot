@@ -273,9 +273,12 @@ def handle_text(event):
             table = Table('user_info', metadata, autoload=True)
             # insert = table.insert()
             select = table.select()
-            # conn.cexecute(insert, user_id='sqlalchemy test', banned=0)
-            res = conn.execute(select, user_id='sqlalchemy test')
-            print(res)
+            s = select([table])
+            result = conn.execute(s)
+            # conn.execute(insert, user_id='sqlalchemy test', banned=0)
+            for row in result:
+                print (row['user_id'], row['banned'])
+                result.close()
             logging.info('sqlalchemy test pass')
 
         else:
