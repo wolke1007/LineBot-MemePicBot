@@ -272,14 +272,12 @@ def handle_text(event):
             metadata = MetaData(engine)
             table = Table('user_info', metadata, autoload=True)
             # insert = table.insert()
-            s = select([table])
+            s = select([table].row['user_id'])
             print(s)
-            result = conn.execute(s)
+            result = conn.execute(s).fetchall()
             # conn.execute(insert, user_id='sqlalchemy test', banned=0)
             print(result)
-            for row in result:
-                print (row['user_id'], row['banned'])
-                result.close()
+            result.close()
             logging.info('sqlalchemy test pass')
 
         else:
@@ -291,3 +289,10 @@ def handle_text(event):
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
             logging.debug('clean PICLINK')
+
+
+
+
+
+
+# SQL 參考：https://www.jianshu.com/p/e6bba189fcbd
