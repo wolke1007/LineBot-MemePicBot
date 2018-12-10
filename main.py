@@ -53,7 +53,7 @@ metadata = MetaData(engine)
 # metadata = GetMetadata(sql_connect=user_info_connect)
 table = Table('user_info', metadata, autoload=True)
 insert = table.insert()
-session.execute(insert, user_id='sqlalchemy test', banned=0)
+conn.execute(insert, user_id='sqlalchemy test', banned=0)
 
 ######### SQL 相關的 code #########
 
