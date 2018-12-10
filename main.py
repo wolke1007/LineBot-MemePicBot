@@ -43,7 +43,7 @@ user_info_connect = 'mysql+pymysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ 'us
 def GetMetadata(sql_connect):
     engine = create_engine(sql_connect)
     # DBSession = sessionmaker(bind=engine)
-    metadata = MetaData(db)
+    metadata = MetaData(engine)
     return metadata
 
 ######### SQL 相關的 code #########
