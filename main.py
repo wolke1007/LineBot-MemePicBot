@@ -341,9 +341,12 @@ def handle_text(event):
 
             with __get_cursor() as cursor:
                 insert = ("INSERT INTO user_info (user_id, banned) VALUES (%s, %s)")
-                data = ('test_123', '0')
+                data = (user_id, '0')
                 cursor.execute(insert, data)
-                connection.commit()
+                select = ("SELECT user_id FROM user_info")
+                cursor.execute(select)
+                result = cursor.fetchall()
+                print(result)
 
         else:
             # 根據模式決定要不要回話
