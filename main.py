@@ -50,27 +50,42 @@ mysql_config = {
 # PyMySQL does not include support for connection pooling
 mysql_conn = None
 
-# def mysql_demo(request):
-#     global mysql_conn
+class Accessdb():
 
-#     # Initialize connections lazily, in case SQL access isn't needed for this
-#     # GCF instance. Doing so minimizes the number of active SQL connections,
-#     # which helps keep your GCF instances under SQL connection limits.
-#     if not mysql_conn:
-#         try:
-#             mysql_conn = pymysql.connect(**mysql_config)
-#         except OperationalError:
-#             # If production settings fail, use local development ones
-#             mysql_config['unix_socket'] = f'/cloudsql/{CONNECTION_NAME}'
-#             mysql_conn = pymysql.connect(**mysql_config)
 
-#     # Remember to close SQL resources declared while running this function.
-#     # Keep any declared in global scope (e.g. mysql_conn) for later reuse.
-#     with __get_cursor() as cursor:
-#         cursor.execute('SELECT NOW() as now')
-#         results = cursor.fetchone()
-#         return str(results['now'])
+    global mysql_conn
+    def __init__(self):
+        if not self.mysql_conn:
+            try:
+                self.mysql_conn = pymysql.connect(**mysql_config)
+            except OperationalError:
+                # If production settings fail, use local development ones
+                mysql_config['unix_socket'] = f'/cloudsql/{CONNECTION_NAME}'
+                self.mysql_conn = pymysql.connect(**mysql_config)
 
+    def __get_cursor(self):
+        """
+        Helper function to get a cursor
+        PyMySQL does NOT automatically reconnect,
+        so we must reconnect explicitly using ping()
+        """
+        try:
+            return self.mysql_conn.cursor()
+        except OperationalError:
+            self.mysql_conn.ping(reconnect=True)
+            return self.mysql_conn.cursor()
+
+    def selectdata(self, table, *columns, condition):
+        with self.__get_cursor() as cursor:
+            select = ("SELECT "+str(*columns)+" FROM "+str(table))
+            cursor.execute(select)
+            result = cursor.fetchall()
+            return(result)
+
+    def insertdata(self, table, *column, *values):
+        insert = ("INSERT INTO table "+ str(*columns) +" VALUES "+str(*values))
+        cursor.execute(insert)
+        return True
 
 ######### SQL 相關的 code #########
 
@@ -224,16 +239,7 @@ def handle_image(event):
         logging.debug('name already exist, start to upload')
         pic_link, reply_msg = UploadToImgur(user_id, group_id)
         pic_name = UserInfoDict.get(user_id).get('pic_name')
-        PicNameDict[pic_name] = pic_link
-        logging.debug('set PicNameDict done')
-        UserInfoDict[user_id]['pic_content'] = None
-        logging.debug('empty pic_content done')
-        UserInfoDict[user_id]['pic_name'] = None
-        logging.debug('empty pic_name done')
         LineReplyMsg(event.reply_token, reply_msg, content_type='text')
-    else:
-        ''' 檔案名稱還沒取好 '''
-        LineReplyMsg(event.reply_token, '檔案已存成暫存檔，請設定圖片名稱，範例: #圖片名稱#', content_type='text')
 
 # #################################################
 #                   收到文字後邏輯                  #
@@ -266,23 +272,12 @@ def handle_text(event):
             pic_name = Line_Msg_Text[1:-1].lower()
             if len(pic_name) >= 4 and len(pic_name) <=10 :
                 UserInfoDict[user_id]['pic_name'] = pic_name
+                LineReplyMsg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
             else:
                 LineReplyMsg(event.reply_token, '圖片名稱長度需介於 4~10 個字（中英文或數字皆可)', content_type='text')
                 return
 
             logging.debug('add to pic_name done')
-            if isPicContentExist(user_id):
-                pic_link = UploadToImgur(user_id, group_id)
-                pic_name = UserInfoDict.get(user_id).get('pic_name')
-                PicNameDict[pic_name] = pic_link
-                logging.debug('set PicNameDict done')
-                UserInfoDict[user_id]['pic_content'] = None
-                logging.debug('empty pic_content done')
-                UserInfoDict[user_id]['pic_name'] = None
-                logging.debug('empty pic_name done')
-            else:
-                # to = group_id if group_id else user_id
-                LineReplyMsg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
@@ -318,35 +313,8 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            global mysql_conn
-            if not mysql_conn:
-                try:
-                    mysql_conn = pymysql.connect(**mysql_config)
-                except OperationalError:
-                    # If production settings fail, use local development ones
-                    mysql_config['unix_socket'] = f'/cloudsql/{CONNECTION_NAME}'
-                    mysql_conn = pymysql.connect(**mysql_config)
-            
-            def __get_cursor():
-                """
-                Helper function to get a cursor
-                PyMySQL does NOT automatically reconnect,
-                so we must reconnect explicitly using ping()
-                """
-                try:
-                    return mysql_conn.cursor()
-                except OperationalError:
-                    mysql_conn.ping(reconnect=True)
-                    return mysql_conn.cursor()
-
-            with __get_cursor() as cursor:
-                insert = ("INSERT INTO user_info (user_id, banned) VALUES (%s, %s)")
-                data = (user_id, '0')
-                cursor.execute(insert, data)
-                select = ("SELECT user_id FROM user_info")
-                cursor.execute(select)
-                result = cursor.fetchall()
-                print(result)
+            sql = Accessdb()
+            sql.insertdata(table= user_info, column='user_id', values=user_id)
 
         else:
             # 根據模式決定要不要回話
