@@ -40,11 +40,11 @@ DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 
 user_info_connect = 'mysql+pymysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ 'user_info'
 
-def InitDBSession(sql_connect):
+def GetMetadata(sql_connect):
     engine = create_engine(sql_connect)
-    DBSession = sessionmaker(bind=engine)
+    # DBSession = sessionmaker(bind=engine)
     metadata = MetaData(db)
-    return DBSession(), metadata
+    return metadata
 
 ######### SQL 相關的 code #########
 
@@ -272,7 +272,7 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            session, metadata = InitDBSession(sql_connect=user_info_connect)
+            metadata = GetMetadata(sql_connect=user_info_connect)
             
             table = Table('user_info', metadata, autoload=True)
             insert = table.insert()
