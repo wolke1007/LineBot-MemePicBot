@@ -16,9 +16,12 @@ import requests
 import base64
 import json
 from os import getenv
-import pymysql
-from pymysql.err import OperationalError
 import logging
+from sqlalchemy import Column, create_engine
+from sqlalchemy.types import *
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
 
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -27,7 +30,7 @@ API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 System = {'talk_mode':True, 'retrieve_pic_mode':True, }
 UserInfoDict = {}
-PicNameDict = {}
+PicInfoDict = {}
 
 ######### SQL 相關的 code #########
 CONNECTION_NAME = getenv(
@@ -37,61 +40,18 @@ DB_USER = getenv('MYSQL_USER', '<YOUR DB USER>')
 DB_PASSWORD = getenv('MYSQL_PASSWORD', '<YOUR DB PASSWORD>')
 DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 
-mysql_config = {
-  'user': DB_USER,
-  'password': DB_PASSWORD,
-  'db': DB_NAME,
-  'charset': 'utf8mb4',
-  'cursorclass': pymysql.cursors.DictCursor,
-  'autocommit': True
-}
+sql_connect = 'mysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ user_info
 
-# Create SQL connection globally to enable reuse
-# PyMySQL does not include support for connection pooling
-mysql_conn = None
-
-class Accessdb():
-
-
-    global mysql_conn
-    def __init__(self):
-        if not self.mysql_conn:
-            try:
-                self.mysql_conn = pymysql.connect(**mysql_config)
-            except OperationalError:
-                # If production settings fail, use local development ones
-                mysql_config['unix_socket'] = f'/cloudsql/{CONNECTION_NAME}'
-                self.mysql_conn = pymysql.connect(**mysql_config)
-
-    def __get_cursor(self):
-        """
-        Helper function to get a cursor
-        PyMySQL does NOT automatically reconnect,
-        so we must reconnect explicitly using ping()
-        """
-        try:
-            return self.mysql_conn.cursor()
-        except OperationalError:
-            self.mysql_conn.ping(reconnect=True)
-            return self.mysql_conn.cursor()
-
-    def selectdata(self, table, *columns, condition):
-        with self.__get_cursor() as cursor:
-            select = ("SELECT "+str(*columns)+" FROM "+str(table))
-            cursor.execute(select)
-            result = cursor.fetchall()
-            return(result)
-
-    def insertdata(self, table, *column, *values):
-        insert = ("INSERT INTO table "+ str(*columns) +" VALUES "+str(*values))
-        cursor.execute(insert)
-        return True
+def InitDBSession():
+    engine = create_engine(sql_connect)
+    DBSession = sessionmaker(bind=engine)
+    return DBSession()
 
 ######### SQL 相關的 code #########
 
 # UserInfoDict  格式定為 { 'user_id': { 'pic_name': '圖片名稱', 'pic_content': 'binary content', 
 #                       'pic_link': 'https://imgur.xxx.xxx', 'banned':False }}
-# PicNameDict   格式定為 { 'pic_name' : 'pic_link' }
+# PicInfoDict   格式定為 { 'pic_name' : 'pic_link' }
 
 ###################################################
 @app.route("/callback", methods=['POST'])
@@ -176,9 +136,9 @@ def GetPicFromPicLink(user_id):
 
 def CheckMsgContent(MsgContent):
     MsgContent = MsgContent.lower()
-    for PicName in PicNameDict.keys():
+    for PicName in PicInfoDict.keys():
         if re.search(PicName, MsgContent):
-            return PicNameDict.get(PicName)
+            return PicInfoDict.get(PicName)
     return False
 
 def LineReplyMsg(to, content, content_type):
@@ -287,7 +247,7 @@ def handle_text(event):
             command = event.message.text[8:]
             to = group_id if group_id else user_id
             if not command :
-                LinePushTextMsg(to, 'UserInfoDict = ' + str(UserInfoDict) + 'PicNameDict = ' + str(PicNameDict)
+                LinePushTextMsg(to, 'UserInfoDict = ' + str(UserInfoDict) + 'PicInfoDict = ' + str(PicInfoDict)
                         + 'to: ' + str(to))
             elif command is 'help' :
                 LinePushTextMsg(to, '\
@@ -313,8 +273,9 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            sql = Accessdb()
-            sql.insertdata(table= user_info, column='user_id', values=user_id)
+            with InitDBSession() as session:
+                new_user = user_id(user_id='sqlalchemy test', banned=0)
+                logging.debug('sqlalchemy test pass')
 
         else:
             # 根據模式決定要不要回話
