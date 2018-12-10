@@ -274,11 +274,11 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            with InitDBSession(sql_connect=user_info_connect) as session:
-                new_user = user_id(user_id='sqlalchemy test', banned=0)
-                session.add(new_user)
-                session.commit()
-                logging.debug('sqlalchemy test pass')
+            session = InitDBSession(sql_connect=user_info_connect)
+            new_user = user_id(user_id='sqlalchemy test', banned=0)
+            session.add(new_user)
+            session.commit()
+            logging.debug('sqlalchemy test pass')
 
         else:
             # 根據模式決定要不要回話
