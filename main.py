@@ -37,11 +37,6 @@ DB_USER = getenv('MYSQL_USER', '<YOUR DB USER>')
 DB_PASSWORD = getenv('MYSQL_PASSWORD', '<YOUR DB PASSWORD>')
 DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 
-print(CONNECTION_NAME)
-print(type(CONNECTION_NAME))
-print(DB_USER)
-print(DB_PASSWORD)
-print(DB_NAME)
 mysql_config = {
   'user': DB_USER,
   'password': DB_PASSWORD,
@@ -345,8 +340,8 @@ def handle_text(event):
                     return mysql_conn.cursor()
 
             with __get_cursor() as cursor:
-                insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, %s)")
-                data = ('test_123', '0', 'CURDATE()')
+                insert = ("INSERT INTO user_info (user_id, banned) VALUES (%s, %s)")
+                data = ('test_123', '0')
                 cursor.execute(insert, data)
                 connection.commit()
 
