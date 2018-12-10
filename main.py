@@ -345,11 +345,10 @@ def handle_text(event):
                     return mysql_conn.cursor()
 
             with __get_cursor() as cursor:
-                insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, %s")
+                insert = ("INSERT INTO user_info (user_id, banned, account_created_time) VALUES (%s, %s, %s)"
                 data = ('test_123', '0', 'CURDATE()')
-                cursor.executemany(insert, data)
+                cursor.execute(insert, *data)
                 connection.commit()
-
 
         else:
             # 根據模式決定要不要回話
