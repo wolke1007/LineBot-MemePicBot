@@ -41,20 +41,6 @@ DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 user_info_connect = 'mysql+pymysql://root:'+DB_PASSWORD+'@/'+DB_NAME+'?unix_socket=/cloudsql/'+CONNECTION_NAME
 # mysql+pymysql://<USER>:<PASSWORD>@/<DATABASE_NAME>?unix_socket=/cloudsql/<PUT-SQL-INSTANCE-CONNECTION-NAME-HERE>
 
-# def GetMetadata(sql_connect):
-engine = create_engine(user_info_connect)
-conn = engine.connect()
-# DBSession = sessionmaker(bind=engine)
-metadata = MetaData(engine)
-
-
-
-# metadata = GetMetadata(sql_connect=user_info_connect)
-# metadata = GetMetadata(sql_connect=user_info_connect)
-table = Table('user_info', metadata, autoload=True)
-insert = table.insert()
-conn.execute(insert, user_id='sqlalchemy test', banned=0)
-
 ######### SQL 相關的 code #########
 
 # UserInfoDict  格式定為 { 'user_id': { 'pic_name': '圖片名稱', 'pic_content': 'binary content', 
@@ -281,11 +267,15 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            # new_user = user_id(user_id='sqlalchemy test', banned=0)
-            # session.add(new_user)
-            # session.commit()
-            logging.debug('sqlalchemy test pass')
-            pass
+            engine = create_engine(user_info_connect)
+            conn = engine.connect()
+            metadata = MetaData(engine)
+            table = Table('user_info', metadata, autoload=True)
+            # insert = table.insert()
+            select = table.select()
+            # conn.cexecute(insert, user_id='sqlalchemy test', banned=0)
+            conn.cexecute(select, user_id='sqlalchemy test')
+            logging.info('sqlalchemy test pass')
 
         else:
             # 根據模式決定要不要回話
