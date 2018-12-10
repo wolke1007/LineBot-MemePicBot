@@ -41,14 +41,16 @@ DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 user_info_connect = 'mysql+pymysql://root:'+DB_PASSWORD+'@/'+DB_NAME+'?unix_socket=/cloudsql/'+CONNECTION_NAME
 # mysql+pymysql://<USER>:<PASSWORD>@/<DATABASE_NAME>?unix_socket=/cloudsql/<PUT-SQL-INSTANCE-CONNECTION-NAME-HERE>
 
+# def GetMetadata(sql_connect):
+engine = create_engine(sql_connect)
+conn = engine.connect()
+# DBSession = sessionmaker(bind=engine)
+metadata = MetaData(engine)
 
-def GetMetadata(sql_connect):
-    engine = create_engine(sql_connect)
-    # DBSession = sessionmaker(bind=engine)
-    metadata = MetaData(engine)
-    return metadata
 
-metadata = GetMetadata(sql_connect=user_info_connect)         
+
+# metadata = GetMetadata(sql_connect=user_info_connect)
+# metadata = GetMetadata(sql_connect=user_info_connect)
 table = Table('user_info', metadata, autoload=True)
 insert = table.insert()
 session.execute(insert, user_id='sqlalchemy test', banned=0)
