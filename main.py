@@ -38,13 +38,20 @@ DB_USER = getenv('MYSQL_USER', '<YOUR DB USER>')
 DB_PASSWORD = getenv('MYSQL_PASSWORD', '<YOUR DB PASSWORD>')
 DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 
-user_info_connect = 'mysql+pymysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ 'user_info'
+user_info_connect = 'mysql+pymysql://root:'+DB_PASSWORD+'@/'+DB_NAME+'?unix_socket=/cloudsql/'+CONNECTION_NAME
+# mysql+pymysql://<USER>:<PASSWORD>@/<DATABASE_NAME>?unix_socket=/cloudsql/<PUT-SQL-INSTANCE-CONNECTION-NAME-HERE>
+
 
 def GetMetadata(sql_connect):
     engine = create_engine(sql_connect)
     # DBSession = sessionmaker(bind=engine)
     metadata = MetaData(engine)
     return metadata
+
+metadata = GetMetadata(sql_connect=user_info_connect)         
+table = Table('user_info', metadata, autoload=True)
+insert = table.insert()
+session.execute(insert, user_id='sqlalchemy test', banned=0)
 
 ######### SQL 相關的 code #########
 
@@ -272,15 +279,11 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            metadata = GetMetadata(sql_connect=user_info_connect)
-            
-            table = Table('user_info', metadata, autoload=True)
-            insert = table.insert()
-            session.execute(insert, user_id='sqlalchemy test', banned=0)
             # new_user = user_id(user_id='sqlalchemy test', banned=0)
             # session.add(new_user)
             # session.commit()
             logging.debug('sqlalchemy test pass')
+            pass
 
         else:
             # 根據模式決定要不要回話
