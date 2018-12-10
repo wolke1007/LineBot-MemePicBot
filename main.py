@@ -275,6 +275,8 @@ def handle_text(event):
         elif event.message.text == "sql-test insert user_id":
             with InitDBSession() as session:
                 new_user = user_id(user_id='sqlalchemy test', banned=0)
+                session.add(new_user)
+                session.commit()
                 logging.debug('sqlalchemy test pass')
 
         else:
