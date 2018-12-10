@@ -274,7 +274,8 @@ def handle_text(event):
             # insert = table.insert()
             select = table.select()
             # conn.cexecute(insert, user_id='sqlalchemy test', banned=0)
-            conn.cexecute(select, user_id='sqlalchemy test')
+            res = conn.execute(select, user_id='sqlalchemy test')
+            print(res)
             logging.info('sqlalchemy test pass')
 
         else:
