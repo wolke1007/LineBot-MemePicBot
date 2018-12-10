@@ -17,6 +17,7 @@ import base64
 import json
 from os import getenv
 import logging
+import pymysql
 from sqlalchemy import Column, create_engine
 from sqlalchemy.types import *
 from sqlalchemy.orm import sessionmaker
@@ -40,9 +41,9 @@ DB_USER = getenv('MYSQL_USER', '<YOUR DB USER>')
 DB_PASSWORD = getenv('MYSQL_PASSWORD', '<YOUR DB PASSWORD>')
 DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 
-sql_connect = 'mysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ 'user_info'
+user_info_connect = 'mysql+pymysql://root:'+ DB_PASSWORD +'@'+ DB_NAME +'/'+ 'user_info'
 
-def InitDBSession():
+def InitDBSession(sql_connect):
     engine = create_engine(sql_connect)
     DBSession = sessionmaker(bind=engine)
     return DBSession()
@@ -273,11 +274,11 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            session = InitDBSession()
-            new_user = user_id(user_id='sqlalchemy test', banned=0)
-            session.add(new_user)
-            session.commit()
-            logging.debug('sqlalchemy test pass')
+            with InitDBSession(sql_connect=user_info_connect) as session:
+                new_user = user_id(user_id='sqlalchemy test', banned=0)
+                session.add(new_user)
+                session.commit()
+                logging.debug('sqlalchemy test pass')
 
         else:
             # 根據模式決定要不要回話
