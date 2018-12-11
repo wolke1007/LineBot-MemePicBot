@@ -93,7 +93,7 @@ def AddUserIdIfNotExist(user_id):
                 }
     select_pre_sql = "SELECT user_id FROM user_info WHERE user_id = :user_id"
     res = select_from_db(select_pre_sql, select_params_dict)
-    # 回傳值應為 list type，但有可能沒有值所以不指定取第一個
+    # 回傳值應為 list type 裡面包著 tuple，但有可能沒有值所以不指定取第一個
     if res:
         # user_id 存在，不做事
         return
@@ -115,15 +115,15 @@ def isUserIdBanned(user_id):
     select_pre_sql = "SELECT banned FROM user_info WHERE user_id = :user_id"
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
-    # 回傳值應為 list type，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
+    # 回傳值應為 list type 裡面包著 tuple，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
     print('isUserIdBanned type res', type(res))
-    if res[0] is False:
+    if res[0][0] is False:
         # 沒有被 banned
         print('user_id not got banned')
         return False
     else:
         # 被 banned 的帳號
-        print('user_id got banned', res[0])
+        print('user_id got banned', res[0][0])
         return True
 
 def isFileNameExist(user_id):
@@ -146,8 +146,8 @@ def UploadToImgur(user_id, group_id, binary_pic):
                 }
     # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
     select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL AND user_id = :user_id"
-    # 回傳為 list type 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
-    Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0]
+    # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
+    Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0][0]
     try:
         logging.debug('type binary_pic: '+str(type(binary_pic)))
         logging.debug('type binary_pic.content: '+str(dir(binary_pic)))
@@ -352,6 +352,13 @@ def handle_text(event):
             #     }
             # update_pre_sql = "UPDATE pic_info SET pic_name=123, pic_link='123' WHERE user_id = :user_id"
             # update_from_db(update_pre_sql, update_params_dict)
+
+            select_params_dict = {
+                'state': 'Texas',
+                }
+            select_pre_sql = "SELECT state FROM census WHERE state = :state"
+            select_from_db(select_pre_sql, select_params_dict)
+
             logging.info('sqlalchemy test pass')
             pass
 
