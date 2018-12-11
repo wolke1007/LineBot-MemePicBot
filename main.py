@@ -93,10 +93,10 @@ def AddUserIdIfNotExist(user_id):
                 }
     select_pre_sql = "SELECT user_id FROM user_info WHERE user_id = :user_id"
     res = select_from_db(select_pre_sql, select_params_dict)
-    print('AddUserIdIfNotExist:'+res)
     # 回傳值應為 list type，但有可能沒有值所以不指定取第一個
     if res:
         # user_id 存在，不做事
+        print('AddUserIdIfNotExist:'+res[0])
         return
     else:
         # user_id 不存在，加入
