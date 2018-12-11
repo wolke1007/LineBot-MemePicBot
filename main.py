@@ -18,7 +18,8 @@ import json
 from os import getenv
 import logging
 import pymysql
-from sqlalchemy import *
+from sqlalchemy import text
+from sqlalchemy import create_engine
 
 
 app = Flask(__name__)
@@ -40,6 +41,27 @@ DB_NAME = getenv('MYSQL_DATABASE', '<YOUR DB NAME>')
 
 user_info_connect = 'mysql+pymysql://root:'+DB_PASSWORD+'@/'+DB_NAME+'?unix_socket=/cloudsql/'+CONNECTION_NAME
 # mysql+pymysql://<USER>:<PASSWORD>@/<DATABASE_NAME>?unix_socket=/cloudsql/<PUT-SQL-INSTANCE-CONNECTION-NAME-HERE>
+engine = create_engine(user_info_connect)
+
+def select_from_db(pre_sql, select_params_dict):
+    bind_sql = text(pre_sql)
+    with engine.connect() as conn:
+        resproxy = conn.execute(bind_sql, select_params_dict)
+        rows = resproxy.fetchall()
+        ret = rows
+        return ret
+
+def insert_from_db(pre_sql, insert_params_dict):
+    bind_sql = text(pre_sql)
+    with engine.connect() as conn:
+        resproxy = conn.execute(bind_sql, insert_params_dict)
+        return True
+
+def update_from_db(pre_sql, update_params_dict):
+    bind_sql = text(pre_sql)
+    with engine.connect() as conn:
+        resproxy = conn.execute(bind_sql, update_params_dict)
+        return True
 
 ######### SQL 相關的 code #########
 
@@ -267,17 +289,31 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            engine = create_engine(user_info_connect)
-            conn = engine.connect()
-            metadata = MetaData(engine)
-            table = Table('user_info', metadata, autoload=True)
-            # insert = table.insert()
-            s = select([table].row['user_id'])
-            print(s)
-            result = conn.execute(s).fetchall()
-            # conn.execute(insert, user_id='sqlalchemy test', banned=0)
-            print(result)
-            result.close()
+            select_params_dict = {
+                'user_id': 'test_user_id',
+                'pic_name': 'test_pic_name',
+                'pic_link': 'test_pic_link',
+                }
+            insert_params_dict = {
+                'user_id': 'test_user_id',
+                'pic_name': 'test_pic_name',
+                'pic_link': 'test_pic_link',
+                }
+            update_params_dict = {
+                'user_id': 'test_user_id',
+                'pic_name': 'test_pic_name',
+                'pic_link': 'test_pic_link',
+                }
+            select_pre_sql = "SELECT user_id FROM pic_info WHERE user_id = :user_id"
+            insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, pic_link) values (:user_id, :pic_name, :pic_link)"
+            update_pre_sql = "UPDATE pic_info SET pic_name=123, pic_link='123' WHERE user_id = :user_id"
+            
+            insert_from_db(insert_pre_sql, insert_params_dict)
+            select_from_db(select_pre_sql, select_params_dict)
+            update_from_db(update_pre_sql, update_params_dict)
+            select_from_db(select_pre_sql, select_params_dict)
+            print("預期要看到 pic_name=123, pic_link='123'")
+
             logging.info('sqlalchemy test pass')
 
         else:
@@ -295,4 +331,6 @@ def handle_text(event):
 
 
 
-# SQL 參考：https://www.jianshu.com/p/e6bba189fcbd
+# SQL 參考：
+# 1. https://www.jianshu.com/p/e6bba189fcbd
+# 2. https://blog.csdn.net/slvher/article/details/47154363
