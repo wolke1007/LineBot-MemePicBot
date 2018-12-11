@@ -27,9 +27,8 @@ line_bot_api = LineBotApi(line_channel_access_token)
 handler = WebhookHandler(line_channel_secret)
 API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
+################# System Dict 要再想要怎麼實作#################
 System = {'talk_mode':True, 'retrieve_pic_mode':True, }
-UserInfoDict = {}
-PicInfoDict = {}
 
 ######### SQL 相關的 code #########
 CONNECTION_NAME = getenv(
@@ -46,30 +45,34 @@ engine = create_engine(user_info_connect)
 def select_from_db(pre_sql, select_params_dict):
     bind_sql = text(pre_sql)
     with engine.connect() as conn:
-        resproxy = conn.execute(bind_sql, select_params_dict)
-        rows = resproxy.fetchall()
-        ret = rows
-        return ret
+        try:
+            resproxy = conn.execute(bind_sql, select_params_dict)
+            rows = resproxy.fetchall()
+            ret = rows
+            return ret
+        except:
+            return False
 
 def insert_from_db(pre_sql, insert_params_dict):
     bind_sql = text(pre_sql)
     with engine.connect() as conn:
-        resproxy = conn.execute(bind_sql, insert_params_dict)
-        return True
+        try:
+            resproxy = conn.execute(bind_sql, insert_params_dict)
+            return True
+        except:
+            return False
 
 def update_from_db(pre_sql, update_params_dict):
     bind_sql = text(pre_sql)
     with engine.connect() as conn:
-        resproxy = conn.execute(bind_sql, update_params_dict)
-        return True
+        try:
+            resproxy = conn.execute(bind_sql, update_params_dict)
+            return True
+        except:
+            return False
+######### SQL 相關的 code 結束 ########
 
-######### SQL 相關的 code #########
 
-# UserInfoDict  格式定為 { 'user_id': { 'pic_name': '圖片名稱', 'pic_content': 'binary content', 
-#                       'pic_link': 'https://imgur.xxx.xxx', 'banned':False }}
-# PicInfoDict   格式定為 { 'pic_name' : 'pic_link' }
-
-###################################################
 @app.route("/callback", methods=['POST'])
 def callback(event):
     # get X-Line-Signature header value
@@ -85,45 +88,66 @@ def callback(event):
 
 def AddUserIdIfNotExist(user_id):
     logging.debug('enter AddUserIdIfNotExist')
-    if user_id not in UserInfoDict.keys():
-        new_dict = {user_id: {'pic_name': None, 'pic_content': None, 'pic_link': None, 'banned':False}}
-        UserInfoDict.update(new_dict)
-        return True
-
-def isUserIdBanned(user_id):
-    if UserInfoDict.get(user_id).get('banned'):
+    select_params_dict = {
+                'user_id': user_id,
+                }
+    select_pre_sql = "SELECT user_id FROM user_info WHERE user_id = :user_id"
+    res = select_from_db(select_pre_sql, select_params_dict)
+    # 回傳值應為 list type，但有可能沒有值所以不指定取第一個
+    if res:
+        # user_id 存在，不做事
         return True
     else:
+        # user_id 不存在，加入
+        insert_params_dict = {
+                'user_id': user_id,
+                'banned': 0,
+                }
+        insert_pre_sql = "INSERT INTO user_info (user_id, banned) VALUES (:user_id, :banned)"
+        insert_from_db(insert_pre_sql, insert_params_dict)
         return False
 
-def isPicContentExist(user_id):
-    logging.debug('enter isPicContentExist')
-    if UserInfoDict.get(user_id).get('pic_content'):
+def isUserIdBanned(user_id):
+    logging.debug('enter isUserIdBanned')
+    select_params_dict = {
+                'user_id': user_id,
+                }
+    select_pre_sql = "SELECT banned FROM user_info WHERE user_id = :user_id"
+    # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
+    res = select_from_db(select_pre_sql, select_params_dict)
+    # 回傳值應為 list type，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
+    print(res[0])
+    if res[0]:
         return True
     else:
         return False
 
 def isFileNameExist(user_id):
     logging.debug('enter isFileNameExist')
-    if UserInfoDict.get(user_id).get('pic_name'):
+    select_params_dict = {
+                'user_id': user_id,
+                }
+    select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL"
+    # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
+    res = select_from_db(select_pre_sql, select_params_dict)
+    if res:
         return True
     else:
         return False
-    
-def SavePicContentToDict(user_id, group_id, message_id):
-    logging.debug('enter SavePicContentToDict')
-    message_content = line_bot_api.get_message_content(message_id)
-    UserInfoDict[user_id]['pic_content'] = message_content
-    return True
 
-def UploadToImgur(user_id, group_id):
+def UploadToImgur(user_id, group_id, binary_pic):
     logging.debug('enter UploadToImgur')
-    Pic_Name = UserInfoDict.get(user_id).get('pic_name')
+    select_params_dict = {
+                'user_id': user_id,
+                }
+    # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
+    select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL AND user_id = :user_id"
+    # 回傳為 list type 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
+    Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0]
     try:
-        binary_pic = UserInfoDict.get(user_id).get('pic_content')
         logging.debug('type binary_pic: '+str(type(binary_pic)))
-        logging.debug('type binary_pic.content: '+str(type(binary_pic.content)))
-        payload = base64.b64encode(binary_pic.content)
+        logging.debug('type binary_pic.content: '+str(dir(binary_pic)))
+        payload = base64.b64encode(binary_pic)
         ################################
         data = {
             'image': payload,
@@ -146,16 +170,18 @@ def UploadToImgur(user_id, group_id):
         reply_msg = '上傳至Imgur失敗'
         return '', reply_msg
 
-def GetPicFromPicLink(user_id):
-    pic_link = UserInfoDict[user_id]['pic_link']
-    return pic_link
-
 def CheckMsgContent(MsgContent):
     MsgContent = MsgContent.lower()
-    for PicName in PicInfoDict.keys():
-        if re.search(PicName, MsgContent):
-            return PicInfoDict.get(PicName)
-    return False
+    select_params_dict = {
+        'pic_name': MsgContent,
+        }
+    select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_name = :pic_name"
+    ########## 這邊有效能問題需要解決，目前是每一句對話都去掃描全部的 DB ############
+    res = select_from_db(select_pre_sql, select_params_dict)
+    if res:
+        return True
+    else:
+        return False
 
 def LineReplyMsg(to, content, content_type):
     if content_type is 'text':
@@ -206,15 +232,16 @@ def handle_image(event):
             logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return True
     
-    # 直接再儲存一次，已經存在的話就覆蓋過去
-    SavePicContentToDict(user_id, group_id, message_id)
-    logging.debug('已儲存圖片暫存檔')
-    
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
         logging.debug('name already exist, start to upload')
         pic_link, reply_msg = UploadToImgur(user_id, group_id)
-        pic_name = UserInfoDict.get(user_id).get('pic_name')
+        update_params_dict = {
+            'pic_link': pic_link,
+            }
+        # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
+        update_pre_sql = "UPDATE pic_info SET pic_link=:piclink WHERE user_id = :user_id AND pic_link IS NULL"
+        update_from_db(update_pre_sql, update_params_dict)
         LineReplyMsg(event.reply_token, reply_msg, content_type='text')
 
 # #################################################
@@ -247,8 +274,15 @@ def handle_text(event):
             # 圖片名稱長度在此設定門檻，目前設定為４~10 個字
             pic_name = Line_Msg_Text[1:-1].lower()
             if len(pic_name) >= 4 and len(pic_name) <=10 :
-                UserInfoDict[user_id]['pic_name'] = pic_name
-                LineReplyMsg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
+                insert_params_dict = {
+                'user_id': user_id,
+                'pic_name': pic_name,
+                }
+                insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name) values (:user_id, :pic_name)"
+                if insert_from_db(insert_pre_sql, insert_params_dict):
+                    LineReplyMsg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
+                else:
+                    LineReplyMsg(event.reply_token, 'Database 寫檔失敗！請聯絡管理員', content_type='text')
             else:
                 LineReplyMsg(event.reply_token, '圖片名稱長度需介於 4~10 個字（中英文或數字皆可)', content_type='text')
                 return
@@ -263,8 +297,9 @@ def handle_text(event):
             command = event.message.text[8:]
             to = group_id if group_id else user_id
             if not command :
-                LinePushTextMsg(to, 'UserInfoDict = ' + str(UserInfoDict) + 'PicInfoDict = ' + str(PicInfoDict)
-                        + 'to: ' + str(to))
+                select_params_dict = {}
+                select_pre_sql = "SELECT * FROM pic_info"
+                select_from_db(select_pre_sql, select_params_dict)
             elif command is 'help' :
                 LinePushTextMsg(to, '\
                         -q : quiet mode, for not talk back.\n \
@@ -281,7 +316,7 @@ def handle_text(event):
 
         elif event.message.text == "--help":
             logging.debug('event.message.text == "--help"') #debug
-            LineReplyMsg(event.reply_token, '請使用 "#"+"圖片名稱"+"#" 來設定圖片名稱，範例: #圖片名稱', content_type='text')
+            LineReplyMsg(event.reply_token, '請先設定圖片名稱完後再上傳圖片！\n使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人#', content_type='text')
 
         elif event.message.text == "--mode":
             logging.debug('event.message.text == "--mode"') #debug
@@ -289,32 +324,32 @@ def handle_text(event):
 
         
         elif event.message.text == "sql-test insert user_id":
-            select_params_dict = {
-                'user_id': 'test_user_id',
-                'pic_name': 'test_pic_name',
-                'pic_link': 'test_pic_link',
-                }
-            insert_params_dict = {
-                'user_id': 'test_user_id',
-                'pic_name': 'test_pic_name',
-                'pic_link': 'test_pic_link',
-                }
-            update_params_dict = {
-                'user_id': 'test_user_id',
-                'pic_name': 'test_pic_name',
-                'pic_link': 'test_pic_link',
-                }
-            select_pre_sql = "SELECT user_id FROM pic_info WHERE user_id = :user_id"
-            insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, pic_link) values (:user_id, :pic_name, :pic_link)"
-            update_pre_sql = "UPDATE pic_info SET pic_name=123, pic_link='123' WHERE user_id = :user_id"
-            
-            insert_from_db(insert_pre_sql, insert_params_dict)
-            select_from_db(select_pre_sql, select_params_dict)
-            update_from_db(update_pre_sql, update_params_dict)
-            select_from_db(select_pre_sql, select_params_dict)
-            print("預期要看到 pic_name=123, pic_link='123'")
 
+            # select_params_dict = {
+            #     'user_id': 'test_user_id',
+            #     'pic_name': 'test_pic_name',
+            #     'pic_link': 'test_pic_link',
+            #     }
+            # select_pre_sql = "SELECT user_id FROM pic_info WHERE user_id = :user_id"
+            # select_from_db(select_pre_sql, select_params_dict)
+            
+            # insert_params_dict = {
+            #     'user_id': 'test_user_id',
+            #     'pic_name': 'test_pic_name',
+            #     'pic_link': 'test_pic_link',
+            #     }
+            # insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, pic_link) values (:user_id, :pic_name, :pic_link)"
+            # insert_from_db(insert_pre_sql, insert_params_dict)
+
+            # update_params_dict = {
+            #     'user_id': 'test_user_id',
+            #     'pic_name': 'test_pic_name',
+            #     'pic_link': 'test_pic_link',
+            #     }
+            # update_pre_sql = "UPDATE pic_info SET pic_name=123, pic_link='123' WHERE user_id = :user_id"
+            # update_from_db(update_pre_sql, update_params_dict)
             logging.info('sqlalchemy test pass')
+            pass
 
         else:
             # 根據模式決定要不要回話
