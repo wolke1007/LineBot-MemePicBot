@@ -117,7 +117,6 @@ def isUserIdBanned(user_id):
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
     # 回傳值應為 list type，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
-    print('isUserIdBanned:'+res[0])
     if res[0] is 0:
         # 沒有被 banned
         return False
