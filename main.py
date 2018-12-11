@@ -116,11 +116,14 @@ def isUserIdBanned(user_id):
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
     # 回傳值應為 list type，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
-    if res[0] is 0:
+    print('isUserIdBanned type res', type(res)
+    if res[0] == False:
         # 沒有被 banned
+         print('user_id not got banned')
         return False
     else:
         # 被 banned 的帳號
+        print('user_id got banned', res[0])
         return True
 
 def isFileNameExist(user_id):
@@ -231,7 +234,7 @@ def handle_image(event):
             raise Exception('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         except Exception:
             logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
-        return True
+        return
     
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
@@ -265,7 +268,7 @@ def handle_text(event):
             raise Exception('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         except Exception:
             logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
-        return True
+        return
     
     Line_Msg_Text = event.message.text
     if isinstance(event.message, TextMessage):
