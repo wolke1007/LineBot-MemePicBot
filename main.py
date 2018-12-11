@@ -243,10 +243,11 @@ def handle_image(event):
         print('type line_bot_api.get_message_content(event): ', type(line_bot_api.get_message_content(message_id).content))
         pic_link, reply_msg = UploadToImgur(user_id, group_id, line_bot_api.get_message_content(message_id).content)
         update_params_dict = {
+            'user_id': user_id,
             'pic_link': pic_link,
             }
         # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
-        update_pre_sql = "UPDATE pic_info SET pic_link=:piclink WHERE user_id = :user_id AND pic_link IS NULL"
+        update_pre_sql = "UPDATE pic_info SET pic_link=:pic_link WHERE user_id = :user_id AND pic_link IS NULL"
         update_from_db(update_pre_sql, update_params_dict)
         LineReplyMsg(event.reply_token, reply_msg, content_type='text')
 
