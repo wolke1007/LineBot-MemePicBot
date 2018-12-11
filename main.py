@@ -96,7 +96,6 @@ def AddUserIdIfNotExist(user_id):
     # 回傳值應為 list type，但有可能沒有值所以不指定取第一個
     if res:
         # user_id 存在，不做事
-        print('AddUserIdIfNotExist:'+res[0])
         return
     else:
         # user_id 不存在，加入
