@@ -239,9 +239,9 @@ def handle_image(event):
     if isFileNameExist(user_id):
         ''' 檔案名稱已取好了 '''
         logging.debug('name already exist, start to upload')
-        print('dir line_bot_api.get_message_content(event): ', dir(line_bot_api.get_message_content(event)))
-        print('type line_bot_api.get_message_content(event): ', type(line_bot_api.get_message_content(event)))
-        pic_link, reply_msg = UploadToImgur(user_id, group_id, line_bot_api.get_message_content(event))
+        print('dir line_bot_api.get_message_content(event): ', dir(line_bot_api.get_message_content(message_id)))
+        print('type line_bot_api.get_message_content(event): ', type(line_bot_api.get_message_content(message_id)))
+        pic_link, reply_msg = UploadToImgur(user_id, group_id, line_bot_api.get_message_content(message_id))
         update_params_dict = {
             'pic_link': pic_link,
             }
