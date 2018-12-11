@@ -93,10 +93,11 @@ def AddUserIdIfNotExist(user_id):
                 }
     select_pre_sql = "SELECT user_id FROM user_info WHERE user_id = :user_id"
     res = select_from_db(select_pre_sql, select_params_dict)
+    print('AddUserIdIfNotExist:'+res)
     # 回傳值應為 list type，但有可能沒有值所以不指定取第一個
     if res:
         # user_id 存在，不做事
-        return True
+        return
     else:
         # user_id 不存在，加入
         insert_params_dict = {
@@ -105,7 +106,7 @@ def AddUserIdIfNotExist(user_id):
                 }
         insert_pre_sql = "INSERT INTO user_info (user_id, banned) VALUES (:user_id, :banned)"
         insert_from_db(insert_pre_sql, insert_params_dict)
-        return False
+        return True
 
 def isUserIdBanned(user_id):
     logging.debug('enter isUserIdBanned')
@@ -116,11 +117,13 @@ def isUserIdBanned(user_id):
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
     # 回傳值應為 list type，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
-    print(res[0])
-    if res[0]:
-        return True
-    else:
+    print('isUserIdBanned:'+res[0])
+    if res[0] is 0:
+        # 沒有被 banned
         return False
+    else:
+        # 被 banned 的帳號
+        return True
 
 def isFileNameExist(user_id):
     logging.debug('enter isFileNameExist')
