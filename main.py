@@ -377,7 +377,7 @@ def handle_text(event):
                 System['talk_mode'] = True
                 LinePushTextMsg(user_id, 'set talk_mode to Quiet Mode')
 
-        elif event.message.text == "--help":
+        elif event.message.text == "--help" :
             logging.debug('event.message.text == "--help"') #debug
             LineReplyMsg(event.reply_token, \
 # line 手機版莫約 15 個中文字寬度就會換行
@@ -386,9 +386,13 @@ def handle_text(event):
 嚴 禁 上 傳 色 情 圖 片
 (作者: 我不想被 Imgur banned 拜託配合了ＱＡＱ
 使用教學：
-1. 先設定圖片名稱完後再上傳圖片
-2. 使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大#
-3. 設定同圖片名稱會蓋掉前面上傳的
+step 1. 設定圖片名稱，例如 #我是帥哥#
+step 2. 上傳圖片 or 貼上URL，系統會回傳上傳成功
+step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
+
+備註:
+1. 圖片字數有限制，空白或是特殊符號皆算數
+2. 設定同圖片名稱則會蓋掉前面上傳的
 ''', content_type='text')
 
         elif event.message.text == "--mode":
