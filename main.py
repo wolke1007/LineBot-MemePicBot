@@ -328,10 +328,10 @@ def handle_text(event):
             if not command :
                 select_params_dict = {}
                 select_pre_sql = "SELECT * FROM pic_info"
-                select_from_db(select_pre_sql, select_params_dict)
+                res = select_from_db(select_pre_sql, select_params_dict)
+                LineReplyMsg(event.reply_token, res, content_type='text')
             elif command is 'help' :
                 LinePushTextMsg(to, '\
-                        -q : quiet mode, for not talk back.\n \
                         -q : quiet mode, for not talk back.\n \
                         ')
             elif command[5:] is '-q 0' :
@@ -346,7 +346,9 @@ def handle_text(event):
         elif event.message.text == "--help":
             logging.debug('event.message.text == "--help"') #debug
             LineReplyMsg(event.reply_token, \
-            '使用教學：\n \
+            '感謝使用本回話機器人，貼心提醒您請勿洩漏個資與 禁 止 上 傳 1 8 禁 圖 片\n \
+            我帳號不想被 Imgur banne.. 拜託了 m(_ _)m \n \
+            使用教學：\n \
             1. 先設定圖片名稱完後再上傳圖片\n \
             2. 使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人# \n \
             3. 設定同圖片名稱會蓋掉前面上傳的 \
