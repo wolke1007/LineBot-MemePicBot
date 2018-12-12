@@ -194,11 +194,11 @@ def CheckMsgContent(MsgContent):
             select_params_dict = {
             'pic_name': pic_name,
             }
-            select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_name = :pic_name"
+            select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name = :pic_name"
             res = select_from_db(select_pre_sql, select_params_dict)
             print('CheckMsgContent res:', res)
             if res:
-                # 回傳 pic
+                # 回傳 pic_link
                 PICLINK = res[0][0]
                 return PICLINK
             else:
