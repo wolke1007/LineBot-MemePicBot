@@ -346,13 +346,14 @@ def handle_text(event):
         elif event.message.text == "--help":
             logging.debug('event.message.text == "--help"') #debug
             LineReplyMsg(event.reply_token, \
-            '感謝使用本回話機器人，貼心提醒您請勿洩漏個資與 禁 止 上 傳 1 8 禁 圖 片\n \
-            我帳號不想被 Imgur banne.. 拜託了 m(_ _)m \n \
-            使用教學：\n \
-            1. 先設定圖片名稱完後再上傳圖片\n \
-            2. 使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人# \n \
-            3. 設定同圖片名稱會蓋掉前面上傳的 \
-            ', content_type='text')
+'''
+貼心提醒您請勿洩漏個資與 禁 止 上 傳 1 8 禁 圖 片
+(作者: 我帳號不想被 Imgur banne.. 拜託了 m(_ _)m 
+使用教學：
+1. 先設定圖片名稱完後再上傳圖片
+2. 使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人#
+3. 設定同圖片名稱會蓋掉前面上傳的
+''', content_type='text')
 
         elif event.message.text == "--mode":
             logging.debug('event.message.text == "--mode"') #debug
