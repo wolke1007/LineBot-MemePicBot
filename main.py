@@ -126,12 +126,16 @@ def isUserIdBanned(user_id):
         print('user_id got banned', res[0][0])
         return True
 
-def isFileNameExist(user_id):
+def isFileNameExist(user_id, pic_name=True, checkrepeat=True):
     logging.debug('enter isFileNameExist')
     select_params_dict = {
                 'user_id': user_id,
+                'pic_name': pic_name,
                 }
-    select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL"
+    if checkrepeat is True:
+        select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_name = :pic_name"
+    else:
+        select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL"
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
     if res:
@@ -238,12 +242,13 @@ def handle_image(event):
             logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return
     
-    if isFileNameExist(user_id):
+    if isFileNameExist(user_id, checkrepeat=False):
         ''' 檔案名稱已取好了 '''
         logging.debug('name already exist, start to upload')
         print('dir line_bot_api.get_message_content(event): ', dir(line_bot_api.get_message_content(message_id).content))
         print('type line_bot_api.get_message_content(event): ', type(line_bot_api.get_message_content(message_id).content))
-        pic_link, reply_msg = UploadToImgur(user_id, group_id, line_bot_api.get_message_content(message_id).content)
+        binary_pic = line_bot_api.get_message_content(message_id).content
+        pic_link, reply_msg = UploadToImgur(user_id, group_id, binary_pic)
         update_params_dict = {
             'user_id': user_id,
             'pic_link': pic_link,
@@ -283,12 +288,24 @@ def handle_text(event):
             # 圖片名稱長度在此設定門檻，目前設定為４~10 個字
             pic_name = Line_Msg_Text[1:-1].lower()
             if len(pic_name) >= 4 and len(pic_name) <=10 :
-                insert_params_dict = {
-                'user_id': user_id,
-                'pic_name': pic_name,
-                }
-                insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name) values (:user_id, :pic_name)"
-                if insert_from_db(insert_pre_sql, insert_params_dict):
+                if isFileNameExist(user_id, pic_name=pic_name, checkrepeat=True):
+                    # 如果圖片重複了，對 user_id pic_link 欄位進行 update
+                    update_params_dict = {
+                        'user_id': user_id,
+                        'pic_name': pic_name,
+                        'pic_link': '',
+                        }
+                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=:pic_link WHERE pic_name = :pic_name"
+                    res = update_from_db(update_pre_sql, update_params_dict)
+                else:
+                    # 如果沒重複直接 insert
+                    insert_params_dict = {
+                    'user_id': user_id,
+                    'pic_name': pic_name,
+                    }
+                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name) values (:user_id, :pic_name)"
+                    res = insert_from_db(insert_pre_sql, insert_params_dict)
+                if res is True:
                     LineReplyMsg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
                 else:
                     LineReplyMsg(event.reply_token, 'Database 寫檔失敗！請聯絡管理員', content_type='text')
