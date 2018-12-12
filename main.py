@@ -179,19 +179,27 @@ def UploadToImgur(user_id, group_id, binary_pic):
         return '', reply_msg
 
 def CheckMsgContent(MsgContent):
-    MsgContent = MsgContent.lower()
-    select_params_dict = {
-        'pic_name': MsgContent,
-        }
-    select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name = :pic_name"
-    ########## 這邊有效能問題需要解決，目前是每一句對話都去掃描全部的 DB ############
-    res = select_from_db(select_pre_sql, select_params_dict)
-    if res:
-        # 回傳 pic
-        PICLINK = res[0][0]
-        return PICLINK
-    else:
-        return False
+    select_params_dict = {}
+    select_pre_sql = "SELECT pic_name FROM pic_info"
+    ########## 這邊有效能問題需要解決 ##########
+    # 目前是每一句對話都去抓全部的 DB 回來，然後丟進 for loop 掃描全部的內容
+    # 1. DB server 的運算部分目前已知要錢，所以不要讓它算，要靠 Cloud Function 那邊的資源
+    # 2. 所以整個抓回來再算是一種方法，但需要思考能不能不要每次都跟 DB 拿，而是哪邊有 server cache 之類的
+    all_picname_in_db = select_from_db(select_pre_sql, select_params_dict)
+    print('CheckMsgContent res:', res)
+    for pic_name in all_picname_in_db:
+        if re.search(str(pic_name), MsgContent, re.IGNORECASE):
+            select_params_dict = {
+            'pic_name': pic_name,
+            }
+            select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_name = :pic_name"
+            res = select_from_db(select_pre_sql, select_params_dict)
+            if res:
+                # 回傳 pic
+                PICLINK = res[0][0]
+                return PICLINK
+            else:
+                return False
 
 def LineReplyMsg(to, content, content_type):
     if content_type is 'text':
