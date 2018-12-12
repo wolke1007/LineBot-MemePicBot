@@ -310,7 +310,7 @@ def handle_text(event):
                         'user_id': user_id,
                         'pic_name': pic_name,
                         }
-                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=NULL WHERE pic_name = :pic_name"
+                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id WHERE pic_name = :pic_name"
                     res = update_from_db(update_pre_sql, update_params_dict)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
@@ -320,7 +320,7 @@ def handle_text(event):
                     'user_id': user_id,
                     'pic_name': pic_name,
                     }
-                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, pic_link) values (:user_id, :pic_name, NULL)"
+                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name) values (:user_id, :pic_name)"
                     res = insert_from_db(insert_pre_sql, insert_params_dict)
                     print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
