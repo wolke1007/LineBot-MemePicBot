@@ -285,9 +285,9 @@ def handle_text(event):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             logging.debug('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
-            # 圖片名稱長度在此設定門檻，目前設定為４~10 個字
+            # 圖片名稱長度在此設定門檻，目前設定為４~15 個字
             pic_name = Line_Msg_Text[1:-1].lower()
-            if len(pic_name) >= 4 and len(pic_name) <=10 :
+            if len(pic_name) >= 4 and len(pic_name) <=15 :
                 if isFileNameExist(user_id, pic_name=pic_name, checkrepeat=True):
                     # 如果圖片重複了，對 user_id pic_link 欄位進行 update
                     print('圖片已經存在，更新 user_id pic_link')
@@ -313,7 +313,7 @@ def handle_text(event):
                 else:
                     LineReplyMsg(event.reply_token, 'Database 寫檔失敗！請聯絡管理員', content_type='text')
             else:
-                LineReplyMsg(event.reply_token, '圖片名稱長度需介於 4~10 個字（中英文或數字皆可)', content_type='text')
+                LineReplyMsg(event.reply_token, '圖片名稱長度需介於 4~15 個字（中英文或數字皆可)', content_type='text')
                 return
 
             logging.debug('add to pic_name done')
@@ -323,7 +323,9 @@ def handle_text(event):
         elif event.message.text[0:7] == "--debug":
             logging.debug('event.message.text == "--debug"') #debug
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
+            print('enter debug')
             command = event.message.text[8:]
+            print('command: ', command)
             if not command :
                 select_params_dict = {}
                 LinePushTextMsg(user_id, select_from_db("SELECT user_id FROM pic_info", select_params_dict))
