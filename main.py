@@ -320,7 +320,7 @@ def handle_text(event):
                     'user_id': user_id,
                     'pic_name': pic_name,
                     }
-                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name) values (:user_id, :pic_name)"
+                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, pic_link) values (:user_id, :pic_name, NULL)"
                     res = insert_from_db(insert_pre_sql, insert_params_dict)
                     print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
