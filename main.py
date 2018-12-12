@@ -143,7 +143,7 @@ def isFileNameExist(user_id, pic_name=True, checkrepeat=True):
     else:
         return False
 
-def UploadToImgur(user_id, group_id, binary_pic):
+def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
     logging.debug('enter UploadToImgur')
     select_params_dict = {
                 'user_id': user_id,
@@ -155,13 +155,15 @@ def UploadToImgur(user_id, group_id, binary_pic):
     try:
         logging.debug('type binary_pic: '+str(type(binary_pic)))
         logging.debug('type binary_pic.content: '+str(dir(binary_pic)))
-        payload = base64.b64encode(binary_pic)
+        payload = base64.b64encode(binary_pic) if binary_pic == True else url
+        upload_type = 'base64' if binary_pic == True else 'URL' 
         ################################
         data = {
             'image': payload,
             'album': Album_ID,
             'name': Pic_Name,
             'title': Pic_Name,
+            'type': upload_type,
             'description': 'Upload From MemePicLineBot'
         }
         # 這邊要考慮在 description 中加入 sha256 加密過的使用者 line user id 來達到嚇阻避免使用者濫用，濫用情況類似像是 PO 違法照片等等
@@ -259,7 +261,7 @@ def handle_image(event):
         print('dir line_bot_api.get_message_content(event): ', dir(line_bot_api.get_message_content(message_id).content))
         print('type line_bot_api.get_message_content(event): ', type(line_bot_api.get_message_content(message_id).content))
         binary_pic = line_bot_api.get_message_content(message_id).content
-        pic_link, reply_msg = UploadToImgur(user_id, group_id, binary_pic)
+        pic_link, reply_msg = UploadToImgur(user_id, group_id, binary_pic=binary_pic)
         update_params_dict = {
             'user_id': user_id,
             'pic_link': pic_link,
@@ -328,6 +330,22 @@ def handle_text(event):
                 return
 
             logging.debug('add to pic_name done')
+        #實作用 URL 上傳圖片
+        elif event.message.text[0:4] == "http" and event.message.text[-4:] == ".jpg" \
+                                                or event.message.text[-4:] == '.png' \
+                                                or event.message.text[-4:] == '.gif':
+            if isFileNameExist(user_id, checkrepeat=False):
+                # 已經命名好名字 pic_name，但還沒上傳圖片的 pic_link is NULL 才是這邊的目標
+                pic_link, reply_msg = UploadToImgur(user_id, group_id, url=event.message.text)
+                update_params_dict = {
+                    'user_id': user_id,
+                    'pic_link': pic_link,
+                    }
+                # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
+                update_pre_sql = "UPDATE pic_info SET pic_link=:pic_link WHERE user_id = :user_id AND pic_link IS NULL"
+                update_from_db(update_pre_sql, update_params_dict)
+                LineReplyMsg(event.reply_token, reply_msg, content_type='text')
+
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
