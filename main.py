@@ -181,9 +181,10 @@ def CheckMsgContent(MsgContent):
         }
     select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name = :pic_name"
     ########## 這邊有效能問題需要解決，目前是每一句對話都去掃描全部的 DB ############
-    PICLINK = select_from_db(select_pre_sql, select_params_dict)[0][0]
-    if PICLINK:
+    res = select_from_db(select_pre_sql, select_params_dict)
+    if res:
         # 回傳 pic
+        PICLINK = res[0][0]
         return PICLINK
     else:
         return False
