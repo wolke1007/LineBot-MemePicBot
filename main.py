@@ -324,31 +324,33 @@ def handle_text(event):
             logging.debug('event.message.text == "--debug"') #debug
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             command = event.message.text[8:]
-            to = group_id if group_id else user_id
             if not command :
                 select_params_dict = {}
-                select_pre_sql = "SELECT * FROM pic_info"
-                res = select_from_db(select_pre_sql, select_params_dict)
-                LineReplyMsg(event.reply_token, res, content_type='text')
+                LinePushTextMsg(user_id, select_from_db("SELECT user_id FROM pic_info", select_params_dict))
+                LinePushTextMsg(user_id, select_from_db("SELECT pic_name FROM pic_info", select_params_dict))
+                LinePushTextMsg(user_id, select_from_db("SELECT created_time FROM pic_info", select_params_dict))
+
             elif command is 'help' :
-                LinePushTextMsg(to, '\
+                LinePushTextMsg(user_id, '\
                         -q : quiet mode, for not talk back.\n \
                         ')
             elif command[5:] is '-q 0' :
                 System['talk_mode'] = False
-                LinePushTextMsg(to, 'set talk_mode to Quiet Mode')
+                LinePushTextMsg(user_id, 'set talk_mode to Quiet Mode')
 
             # 這邊要改寫成判斷最後一個字元來決定要做什麼事
             elif command[5:] is '-q 1' :
                 System['talk_mode'] = True
-                LinePushTextMsg(to, 'set talk_mode to Quiet Mode')
+                LinePushTextMsg(user_id, 'set talk_mode to Quiet Mode')
 
         elif event.message.text == "--help":
             logging.debug('event.message.text == "--help"') #debug
             LineReplyMsg(event.reply_token, \
+# line 手機版莫約 15 個中文字寬度就會換行
 '''
-貼心提醒您請勿洩漏個資與 禁 止 上 傳 1 8 禁 圖 片
-(作者: 我帳號不想被 Imgur banne.. 拜託了 m(_ _)m 
+貼心提醒您請勿洩漏個資
+嚴 禁 上 傳 色 情 圖 片
+(作者: 我不想被 Imgur banned 拜託配合了ＱＡＱ
 使用教學：
 1. 先設定圖片名稱完後再上傳圖片
 2. 使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人#
