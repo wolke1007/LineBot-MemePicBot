@@ -294,9 +294,8 @@ def handle_text(event):
                     update_params_dict = {
                         'user_id': user_id,
                         'pic_name': pic_name,
-                        'pic_link': '',
                         }
-                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=:pic_link WHERE pic_name = :pic_name"
+                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=NULL WHERE pic_name = :pic_name"
                     res = update_from_db(update_pre_sql, update_params_dict)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
