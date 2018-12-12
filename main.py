@@ -328,9 +328,12 @@ def handle_text(event):
             print('command: ', command)
             if not command :
                 select_params_dict = {}
-                LinePushTextMsg(user_id, select_from_db("SELECT user_id FROM pic_info", select_params_dict))
-                LinePushTextMsg(user_id, select_from_db("SELECT pic_name FROM pic_info", select_params_dict))
-                LinePushTextMsg(user_id, select_from_db("SELECT created_time FROM pic_info", select_params_dict))
+                res = select_from_db("SELECT user_id FROM pic_info", select_params_dict)
+                LinePushTextMsg(user_id, res)
+                res = select_from_db("SELECT pic_name FROM pic_info", select_params_dict)
+                LinePushTextMsg(user_id, res)
+                res = select_from_db("SELECT created_time FROM pic_info", select_params_dict)
+                LinePushTextMsg(user_id, res)
 
             elif command is 'help' :
                 LinePushTextMsg(user_id, '\
