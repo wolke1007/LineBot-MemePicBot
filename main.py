@@ -171,11 +171,11 @@ def UploadToImgur(user_id, group_id, binary_pic):
         response = requests.post('https://api.imgur.com/3/image', headers=headers, data=data)
         pic_link = json.loads(response.text)['data']['link']
         ########################################################################
-        reply_msg = '上傳至Imgur成功'
+        reply_msg = '上傳成功'
         return pic_link, reply_msg
     except Exception as e:
         logging.debug(e)
-        reply_msg = '上傳至Imgur失敗'
+        reply_msg = '上傳失敗，請聯絡管理員'
         return '', reply_msg
 
 def CheckMsgContent(MsgContent):
@@ -345,11 +345,12 @@ def handle_text(event):
 
         elif event.message.text == "--help":
             logging.debug('event.message.text == "--help"') #debug
-            LineReplyMsg(event.reply_token, '使用教學：\n \
-                                            1. 先設定圖片名稱完後再上傳圖片\n \
-                                            2. 使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人# \n \
-                                            3. 設定同圖片名稱會蓋掉前面上傳的 \
-                                            ', content_type='text')
+            LineReplyMsg(event.reply_token, \
+            '使用教學：\n \
+            1. 先設定圖片名稱完後再上傳圖片\n \
+            2. 使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人# \n \
+            3. 設定同圖片名稱會蓋掉前面上傳的 \
+            ', content_type='text')
 
         elif event.message.text == "--mode":
             logging.debug('event.message.text == "--mode"') #debug
