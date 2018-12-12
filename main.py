@@ -290,6 +290,7 @@ def handle_text(event):
             if len(pic_name) >= 4 and len(pic_name) <=10 :
                 if isFileNameExist(user_id, pic_name=pic_name, checkrepeat=True):
                     # 如果圖片重複了，對 user_id pic_link 欄位進行 update
+                    print('圖片已經存在，更新 user_id pic_link')
                     update_params_dict = {
                         'user_id': user_id,
                         'pic_name': pic_name,
@@ -297,14 +298,17 @@ def handle_text(event):
                         }
                     update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=:pic_link WHERE pic_name = :pic_name"
                     res = update_from_db(update_pre_sql, update_params_dict)
+                    print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
                     # 如果沒重複直接 insert
+                    print('新增 user_id pic_name')
                     insert_params_dict = {
                     'user_id': user_id,
                     'pic_name': pic_name,
                     }
                     insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name) values (:user_id, :pic_name)"
                     res = insert_from_db(insert_pre_sql, insert_params_dict)
+                    print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
                     LineReplyMsg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
                 else:
@@ -342,7 +346,11 @@ def handle_text(event):
 
         elif event.message.text == "--help":
             logging.debug('event.message.text == "--help"') #debug
-            LineReplyMsg(event.reply_token, '請先設定圖片名稱完後再上傳圖片！\n使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人#', content_type='text')
+            LineReplyMsg(event.reply_token, '使用教學：\n \
+                                            1. 先設定圖片名稱完後再上傳圖片\n \
+                                            2. 使用 #圖片名稱# 的方式設定圖片名稱，範例: #大什麼大 人什麼人# \n \
+                                            3. 設定同圖片名稱會蓋掉前面上傳的 \
+                                            ', content_type='text')
 
         elif event.message.text == "--mode":
             logging.debug('event.message.text == "--mode"') #debug
