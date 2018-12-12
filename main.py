@@ -371,6 +371,7 @@ def handle_text(event):
             logging.debug('CheckMsgContent(event.message.text)') #debug
             PICLINK = CheckMsgContent(event.message.text)
             if PICLINK:
+                print('PICLINK', PICLINK)
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
             logging.debug('clean PICLINK')
