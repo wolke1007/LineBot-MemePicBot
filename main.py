@@ -322,7 +322,7 @@ def handle_text(event):
                         'user_id': user_id,
                         'pic_name': pic_name,
                         }
-                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id WHERE pic_name = :pic_name"
+                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=NULL WHERE pic_name = :pic_name"
                     res = update_from_db(update_pre_sql, update_params_dict)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
@@ -348,6 +348,7 @@ def handle_text(event):
         elif event.message.text[0:4] == "http" and event.message.text[-4:] == ".jpg" \
                                                 or event.message.text[-4:] == '.png' \
                                                 or event.message.text[-4:] == '.gif':
+            print('is a pic URL')
             if isFileNameExist(user_id, checkrepeat=False):
                 # 已經命名好名字 pic_name，但還沒上傳圖片的 pic_link is NULL 才是這邊的目標
                 pic_link, reply_msg = UploadToImgur(user_id, group_id, url=event.message.text)
