@@ -22,7 +22,7 @@ e.g. 如 test or test2 兩張圖，test2 將永遠不會出現因為先 match te
 
 
 待實作 Feature:
-1. 統一輸出圖片大小，避免輸出過大尺寸圖片，優化使用者體驗
+1. 完善 debug mode
 2. meme pic 製作功能，效果預期跟 meme gen 一樣，有 open source code 可以參考 
 3. 貼 URL 也可以上傳的功能
 4. 刪除圖片或刪除關鍵字
@@ -30,4 +30,3 @@ e.g. 如 test or test2 兩張圖，test2 將永遠不會出現因為先 match te
 6. 讓 user report 不好的圖片機制
     - 預計是讓使用者貼上哪句話出現不好的圖片，甚至可以附註為什麼，不加附註者即完全讓管理員決定是否刪除
     - 接著去掃描可能是哪些關鍵字的圖片有問題然後列出來，管理員只要人工直接檢查圖片即可
-7. 完善 debug mode
