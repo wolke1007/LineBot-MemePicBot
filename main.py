@@ -158,6 +158,8 @@ def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
     try:
         logging.debug('type binary_pic: '+str(type(binary_pic)))
         logging.debug('type binary_pic.content: '+str(dir(binary_pic)))
+        print('type(binary_pic): ', type(binary_pic))
+        print('binary_pic:', binary_pic)
         payload = base64.b64encode(binary_pic) if binary_pic == True else url
         upload_type = 'base64' if binary_pic == True else 'URL' 
         print('payload:', payload)
@@ -181,7 +183,7 @@ def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
         reply_msg = '上傳成功'
         return pic_link, reply_msg
     except Exception as e:
-        logging.debug(e)
+        print(e)
         reply_msg = '上傳失敗，請聯絡管理員'
         return '', reply_msg
 
@@ -332,7 +334,7 @@ def handle_text(event):
                     'user_id': user_id,
                     'pic_name': pic_name,
                     }
-                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name) values (:user_id, :pic_name)"
+                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, pic_link) values (:user_id, :pic_name, NULL)"
                     res = insert_from_db(insert_pre_sql, insert_params_dict)
                     print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
