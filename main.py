@@ -198,9 +198,11 @@ def CheckMsgContent(MsgContent):
         match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
         if match: 
             match_list.append(pic_name)
-    match_list.sort()
-    # 排序後取 match 最多的
-    if match_list[-1]:
+    # 先確認 match_list 有沒有東西
+    if match_list:        
+        match_list.sort()
+        # 排序後取 match 字數最多的也就是右邊一個
+        pic_name = match_list[-1]
         select_params_dict = {
         'pic_name': pic_name,
         }
