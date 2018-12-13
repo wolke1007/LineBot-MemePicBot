@@ -267,7 +267,7 @@ def handle_image(event):
     
     if isFileNameExist(user_id, checkrepeat=False):
         ''' 檔案名稱已取好了 '''
-        logging.debug('name already exist, start to upload')
+        print('name already exist, start to upload')
         print('dir line_bot_api.get_message_content(event): ', dir(line_bot_api.get_message_content(message_id).content))
         print('type line_bot_api.get_message_content(event): ', type(line_bot_api.get_message_content(message_id).content))
         binary_pic = line_bot_api.get_message_content(message_id).content
@@ -318,7 +318,7 @@ def handle_text(event):
                         'user_id': user_id,
                         'pic_name': pic_name,
                         }
-                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id WHERE pic_name = :pic_name"
+                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id pic_link=NULL WHERE pic_name = :pic_name"
                     res = update_from_db(update_pre_sql, update_params_dict)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
