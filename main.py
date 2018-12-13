@@ -197,8 +197,9 @@ def CheckMsgContent(MsgContent):
         # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
         match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
         if match: 
-            match_list.append[pic_name]
-        match_list.sort()
+            match_list.append[str(pic_name)]
+    match_list.sort()
+    # 排序後取 match 最多的
     if match_list[-1]:
         select_params_dict = {
         'pic_name': pic_name,
