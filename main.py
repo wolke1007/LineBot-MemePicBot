@@ -160,6 +160,8 @@ def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
         logging.debug('type binary_pic.content: '+str(dir(binary_pic)))
         payload = base64.b64encode(binary_pic) if binary_pic == True else url
         upload_type = 'base64' if binary_pic == True else 'URL' 
+        print('payload:', payload)
+        print('upload_type:', upload_type)
         ################################
         data = {
             'image': payload,
