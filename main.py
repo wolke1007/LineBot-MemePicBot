@@ -29,6 +29,9 @@ API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 ################# System Dict 要再想要怎麼實作#################
 System = {'talk_mode':True, 'retrieve_pic_mode':True, }
+# 圖片名稱的字數的長度在此控制
+pic_name_low_limit = 3
+pic_name_high_limit = 15
 
 ######### SQL 相關的 code #########
 CONNECTION_NAME = getenv(
@@ -296,9 +299,9 @@ def handle_text(event):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
             logging.debug('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
-            # 圖片名稱長度在此設定門檻，目前設定為４~15 個字
+            # 圖片名稱長度在此設定門檻，目前設定為 3~15 個字
             pic_name = Line_Msg_Text[1:-1].lower()
-            if len(pic_name) >= 4 and len(pic_name) <=15 :
+            if len(pic_name) >= pic_name_low_limit and len(pic_name) <=pic_name_high_limit :
                 if isFileNameExist(user_id, pic_name=pic_name, checkrepeat=True):
                     # 如果圖片重複了，對 user_id pic_link 欄位進行 update
                     print('圖片已經存在，更新 user_id pic_link')
