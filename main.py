@@ -90,7 +90,7 @@ def callback(event):
     return 'OK'
 
 def AddUserIdIfNotExist(user_id):
-    logging.debug('enter AddUserIdIfNotExist')
+    print('enter AddUserIdIfNotExist')
     select_params_dict = {
                 'user_id': user_id,
                 }
@@ -111,7 +111,7 @@ def AddUserIdIfNotExist(user_id):
         return True
 
 def isUserIdBanned(user_id):
-    logging.debug('enter isUserIdBanned')
+    print('enter isUserIdBanned')
     select_params_dict = {
                 'user_id': user_id,
                 }
@@ -130,7 +130,7 @@ def isUserIdBanned(user_id):
         return True
 
 def isFileNameExist(user_id, pic_name=True, checkrepeat=True):
-    logging.debug('enter isFileNameExist')
+    print('enter isFileNameExist')
     select_params_dict = {
                 'user_id': user_id,
                 'pic_name': pic_name,
@@ -147,7 +147,7 @@ def isFileNameExist(user_id, pic_name=True, checkrepeat=True):
         return False
 
 def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
-    logging.debug('enter UploadToImgur')
+    print('enter UploadToImgur')
     select_params_dict = {
                 'user_id': user_id,
                 }
@@ -156,8 +156,8 @@ def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
     # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
     Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0][0]
     try:
-        logging.debug('type binary_pic: '+str(type(binary_pic)))
-        logging.debug('type binary_pic.content: '+str(dir(binary_pic)))
+        print('type binary_pic: '+str(type(binary_pic)))
+        print('type binary_pic.content: '+str(dir(binary_pic)))
         print('type(binary_pic): ', type(binary_pic))
         print('binary_pic:', binary_pic)
         payload = base64.b64encode(binary_pic) if binary_pic == True else url
@@ -260,7 +260,7 @@ def handle_image(event):
         group_id = event.source.group_id
     except AttributeError as e:
         group_id = None
-        logging.debug("send from 1 to 1 chat room, so there's no group id")
+        print("send from 1 to 1 chat room, so there's no group id")
     # 將 user 建檔管理
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
@@ -298,7 +298,7 @@ def handle_text(event):
         group_id = event.source.group_id
     except AttributeError as e:
         group_id = None
-        logging.debug("send from 1 to 1 chat room, so there's no group id")
+        print("send from 1 to 1 chat room, so there's no group id")
     # 將 user 建檔管理
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
@@ -312,7 +312,7 @@ def handle_text(event):
     Line_Msg_Text = event.message.text
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
-            logging.debug('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
+            print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
             # 圖片名稱長度在此設定門檻，目前設定為 3~15 個字
             pic_name = Line_Msg_Text[1:-1].lower()
@@ -351,7 +351,7 @@ def handle_text(event):
                 LineReplyMsg(event.reply_token, '圖片名稱長度需介於 4~15 個字（中英文或數字皆可)', content_type='text')
                 return
 
-            logging.debug('add to pic_name done')
+            print('add to pic_name done')
         #實作用 URL 上傳圖片
         elif event.message.text[0:4] == "http" and event.message.text[-4:] == ".jpg" \
                                                 or event.message.text[-4:] == '.png' \
@@ -373,7 +373,7 @@ def handle_text(event):
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
         elif event.message.text[0:7] == "--debug":
-            logging.debug('event.message.text == "--debug"') #debug
+            print('event.message.text == "--debug"') #debug
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             print('enter debug')
             command = event.message.text[8:]
@@ -401,7 +401,7 @@ def handle_text(event):
                 LinePushTextMsg(user_id, 'set talk_mode to Quiet Mode')
 
         elif event.message.text == "--help" :
-            logging.debug('event.message.text == "--help"') #debug
+            print('event.message.text == "--help"') #debug
             LineReplyMsg(event.reply_token, \
 # line 手機版莫約 15 個中文字寬度就會換行
 '''
@@ -424,7 +424,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 ''', content_type='text')
 
         elif event.message.text == "--mode":
-            logging.debug('event.message.text == "--mode"') #debug
+            print('event.message.text == "--mode"') #debug
             LineReplyMsg(event.reply_token, '當前模式為: ' + System.get('mode'), content_type='text')
 
         
@@ -466,13 +466,13 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
         else:
             # 根據模式決定要不要回話
             if System.get('talk_mode') is False: return          
-            logging.debug('CheckMsgContent(event.message.text)') #debug
+            print('CheckMsgContent(event.message.text)') #debug
             PICLINK = CheckMsgContent(event.message.text)
             if PICLINK:
                 print('PICLINK', PICLINK)
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
-            logging.debug('clean PICLINK')
+            print('clean PICLINK')
 
 
 
