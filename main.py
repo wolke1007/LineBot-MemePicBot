@@ -154,7 +154,9 @@ def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
     # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
     select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL AND user_id = :user_id"
     # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
-    Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0][0]
+    res = select_from_db(select_pre_sql, select_params_dict)
+    print('UploadToImgur select res:', res) #debug
+    Pic_Name = res[0][0]
     try:
         print('type binary_pic: '+str(type(binary_pic)))
         print('type binary_pic.content: '+str(dir(binary_pic)))
