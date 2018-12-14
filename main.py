@@ -326,7 +326,8 @@ def handle_text(event):
                         }
                     update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=NULL WHERE pic_name = :pic_name"
                     res = update_from_db(update_pre_sql, update_params_dict)
-                    debug_res = select_from_db("SELECT pic_name, pic_link FROM pic_info", select_params_dict)
+                    update_params_dict = {} #debug
+                    debug_res = select_from_db("SELECT pic_name, pic_link FROM pic_info", select_params_dict) #debug
                     print('debug_res1: ',debug_res)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
@@ -338,7 +339,8 @@ def handle_text(event):
                     }
                     insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, pic_link) values (:user_id, :pic_name, NULL)"
                     res = insert_from_db(insert_pre_sql, insert_params_dict)
-                    debug_res = select_from_db("SELECT pic_name, pic_link FROM pic_info", select_params_dict)
+                    update_params_dict = {} #debug
+                    debug_res = select_from_db("SELECT pic_name, pic_link FROM pic_info", select_params_dict) #debug
                     print('debug_res2: ',debug_res)
                     print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
