@@ -159,9 +159,9 @@ def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
     Pic_Name = res[0][0]
     try:
         print('type binary_pic: '+str(type(binary_pic)))
-        print('type binary_pic.content: '+str(dir(binary_pic)))
-        print('type(binary_pic): ', type(binary_pic))
-        print('binary_pic:', binary_pic)
+        print('type(base64 binary_pic): ', type(base64.b64encode(binary_pic)))
+        print('base64 binary_pic:', base64.b64encode(binary_pic))
+        if binary_pic == True: print('binary_pic is true')
         payload = base64.b64encode(binary_pic) if binary_pic == True else url
         upload_type = 'base64' if binary_pic == True else 'URL' 
         print('payload:', payload)
