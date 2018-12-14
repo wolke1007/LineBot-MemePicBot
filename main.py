@@ -280,12 +280,6 @@ def handle_image(event):
         update_pre_sql = "UPDATE pic_info SET pic_link=:pic_link WHERE user_id = :user_id AND pic_link IS NULL"
         update_from_db(update_pre_sql, update_params_dict)
         LineReplyMsg(event.reply_token, reply_msg, content_type='text')
-<<<<<<< HEAD
-=======
-    else:
-        img = line_bot_api.get_message_content(message_id).content
-        LineReplyMsg(event.reply_token, img, content_type='image')
->>>>>>> 5d9aed2... debug
 
 # #################################################
 #                   收到文字後邏輯                  #
