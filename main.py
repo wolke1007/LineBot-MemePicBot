@@ -163,7 +163,7 @@ def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
         print('base64 binary_pic:', base64.b64encode(binary_pic))
         if binary_pic == True: print('binary_pic is true')
         payload = base64.b64encode(binary_pic) if binary_pic == True else url
-        upload_type = 'base64' if binary_pic == True else 'URL' 
+        # upload_type = 'base64' if binary_pic == True else 'URL' 
         print('payload:', payload)
         print('upload_type:', upload_type)
         ################################
@@ -172,7 +172,6 @@ def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
             'album': Album_ID,
             'name': Pic_Name,
             'title': Pic_Name,
-            'type': upload_type,
             'description': 'Upload From MemePicLineBot'
         }
         # 這邊要考慮在 description 中加入 sha256 加密過的使用者 line user id 來達到嚇阻避免使用者濫用，濫用情況類似像是 PO 違法照片等等
