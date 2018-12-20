@@ -200,7 +200,8 @@ def CheckMsgContent(MsgContent):
             match_list.append(pic_name)
     # 先確認 match_list 有沒有東西
     if match_list:        
-        match_list.sort()
+        # key 這邊解決了如果不同名字，會依照字串長度排序
+        match_list.sort(key=lambda x: len(x))
         # 排序後取 match 字數最多的也就是右邊一個
         pic_name = match_list[-1]
         select_params_dict = {
@@ -436,7 +437,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 
         else:
             # 根據模式決定要不要回話
-            if System.get('talk_mode') is False: return          
+            if System.get('talk_mode') is False: return
             logging.debug('CheckMsgContent(event.message.text)') #debug
             PICLINK = CheckMsgContent(event.message.text)
             if PICLINK:
