@@ -400,9 +400,17 @@ def handle_text(event):
             pd_res = pd.DataFrame(res)
 
             table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
-            byte_pic = turn_table_into_pic(table_object)
+            binary_pic = turn_table_into_pic(table_object)
 
-            LineReplyMsg(event.reply_token, byte_pic, content_type='image')
+            pic_link, reply_msg = UploadToImgur(user_id, group_id, binary_pic)
+            update_params_dict = {
+                'pic_link': pic_link,
+                'pic_name': 'pic_name_list',
+                }
+            # 複寫名字為 'pic_name_list' 的 pic_link
+            update_pre_sql = "UPDATE pic_info SET pic_link=:pic_link WHERE pic_name = :pic_name"
+            update_from_db(update_pre_sql, update_params_dict)
+            LineReplyMsg(event.reply_token, pic_link, content_type='image')
 
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         # 或是看看有沒有辦法只回覆擁有者
