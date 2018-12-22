@@ -347,7 +347,62 @@ def handle_text(event):
             res = select_from_db(select_pre_sql, select_params_dict={})
             # res 格式為:  [('1',), ('ABC',)]
             res = [ _[0] for _ in res ]
-            LineReplyMsg(event.reply_token, '目前圖片名稱清單：\n'+str(res), content_type='text')
+
+            import pandas as pd
+            import numpy as np
+            import matplotlib.pyplot as plt
+            from io import BytesIO
+            import six
+            from PIL import Image
+
+            def render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=12,
+                                header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
+                                bbox=[0, 0, 1, 1], header_columns=0,
+                                ax=None, **kwargs):
+                if ax is None:
+                    size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array([col_width, row_height])
+                    fig, ax = plt.subplots(figsize=size)
+                    ax.axis('off')
+
+                mpl_table = ax.table(cellText=data.values, bbox=bbox, colLabels=data.columns, **kwargs)
+
+                mpl_table.auto_set_font_size(False)
+                mpl_table.set_fontsize(font_size)
+
+                for k, cell in  six.iteritems(mpl_table._cells):
+                    cell.set_edgecolor(edge_color)
+                    if k[0] == 0 or k[1] < header_columns:
+                        cell.set_text_props(weight='bold', color='w')
+                        cell.set_facecolor(header_color)
+                    else:
+                        cell.set_facecolor(row_colors[k[0]%len(row_colors) ])
+                return ax
+
+            def turn_table_into_pic(table_object):
+                pic = table_object
+                plt_buf = BytesIO()
+                pil_buf = BytesIO()
+                pic.savefig(plt_buf, format='png')
+                plt_buf.seek(0)
+                im = Image.open(plt_buf)
+                im.save(pil_buf, format="png")
+                byte_img = base64.b64encode(pil_buf.getvalue())
+                plt_buf.close()
+                pil_buf.close()
+                return byte_img
+            
+            # 圖片中的 columns 數
+            columns_cnt = 6
+            # 取餘數用 None 補滿，讓每個 column 都有內如，pd.DataFrame 才不會變成只有一行
+            res.extend([None for i in range(len(res) % columns_cnt)])
+            # 將 list 包成 [ [1,2,3], [1,2,3] ] 這樣的格式再餵給 pd.DataFrame(注意，裡面每個 list 一定要數量一致喔)
+            res = [ res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt) ]
+            pd_res = pd.DataFrame(res)
+
+            table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
+            byte_pic = turn_table_into_pic(table_object)
+
+            LineReplyMsg(event.reply_token, byte_pic, content_type='image')
 
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         # 或是看看有沒有辦法只回覆擁有者
@@ -464,56 +519,4 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 # 2. https://blog.csdn.net/slvher/article/details/47154363
 
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from io import BytesIO
-import six
-from PIL import Image
 
-def render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=14,
-                     header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
-                     bbox=[0, 0, 1, 1], header_columns=0,
-                     ax=None, **kwargs):
-    if ax is None:
-        size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array([col_width, row_height])
-        fig, ax = plt.subplots(figsize=size)
-        ax.axis('off')
-
-    mpl_table = ax.table(cellText=data.values, bbox=bbox, colLabels=data.columns, **kwargs)
-
-    mpl_table.auto_set_font_size(False)
-    mpl_table.set_fontsize(font_size)
-
-    for k, cell in  six.iteritems(mpl_table._cells):
-        cell.set_edgecolor(edge_color)
-        if k[0] == 0 or k[1] < header_columns:
-            cell.set_text_props(weight='bold', color='w')
-            cell.set_facecolor(header_color)
-        else:
-            cell.set_facecolor(row_colors[k[0]%len(row_colors) ])
-    return ax
-
-def turn_table_into_pic(table_object):
-    pic = table_object
-    plt_buf = BytesIO()
-    pil_buf = BytesIO()
-    pic.savefig(plt_buf, format='png')
-    plt_buf.seek(0)
-    im = Image.open(plt_buf)
-    im.save(pil_buf, format="png")
-    byte_img = base64.b64encode(pil_buf.getvalue())
-    plt_buf.close()
-    pil_buf.close()
-    return byte_img
-
-columns_cnt = 4
-l = [ 'Movies', 'Sports', 'Coding', 'Fishing', 'Dancing', 'cooking' ]
-# 取餘數用 None 補滿，讓每個 column 都有內如，pd.DataFrame 才不會變成只有一行
-l.extend([None for i in range(len(l) % columns_cnt)])
-# 將 list 包成 [ [1,2,3], [1,2,3] ] 這樣的格式再餵給 pd.DataFrame(注意，裡面每個 list 一定要數量一致喔)
-newl = [ l[i:i + columns_cnt] for i in range(0, len(l), columns_cnt) ]
-pdnewl = pd.DataFrame(newl)
-
-table_object=render_mpl_table(pdnewl, header_columns=0, col_width=2.0).get_figure()
-turn_table_into_pic(table_object)
