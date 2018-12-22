@@ -341,6 +341,17 @@ def handle_text(event):
                 return
 
             logging.debug('add to pic_name done')
+        
+        if event.message.text == "--list":
+            select_params_dict = {
+            'pic_name': pic_name,
+            }
+            select_pre_sql = "SELECT pic_name FROM pic_info"
+            res = select_from_db(select_pre_sql, select_params_dict)
+            # res 格式為:  [('1',), ('ABC',)]
+            res = [ _[0] for _ in res ]
+            LineReplyMsg(event.reply_token, '目前圖片名稱清單：\n'+str(res), content_type='text')
+
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
