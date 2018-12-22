@@ -343,11 +343,8 @@ def handle_text(event):
             logging.debug('add to pic_name done')
         
         if event.message.text == "--list":
-            select_params_dict = {
-            'pic_name': pic_name,
-            }
             select_pre_sql = "SELECT pic_name FROM pic_info"
-            res = select_from_db(select_pre_sql, select_params_dict)
+            res = select_from_db(select_pre_sql, select_params_dict={})
             # res 格式為:  [('1',), ('ABC',)]
             res = [ _[0] for _ in res ]
             LineReplyMsg(event.reply_token, '目前圖片名稱清單：\n'+str(res), content_type='text')
