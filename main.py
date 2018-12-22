@@ -146,18 +146,9 @@ def isFileNameExist(user_id, pic_name=True, checkrepeat=True):
     else:
         return False
 
-def UploadToImgur(user_id, group_id, binary_pic):
-    logging.debug('enter UploadToImgur')
-    select_params_dict = {
-                'user_id': user_id,
-                }
-    # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
-    select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL AND user_id = :user_id"
-    # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
-    Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0][0]
+def UploadToImgur(Pic_Name, binary_pic):
+    print('enter UploadToImgur')
     try:
-        logging.debug('type binary_pic: '+str(type(binary_pic)))
-        logging.debug('type binary_pic.content: '+str(dir(binary_pic)))
         payload = base64.b64encode(binary_pic)
         ################################
         data = {
@@ -177,7 +168,7 @@ def UploadToImgur(user_id, group_id, binary_pic):
         reply_msg = '上傳成功'
         return pic_link, reply_msg
     except Exception as e:
-        logging.debug(e)
+        print(e)
         reply_msg = '上傳失敗，請聯絡管理員'
         return '', reply_msg
 
@@ -272,7 +263,14 @@ def handle_image(event):
         print('dir line_bot_api.get_message_content(event): ', dir(line_bot_api.get_message_content(message_id).content))
         print('type line_bot_api.get_message_content(event): ', type(line_bot_api.get_message_content(message_id).content))
         binary_pic = line_bot_api.get_message_content(message_id).content
-        pic_link, reply_msg = UploadToImgur(user_id, group_id, binary_pic)
+        select_params_dict = {
+            'user_id': user_id,
+        }
+        # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
+        select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL AND user_id = :user_id"
+        # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
+        Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0][0]
+        pic_link, reply_msg = UploadToImgur(Pic_Name, binary_pic)
         update_params_dict = {
             'user_id': user_id,
             'pic_link': pic_link,
@@ -401,8 +399,7 @@ def handle_text(event):
 
             table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
             binary_pic = turn_table_into_pic(table_object)
-
-            pic_link, reply_msg = UploadToImgur(user_id, group_id, binary_pic)
+            pic_link, reply_msg = UploadToImgur(Pic_Name='pic_name_list', binary_pic=binary_pic)
             update_params_dict = {
                 'pic_link': pic_link,
                 'pic_name': 'pic_name_list',
