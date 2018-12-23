@@ -111,7 +111,7 @@ def AddUserIdIfNotExist(user_id):
         return True
 
 def isUserIdBanned(user_id):
-    logging.debug('enter isUserIdBanned')
+    print('enter isUserIdBanned')
     select_params_dict = {
                 'user_id': user_id,
                 }
@@ -119,7 +119,6 @@ def isUserIdBanned(user_id):
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
     # 回傳值應為 list type 裡面包著 tuple，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
-    print('isUserIdBanned type res', type(res))
     if res[0][0] == False:
         # 沒有被 banned
         print('user_id not got banned')
@@ -341,26 +340,29 @@ def handle_text(event):
             logging.debug('add to pic_name done')
         
         if event.message.text == "--list":
-            select_pre_sql = "SELECT pic_name FROM pic_info"
+            # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱
+            select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_name != 'pic_name_list'"
             res = select_from_db(select_pre_sql, select_params_dict={})
             # res 格式為:  [('1',), ('ABC',)]
             res = [ _[0] for _ in res ]
 
-            import pandas as pd
-            import numpy as np
-            import matplotlib.pyplot as plt
+            from pandas import DataFrame
+            from numpy import array
+            from matplotlib.pyplot import subplots
             from io import BytesIO
-            import six
+            from six import iteritems
             from PIL import Image
+            from matplotlib.font_manager import FontProperties
 
             def render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=12,
                                 header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
                                 bbox=[0, 0, 1, 1], header_columns=0,
                                 ax=None, **kwargs):
                 print('enter render_mpl_table')
+                font = FontProperties(fname=r"./STHeiti Medium.ttc", size=14)
                 if ax is None:
-                    size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array([col_width, row_height])
-                    fig, ax = plt.subplots(figsize=size)
+                    size = (array(data.shape[::-1]) + array([0, 1])) * array([col_width, row_height])
+                    fig, ax = subplots(figsize=size)
                     ax.axis('off')
 
                 mpl_table = ax.table(cellText=data.values, bbox=bbox, colLabels=data.columns, **kwargs)
@@ -368,13 +370,14 @@ def handle_text(event):
                 mpl_table.auto_set_font_size(False)
                 mpl_table.set_fontsize(font_size)
 
-                for k, cell in  six.iteritems(mpl_table._cells):
+                for k, cell in  iteritems(mpl_table._cells):
                     cell.set_edgecolor(edge_color)
                     if k[0] == 0 or k[1] < header_columns:
-                        cell.set_text_props(weight='bold', color='w')
+                        cell.set_text_props(weight='bold', color='w', fontproperties=font)
                         cell.set_facecolor(header_color)
                     else:
                         cell.set_facecolor(row_colors[k[0]%len(row_colors) ])
+                        cell.set_text_props(fontproperties=font)
                 print('type ax:', type(ax))
                 return ax
 
@@ -400,7 +403,7 @@ def handle_text(event):
             # 將 list 包成 [ [1,2,3], [1,2,3] ] 這樣的格式再餵給 pd.DataFrame(注意，裡面每個 list 一定要數量一致喔)
             res = [ res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt) ]
             print('debug res[0]:', res[0])
-            pd_res = pd.DataFrame(res)
+            pd_res = DataFrame(res)
 
             table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
             binary_pic = turn_table_into_pic(table_object)
