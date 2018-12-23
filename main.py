@@ -387,7 +387,7 @@ def handle_text(event):
                 plt_buf.seek(0)
                 im = Image.open(plt_buf)
                 im.save(pil_buf, format="png")
-                byte_img = base64.b64encode(pil_buf.getvalue())
+                byte_img = pil_buf.getvalue()
                 print('type byte_img:', type(byte_img))
                 plt_buf.close()
                 pil_buf.close()
