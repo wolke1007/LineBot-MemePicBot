@@ -168,7 +168,7 @@ def UploadToImgur(Pic_Name, binary_pic):
         reply_msg = '上傳成功'
         return pic_link, reply_msg
     except Exception as e:
-        print(e)
+        print('UploadToImgur Exception e:', e)
         reply_msg = '上傳失敗，請聯絡管理員'
         return '', reply_msg
 
@@ -357,6 +357,7 @@ def handle_text(event):
                                 header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
                                 bbox=[0, 0, 1, 1], header_columns=0,
                                 ax=None, **kwargs):
+                print('enter render_mpl_table')
                 if ax is None:
                     size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array([col_width, row_height])
                     fig, ax = plt.subplots(figsize=size)
@@ -374,9 +375,11 @@ def handle_text(event):
                         cell.set_facecolor(header_color)
                     else:
                         cell.set_facecolor(row_colors[k[0]%len(row_colors) ])
+                print('type ax:', type(ax))
                 return ax
 
             def turn_table_into_pic(table_object):
+                print('enter turn_table_into_pic')
                 pic = table_object
                 plt_buf = BytesIO()
                 pil_buf = BytesIO()
@@ -385,6 +388,7 @@ def handle_text(event):
                 im = Image.open(plt_buf)
                 im.save(pil_buf, format="png")
                 byte_img = base64.b64encode(pil_buf.getvalue())
+                print('type byte_img:', type(byte_img))
                 plt_buf.close()
                 pil_buf.close()
                 return byte_img
@@ -395,6 +399,7 @@ def handle_text(event):
             res.extend([None for i in range(len(res) % columns_cnt)])
             # 將 list 包成 [ [1,2,3], [1,2,3] ] 這樣的格式再餵給 pd.DataFrame(注意，裡面每個 list 一定要數量一致喔)
             res = [ res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt) ]
+            print('debug res[0]:', res[0])
             pd_res = pd.DataFrame(res)
 
             table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
