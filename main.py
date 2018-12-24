@@ -13,14 +13,21 @@ from config import *
 from imgur_auth import ImgurClient
 import re
 import requests
-import base64
+from base64 import b64encode
 import json
 from os import getenv
 import logging
 import pymysql
 from sqlalchemy import text
 from sqlalchemy import create_engine
-
+# --list function 用的，拉出來看能不能加速那部分的 function 否則容易太久導致 reply token timeout 
+from pandas import DataFrame
+from numpy import array
+from matplotlib.pyplot import subplots
+from io import BytesIO
+from six import iteritems
+from PIL import Image
+from matplotlib.font_manager import FontProperties
 
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -148,7 +155,7 @@ def isFileNameExist(user_id, pic_name=True, checkrepeat=True):
 def UploadToImgur(Pic_Name, binary_pic):
     print('enter UploadToImgur')
     try:
-        payload = base64.b64encode(binary_pic)
+        payload = b64encode(binary_pic)
         ################################
         data = {
             'image': payload,
@@ -345,14 +352,6 @@ def handle_text(event):
             res = select_from_db(select_pre_sql, select_params_dict={})
             # res 格式為:  [('1',), ('ABC',)]
             res = [ _[0] for _ in res ]
-
-            from pandas import DataFrame
-            from numpy import array
-            from matplotlib.pyplot import subplots
-            from io import BytesIO
-            from six import iteritems
-            from PIL import Image
-            from matplotlib.font_manager import FontProperties
 
             def render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=12,
                                 header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
