@@ -359,7 +359,8 @@ def handle_text(event):
                                 bbox=[0, 0, 1, 1], header_columns=0,
                                 ax=None, **kwargs):
                 print('enter render_mpl_table')
-                font = FontProperties(fname=r"./STHeiti Medium.ttc", size=14)
+                dir_path = os.path.dirname(os.path.realpath(__file__))
+                font = FontProperties(fname=dir_path+"/STHeitiMedium.ttc", size=14)
                 if ax is None:
                     size = (array(data.shape[::-1]) + array([0, 1])) * array([col_width, row_height])
                     fig, ax = subplots(figsize=size)
@@ -403,7 +404,7 @@ def handle_text(event):
             # 將 list 包成 [ [1,2,3], [1,2,3] ] 這樣的格式再餵給 pd.DataFrame(注意，裡面每個 list 一定要數量一致喔)
             res = [ res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt) ]
             print('debug res[-1]:', res[-1])
-            pd_res = DataFrame(res)
+            repd_res = DataFrame(res)
 
             table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
             binary_pic = turn_table_into_pic(table_object)
