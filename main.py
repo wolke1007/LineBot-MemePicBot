@@ -266,8 +266,6 @@ def handle_image(event):
     if isFileNameExist(user_id, checkrepeat=False):
         ''' 檔案名稱已取好了 '''
         print('name already exist, start to upload')
-        print('dir line_bot_api.get_message_content(event): ', dir(line_bot_api.get_message_content(message_id).content))
-        print('type line_bot_api.get_message_content(event): ', type(line_bot_api.get_message_content(message_id).content))
         binary_pic = line_bot_api.get_message_content(message_id).content
         select_params_dict = {
             'user_id': user_id,
@@ -352,33 +350,33 @@ def handle_text(event):
             res = select_from_db(select_pre_sql, select_params_dict={})
             # res 格式為:  [('1',), ('ABC',)]
             res = [ _[0] for _ in res ]
-
             def render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=12,
                                 header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
                                 bbox=[0, 0, 1, 1], header_columns=0,
                                 ax=None, **kwargs):
                 print('enter render_mpl_table')
-                dir_path = os.path.dirname(os.path.realpath(__file__))
-                font = FontProperties(fname=dir_path+"/STHeitiMedium.ttc", size=14)
                 if ax is None:
                     size = (array(data.shape[::-1]) + array([0, 1])) * array([col_width, row_height])
                     fig, ax = subplots(figsize=size)
                     ax.axis('off')
-
+                # 取當前 main.py 的檔案位置，因為我上傳的字型檔跟他放一起
+                dir_path = os.path.dirname(os.path.realpath(__file__))
+                # STHeitiMedium.ttc 是中文字型檔，有了它 matplotlib 才有辦法印出中文，我擔心 GCP 沒有內建就自己上傳了
+                font = FontProperties(fname=dir_path+"/STHeitiMedium.ttc", size=14)
                 mpl_table = ax.table(cellText=data.values, bbox=bbox, colLabels=data.columns, **kwargs)
-
                 mpl_table.auto_set_font_size(False)
                 mpl_table.set_fontsize(font_size)
 
                 for k, cell in  iteritems(mpl_table._cells):
                     cell.set_edgecolor(edge_color)
                     if k[0] == 0 or k[1] < header_columns:
+                        # fontproperties=font 這個是表格能不能印出中文的關鍵!
                         cell.set_text_props(weight='bold', color='w', fontproperties=font)
                         cell.set_facecolor(header_color)
                     else:
                         cell.set_facecolor(row_colors[k[0]%len(row_colors) ])
+                        # fontproperties=font 這個是表格能不能印出中文的關鍵!
                         cell.set_text_props(fontproperties=font)
-                print('type ax:', type(ax))
                 return ax
 
             def turn_table_into_pic(table_object):
@@ -391,7 +389,6 @@ def handle_text(event):
                 im = Image.open(plt_buf)
                 im.save(pil_buf, format="png")
                 byte_img = pil_buf.getvalue()
-                print('type byte_img:', type(byte_img))
                 plt_buf.close()
                 pil_buf.close()
                 return byte_img
@@ -404,7 +401,6 @@ def handle_text(event):
             res = [ res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt) ]
             print('debug res[-1]:', res[-1])
             pd_res = DataFrame(res)
-
             table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
             binary_pic = turn_table_into_pic(table_object)
             pic_link, reply_msg = UploadToImgur(Pic_Name='pic_name_list', binary_pic=binary_pic)
