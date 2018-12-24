@@ -20,7 +20,7 @@ import logging
 import pymysql
 from sqlalchemy import text
 from sqlalchemy import create_engine
-# --list function 用的，拉出來看能不能加速那部分的 function 否則容易太久導致 reply token timeout 
+# --list function 用的，拉出來看能不能加速那部分的 function 否則用到才 import 容易太久導致 reply token timeout 
 from pandas import DataFrame
 from numpy import array
 from matplotlib.pyplot import subplots
@@ -401,7 +401,7 @@ def handle_text(event):
             res = [ res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt) ]
             print('debug res[-1]:', res[-1])
             pd_res = DataFrame(res)
-            table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
+            table_object = render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
             binary_pic = turn_table_into_pic(table_object)
             pic_link, reply_msg = UploadToImgur(Pic_Name='pic_name_list', binary_pic=binary_pic)
             update_params_dict = {
