@@ -402,7 +402,7 @@ def handle_text(event):
             res.extend([None for i in range(len(res) % columns_cnt)])
             # 將 list 包成 [ [1,2,3], [1,2,3] ] 這樣的格式再餵給 pd.DataFrame(注意，裡面每個 list 一定要數量一致喔)
             res = [ res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt) ]
-            print('debug res[0]:', res[0])
+            print('debug res[-1]:', res[-1])
             pd_res = DataFrame(res)
 
             table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
