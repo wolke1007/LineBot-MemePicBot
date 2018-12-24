@@ -20,7 +20,14 @@ import logging
 import pymysql
 from sqlalchemy import text
 from sqlalchemy import create_engine
-
+# --list 用
+from pandas import DataFrame
+from numpy import array
+from matplotlib.pyplot import subplots
+from io import BytesIO
+from six import iteritems
+from PIL import Image
+from matplotlib.font_manager import FontProperties
 
 app = Flask(__name__)
 line_bot_api = LineBotApi(line_channel_access_token)
@@ -346,14 +353,6 @@ def handle_text(event):
             # res 格式為:  [('1',), ('ABC',)]
             res = [ _[0] for _ in res ]
 
-            from pandas import DataFrame
-            from numpy import array
-            from matplotlib.pyplot import subplots
-            from io import BytesIO
-            from six import iteritems
-            from PIL import Image
-            from matplotlib.font_manager import FontProperties
-
             def render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=12,
                                 header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
                                 bbox=[0, 0, 1, 1], header_columns=0,
@@ -404,7 +403,7 @@ def handle_text(event):
             # 將 list 包成 [ [1,2,3], [1,2,3] ] 這樣的格式再餵給 pd.DataFrame(注意，裡面每個 list 一定要數量一致喔)
             res = [ res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt) ]
             print('debug res[-1]:', res[-1])
-            repd_res = DataFrame(res)
+            pd_res = DataFrame(res)
 
             table_object=render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
             binary_pic = turn_table_into_pic(table_object)
