@@ -385,11 +385,19 @@ def handle_text(event):
                 plt_buf = BytesIO()
                 pil_buf = BytesIO()
                 pic.savefig(plt_buf, format='png')
+<<<<<<< HEAD
                 plt_buf.seek(0)
                 im = Image.open(plt_buf)
                 im.save(pil_buf, format="png")
                 byte_img = pil_buf.getvalue()
+=======
+                # plt_buf.seek(0)
+                # im = Image.open(plt_buf)
+                Image.open(plt_buf).save(pil_buf, format="png")
+>>>>>>> feat_name_list
                 plt_buf.close()
+                # im.save(pil_buf, format="png")
+                byte_img = pil_buf.getvalue()
                 pil_buf.close()
                 return byte_img
             
