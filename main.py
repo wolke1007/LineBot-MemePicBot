@@ -101,7 +101,7 @@ def AddUserIdIfNotExist(user_id):
     select_params_dict = {
                 'user_id': user_id,
                 }
-    select_pre_sql = "SELECT user_id FROM user_info WHERE user_id = :user_id"
+    select_pre_sql = "SELECT user_id FROM user_info WHERE user_id=:user_id"
     res = select_from_db(select_pre_sql, select_params_dict)
     # 回傳值應為 list type 裡面包著 tuple，但有可能沒有值所以不指定取第一個
     if res:
@@ -122,7 +122,7 @@ def isUserIdBanned(user_id):
     select_params_dict = {
                 'user_id': user_id,
                 }
-    select_pre_sql = "SELECT banned FROM user_info WHERE user_id = :user_id"
+    select_pre_sql = "SELECT banned FROM user_info WHERE user_id=:user_id"
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
     # 回傳值應為 list type 裡面包著 tuple，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
@@ -135,22 +135,17 @@ def isUserIdBanned(user_id):
         print('user_id got banned', res[0][0])
         return True
 
-def isFileNameExist(user_id, pic_name=True, checkrepeat=True):
-    logging.debug('enter isFileNameExist')
+def isFileNameExist(pic_name, group_id):
+    print('enter isFileNameExist')
     select_params_dict = {
-                'user_id': user_id,
                 'pic_name': pic_name,
+                'group_id': group_id,
                 }
-    if checkrepeat is True:
-        select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_name = :pic_name"
-    else:
-        select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL"
+    select_pre_sql = "SELECT pic_name FROM pic_info WHERE \
+                      pic_name=:pic_name AND group_id=:group_id"
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
-    if res:
-        return True
-    else:
-        return False
+    return True if res else False
 
 def UploadToImgur(Pic_Name, binary_pic):
     print('enter UploadToImgur')
@@ -204,15 +199,16 @@ def CheckMsgContent(MsgContent):
         select_params_dict = {
         'pic_name': pic_name,
         }
-        select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name = :pic_name"
+        select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name"
         res = select_from_db(select_pre_sql, select_params_dict)
         print('CheckMsgContent res:', res)
-        if res:
-            # 回傳 pic_link
-            PICLINK = res[0][0]
-            return PICLINK
-        else:
-            return False
+        return res[0][0] if res else False
+        # if res:
+        #     # 回傳 pic_link
+        #     PICLINK = res[0][0]
+        #     return PICLINK
+        # else:
+        #     return False
 
 def LineReplyMsg(to, content, content_type):
     if content_type is 'text':
@@ -251,8 +247,8 @@ def handle_image(event):
     try:
         group_id = event.source.group_id
     except AttributeError as e:
-        group_id = None
-        logging.debug("send from 1 to 1 chat room, so there's no group id")
+        group_id = 'NULL'
+        print("send from 1 to 1 chat room, so there's no group id")
     # 將 user 建檔管理
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
@@ -263,24 +259,27 @@ def handle_image(event):
             logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return
     
-    if isFileNameExist(user_id, checkrepeat=False):
-        ''' 檔案名稱已取好了 '''
-        print('name already exist, start to upload')
+    if isFileNameExist(pic_name, group_id):
+        print('name already exist, start to upload') 
         binary_pic = line_bot_api.get_message_content(message_id).content
         select_params_dict = {
             'user_id': user_id,
+            'group_id': group_id,
         }
         # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
-        select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL AND user_id = :user_id"
+        select_pre_sql = "SELECT pic_name FROM pic_info WHERE \
+                          pic_link IS NULL AND user_id=:user_id AND group_id=:group_id"
         # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
         Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0][0]
         pic_link, reply_msg = UploadToImgur(Pic_Name, binary_pic)
         update_params_dict = {
             'user_id': user_id,
             'pic_link': pic_link,
+            'group_id': group_id,
             }
         # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
-        update_pre_sql = "UPDATE pic_info SET pic_link=:pic_link WHERE user_id = :user_id AND pic_link IS NULL"
+        update_pre_sql = "UPDATE pic_info SET pic_link=:pic_link, group_id=:group_id WHERE \
+                          user_id=:user_id AND pic_link IS NULL"
         update_from_db(update_pre_sql, update_params_dict)
         LineReplyMsg(event.reply_token, reply_msg, content_type='text')
 
@@ -293,9 +292,10 @@ def handle_text(event):
     message_id = event.message.id
     try:
         group_id = event.source.group_id
+        print('group_id:', group_id)
     except AttributeError as e:
-        group_id = None
-        logging.debug("send from 1 to 1 chat room, so there's no group id")
+        group_id = 'NULL'
+        print("send from 1 to 1 chat room, so there's no group id")
     # 將 user 建檔管理
     AddUserIdIfNotExist(user_id)
     # 檢查該 user 是否已經被 banned
@@ -313,15 +313,17 @@ def handle_text(event):
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
             # 圖片名稱長度在此設定門檻，目前設定為 3~15 個字
             pic_name = Line_Msg_Text[1:-1].lower()
-            if len(pic_name) >= pic_name_low_limit and len(pic_name) <=pic_name_high_limit :
-                if isFileNameExist(user_id, pic_name=pic_name, checkrepeat=True):
+            if len(pic_name) >= pic_name_low_limit and len(pic_name) <= pic_name_high_limit :
+                if isFileNameExist(pic_name, group_id):
                     # 如果圖片重複了，對 user_id pic_link 欄位進行 update
                     print('圖片已經存在，更新 user_id pic_link')
                     update_params_dict = {
                         'user_id': user_id,
                         'pic_name': pic_name,
+                        'group_id': group_id,
                         }
-                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=NULL WHERE pic_name = :pic_name"
+                    update_pre_sql = "UPDATE pic_info SET user_id=:user_id, pic_link=NULL \
+                                      WHERE pic_name=:pic_name, group_id=:group_id"
                     res = update_from_db(update_pre_sql, update_params_dict)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
@@ -330,8 +332,10 @@ def handle_text(event):
                     insert_params_dict = {
                     'user_id': user_id,
                     'pic_name': pic_name,
+                    'group_id': group_id
                     }
-                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name) values (:user_id, :pic_name)"
+                    insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, group_id) \
+                                      values (:user_id, :pic_name, :group_id)"
                     res = insert_from_db(insert_pre_sql, insert_params_dict)
                     print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
@@ -339,7 +343,7 @@ def handle_text(event):
                 else:
                     LineReplyMsg(event.reply_token, 'Database 寫檔失敗！請聯絡管理員', content_type='text')
             else:
-                LineReplyMsg(event.reply_token, '圖片名稱長度需介於 4~15 個字（中英文或數字皆可)', content_type='text')
+                LineReplyMsg(event.reply_token, '圖片名稱長度需介於 3~10 個字（中英文或數字皆可)', content_type='text')
                 return
 
             logging.debug('add to pic_name done')
@@ -415,10 +419,7 @@ def handle_text(event):
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
         elif event.message.text[0:7] == "--debug":
-            print('event.message.text == "--debug"')
-            print('dir(event.message)', dir(event.message)) #debug
-            print('dir(event.source)', dir(event.source)) #debug
-            print('event.source.group_id', event.source.group_id) #debug
+            pass
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             # print('enter debug')
             # command = event.message.text[8:]
@@ -472,42 +473,6 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
         elif event.message.text == "--mode":
             logging.debug('event.message.text == "--mode"') #debug
             LineReplyMsg(event.reply_token, '當前模式為: ' + System.get('mode'), content_type='text')
-
-        
-        elif event.message.text == "sql-test insert user_id":
-
-            # select_params_dict = {
-            #     'user_id': 'test_user_id',
-            #     'pic_name': 'test_pic_name',
-            #     'pic_link': 'test_pic_link',
-            #     }
-            # select_pre_sql = "SELECT user_id FROM pic_info WHERE user_id = :user_id"
-            # select_from_db(select_pre_sql, select_params_dict)
-            
-            # insert_params_dict = {
-            #     'user_id': 'test_user_id',
-            #     'pic_name': 'test_pic_name',
-            #     'pic_link': 'test_pic_link',
-            #     }
-            # insert_pre_sql = "INSERT INTO pic_info (user_id, pic_name, pic_link) values (:user_id, :pic_name, :pic_link)"
-            # insert_from_db(insert_pre_sql, insert_params_dict)
-
-            # update_params_dict = {
-            #     'user_id': 'test_user_id',
-            #     'pic_name': 'test_pic_name',
-            #     'pic_link': 'test_pic_link',
-            #     }
-            # update_pre_sql = "UPDATE pic_info SET pic_name=123, pic_link='123' WHERE user_id = :user_id"
-            # update_from_db(update_pre_sql, update_params_dict)
-
-            select_params_dict = {
-                'state': 'Texas',
-                }
-            select_pre_sql = "SELECT state FROM census WHERE state = :state"
-            select_from_db(select_pre_sql, select_params_dict)
-
-            logging.info('sqlalchemy test pass')
-            pass
 
         else:
             # 根據模式決定要不要回話
