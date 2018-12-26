@@ -137,6 +137,8 @@ def isUserIdBanned(user_id):
 
 def isFileNameExist(pic_name, group_id):
     print('enter isFileNameExist')
+    if not pic_name:
+        return False
     select_params_dict = {
                 'pic_name': pic_name,
                 'group_id': group_id,
@@ -258,19 +260,20 @@ def handle_image(event):
         except Exception:
             logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return
-    
-    if isFileNameExist(pic_name, group_id):
+    select_params_dict = {
+        'user_id': user_id,
+        'group_id': group_id,
+    }
+    # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
+    select_pre_sql = "SELECT pic_name FROM pic_info WHERE \
+                        pic_link IS NULL AND user_id=:user_id AND group_id=:group_id"
+    # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
+    Pic_Name = select_from_db(select_pre_sql, select_params_dict)
+    Pic_Name = Pic_Name[0][0] if Pic_Name else None
+
+    if isFileNameExist(Pic_Name, group_id):
         print('name already exist, start to upload') 
         binary_pic = line_bot_api.get_message_content(message_id).content
-        select_params_dict = {
-            'user_id': user_id,
-            'group_id': group_id,
-        }
-        # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
-        select_pre_sql = "SELECT pic_name FROM pic_info WHERE \
-                          pic_link IS NULL AND user_id=:user_id AND group_id=:group_id"
-        # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
-        Pic_Name = select_from_db(select_pre_sql, select_params_dict)[0][0]
         pic_link, reply_msg = UploadToImgur(Pic_Name, binary_pic)
         update_params_dict = {
             'user_id': user_id,
