@@ -418,6 +418,7 @@ def handle_text(event):
             print('event.message.text == "--debug"')
             print('dir(event.message)', dir(event.message)) #debug
             print('dir(event.source)', dir(event.source)) #debug
+            print('dir(event.source.group_id)', dir(event.source.group_id)) #debug
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             # print('enter debug')
             # command = event.message.text[8:]
@@ -444,8 +445,8 @@ def handle_text(event):
             #     System['talk_mode'] = True
             #     LinePushTextMsg(user_id, 'set talk_mode to Quiet Mode')
 
-        elif event.message.text == "--help" :
-            logging.debug('event.message.text == "--help"') #debug
+        elif event.message.text == "--help" or event.message.text == "-h" :
+            print('event.message.text == "--help or "-h"') #debug
             LineReplyMsg(event.reply_token, \
 # line 手機版莫約 15 個中文字寬度就會換行
 '''
