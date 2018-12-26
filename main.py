@@ -416,8 +416,8 @@ def handle_text(event):
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
         elif event.message.text[0:7] == "--debug":
             print('event.message.text == "--debug"')
-            print('dir(event.message)', dir(event.message) #debug)
-
+            print('dir(event.message)', dir(event.message)) #debug
+            print('dir(event.source)', dir(event.source)) #debug
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             # print('enter debug')
             # command = event.message.text[8:]
