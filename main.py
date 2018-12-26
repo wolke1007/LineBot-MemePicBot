@@ -418,7 +418,7 @@ def handle_text(event):
             print('event.message.text == "--debug"')
             print('dir(event.message)', dir(event.message)) #debug
             print('dir(event.source)', dir(event.source)) #debug
-            print('dir(event.source.group_id)', dir(event.source.group_id)) #debug
+            print('event.source.group_id', event.source.group_id) #debug
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             # print('enter debug')
             # command = event.message.text[8:]
