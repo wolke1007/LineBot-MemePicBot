@@ -97,7 +97,7 @@ def callback(event):
     return 'OK'
 
 def AddUserIdIfNotExist(user_id):
-    logging.debug('enter AddUserIdIfNotExist')
+    print('enter AddUserIdIfNotExist')
     select_params_dict = {
                 'user_id': user_id,
                 }
@@ -312,7 +312,7 @@ def handle_text(event):
     Line_Msg_Text = event.message.text
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
-            logging.debug('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
+            print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
             # 圖片名稱長度在此設定門檻，目前設定為 3~15 個字
             pic_name = Line_Msg_Text[1:-1].lower()
@@ -349,7 +349,7 @@ def handle_text(event):
                 LineReplyMsg(event.reply_token, '圖片名稱長度需介於 3~10 個字（中英文或數字皆可)', content_type='text')
                 return
 
-            logging.debug('add to pic_name done')
+            print('add to pic_name done')
         
         # if event.message.text == "--list":
         #     # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱
@@ -474,19 +474,27 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 ''', content_type='text')
 
         elif event.message.text == "--mode":
-            logging.debug('event.message.text == "--mode"') #debug
+            print('event.message.text == "--mode"') #debug
             LineReplyMsg(event.reply_token, '當前模式為: ' + System.get('mode'), content_type='text')
 
         else:
             # 根據模式決定要不要回話
-            if System.get('talk_mode') is False: return
-            logging.debug('CheckMsgContent(event.message.text)') #debug
-            PICLINK = CheckMsgContent(event.message.text)
+            select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
+            SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
+            print('SystemConfig', SystemConfig)
+            if not SystemConfig:
+                # 如果還沒有 SystemConfig 那就創一個，只設定 group_id 其他用 default
+                insert_pre_sql = "INSERT INTO system (group_id) values (:group_id)"
+                res = insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
+            print('SystemConfig:', SystemConfig)
+            # if System.get('talk_mode') is False: return
+            # print('CheckMsgContent(event.message.text)') #debug
+            # PICLINK = CheckMsgContent(event.message.text)
             if PICLINK:
                 print('PICLINK', PICLINK)
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
-            logging.debug('clean PICLINK')
+            print('clean PICLINK')
 
 
 
