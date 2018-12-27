@@ -175,7 +175,7 @@ def UploadToImgur(Pic_Name, binary_pic):
         reply_msg = '上傳失敗，請聯絡管理員'
         return '', reply_msg
 
-def CheckMsgContent(MsgContent):
+def CheckMsgContent(MsgContent, trigger_chat):
     select_params_dict = {}
     select_pre_sql = "SELECT pic_name FROM pic_info"
     ########## 這邊有效能問題需要解決 ##########
@@ -198,19 +198,12 @@ def CheckMsgContent(MsgContent):
         match_list.sort(key=lambda x: len(x))
         # 排序後取 match 字數最多的也就是右邊一個
         pic_name = match_list[-1]
-        select_params_dict = {
-        'pic_name': pic_name,
-        }
         select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name"
-        res = select_from_db(select_pre_sql, select_params_dict)
+        res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name})
         print('CheckMsgContent res:', res)
-        return res[0][0] if res else False
-        # if res:
-        #     # 回傳 pic_link
-        #     PICLINK = res[0][0]
-        #     return PICLINK
-        # else:
-        #     return False
+        if res:
+            # 回傳 pic_link
+            return res[0][0] if res[0][0] >= trigger_chat else False
 
 def LineReplyMsg(to, content, content_type):
     if content_type is 'text':
@@ -497,8 +490,8 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
             if SystemConfig[1] == 0: return
             # trigger_chat 判斷
             trigger_chat = SystemConfig[3]
-            PICLINK = CheckMsgContent(event.message.text)
-            if PICLINK >= trigger_chat:
+            PICLINK = CheckMsgContent(event.message.text, trigger_chat)
+            if PICLINK:
                 print('PICLINK', PICLINK)
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
