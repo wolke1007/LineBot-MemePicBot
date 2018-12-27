@@ -175,19 +175,22 @@ def UploadToImgur(Pic_Name, binary_pic):
         reply_msg = '上傳失敗，請聯絡管理員'
         return '', reply_msg
 
-def CheckMsgContent(MsgContent, trigger_chat):
-    select_params_dict = {}
-    select_pre_sql = "SELECT pic_name FROM pic_info"
+def CheckMsgContent(MsgContent, trigger_chat, group_id):
+    select_pre_sql = "SELECT pic_name, group_id FROM pic_info"
     ########## 這邊有效能問題需要解決 ##########
     # 目前是每一句對話都去抓全部的 DB 回來，然後丟進 for loop 掃描全部的內容
     # 1. DB server 的運算部分目前已知要錢，所以不要讓它算，要靠 Cloud Function 那邊的資源
     # 2. 所以整個抓回來再算是一種方法，但需要思考能不能不要每次都跟 DB 拿，而是哪邊有 server cache 之類的
-    all_picname_in_db = select_from_db(select_pre_sql, select_params_dict)
+    all_picname_in_db = select_from_db(select_pre_sql, select_params_dict={})
     match_list = []
-    # 收到的格式為:  [('1',), ('ABC',)]
+    # 收到的格式為:  [('1','C123abc'), ('ABC','C456def')]
     for pic_name in all_picname_in_db:
-        # 到這邊變成 ('ABC',) 這樣，所以再取一次
-        pic_name = pic_name[0]
+        # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
+        # group_id 有指定的話則要符合條件的才會 pass 到後面
+        if group_id and group_id == pic_name[1]:
+            pic_name = pic_name[0]
+        else:
+            pic_name = pic_name[0]
         # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
         match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
         if match: 
@@ -507,13 +510,14 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 return
             # 1 = 隨機回所有 group 創的圖(預設)
             elif SystemConfig[1] is 1:
-                PICLINK = CheckMsgContent(event.message.text, trigger_chat)
+                PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=None)
                 if PICLINK:
                     print('PICLINK', PICLINK)
                     LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             # 2 = 只回該 group 創的圖
             elif SystemConfig[1] is 2 and SystemConfig[0] is group_id :
-                PICLINK = CheckMsgContent(event.message.text, trigger_chat)
+                # 搜尋時帶上 group_id 判斷是否符合同群組
+                PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=group_id)
                 if PICLINK:
                     print('PICLINK', PICLINK)
                     LineReplyMsg(event.reply_token, PICLINK, content_type='image')
