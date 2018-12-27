@@ -97,7 +97,7 @@ def callback(event):
     return 'OK'
 
 def AddUserIdIfNotExist(user_id):
-    logging.debug('enter AddUserIdIfNotExist')
+    print('enter AddUserIdIfNotExist')
     select_params_dict = {
                 'user_id': user_id,
                 }
@@ -175,42 +175,52 @@ def UploadToImgur(Pic_Name, binary_pic):
         reply_msg = '上傳失敗，請聯絡管理員'
         return '', reply_msg
 
-def CheckMsgContent(MsgContent):
-    select_params_dict = {}
-    select_pre_sql = "SELECT pic_name FROM pic_info"
+def CheckMsgContent(MsgContent, trigger_chat, group_id):
+    print('CheckMsgContent, MsgContent, trigger_chat, group_id',MsgContent, trigger_chat, group_id)
+    select_pre_sql = "SELECT pic_name, group_id FROM pic_info"
     ########## 這邊有效能問題需要解決 ##########
     # 目前是每一句對話都去抓全部的 DB 回來，然後丟進 for loop 掃描全部的內容
     # 1. DB server 的運算部分目前已知要錢，所以不要讓它算，要靠 Cloud Function 那邊的資源
     # 2. 所以整個抓回來再算是一種方法，但需要思考能不能不要每次都跟 DB 拿，而是哪邊有 server cache 之類的
-    all_picname_in_db = select_from_db(select_pre_sql, select_params_dict)
+    all_picname_in_db = select_from_db(select_pre_sql, select_params_dict={})
+    print('all_picname_in_db', all_picname_in_db)
     match_list = []
-    # 收到的格式為:  [('1',), ('ABC',)]
-    for pic_name in all_picname_in_db:
-        # 到這邊變成 ('ABC',) 這樣，所以再取一次
-        pic_name = pic_name[0]
-        # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
-        match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
-        if match: 
-            match_list.append(pic_name)
+    # 收到的格式為:  [('1','C123abc'), ('ABC','C456def')]
+    if group_id:
+        for pic_name in all_picname_in_db:
+            # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
+            # group_id 有指定的話則要符合條件的才會 pass 到後面
+            if group_id == pic_name[1]:
+                pic_name = pic_name[0]
+                # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
+                match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
+                if match:
+                    match_list.append(pic_name)
+    else:
+        for pic_name in all_picname_in_db:
+            # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
+            # group_id 有指定的話則要符合條件的才會 pass 到後面
+            pic_name = pic_name[0]
+            # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
+            match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
+            if match:
+                match_list.append(pic_name)
     # 先確認 match_list 有沒有東西
+    print('match_list', match_list)
     if match_list:        
         # key 這邊解決了如果不同名字，會依照字串長度排序
         match_list.sort(key=lambda x: len(x))
         # 排序後取 match 字數最多的也就是右邊一個
         pic_name = match_list[-1]
-        select_params_dict = {
-        'pic_name': pic_name,
-        }
-        select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name"
-        res = select_from_db(select_pre_sql, select_params_dict)
-        print('CheckMsgContent res:', res)
-        return res[0][0] if res else False
-        # if res:
-        #     # 回傳 pic_link
-        #     PICLINK = res[0][0]
-        #     return PICLINK
-        # else:
-        #     return False
+        # 如果圖片名稱小於設定的字數，那就回沒匹配到
+        if len(pic_name) >= trigger_chat:
+            group_id = group_id if group_id else 'NULL'
+            select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name and group_id=:group_id"
+            res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name, 'group_id': group_id})
+            print('CheckMsgContent res:', res)
+            return res[0][0] if res else False
+        else:
+            return False
 
 def LineReplyMsg(to, content, content_type):
     if content_type is 'text':
@@ -312,7 +322,7 @@ def handle_text(event):
     Line_Msg_Text = event.message.text
     if isinstance(event.message, TextMessage):
         if event.message.text[0] == "#" and event.message.text[-1] == "#":
-            logging.debug('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
+            print('enter event.message.text[0] == "#" and event.message.text[-1] == "#"') #debug
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
             # 圖片名稱長度在此設定門檻，目前設定為 3~15 個字
             pic_name = Line_Msg_Text[1:-1].lower()
@@ -349,7 +359,7 @@ def handle_text(event):
                 LineReplyMsg(event.reply_token, '圖片名稱長度需介於 3~10 個字（中英文或數字皆可)', content_type='text')
                 return
 
-            logging.debug('add to pic_name done')
+            print('add to pic_name done')
         
         if event.message.text == "--list":
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱
@@ -421,7 +431,7 @@ def handle_text(event):
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
-        elif event.message.text[0:7] == "--debug":
+        elif event.message.text[0:7] == "--debug" :
             pass
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             # print('enter debug')
@@ -462,6 +472,15 @@ step 1. 設定圖片名稱，例如 #我是帥哥#
 step 2. 上傳圖片，系統會回傳上傳成功
 step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 
+設定教學：
+--mode chat_mode 0~2
+0 = 不回圖
+1 = 隨機回所有群組創的圖(預設)
+2 = 只回該群組上傳的圖
+
+--mode trigger_chat 2~15
+設定在此群組裡超過幾字才回話，可以設為 2~15 
+
 備註:
 1. 圖片字數有限制，空白或是特殊符號皆算數
 2. 設定同圖片名稱則會蓋掉前面上傳的
@@ -473,23 +492,102 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 6. --list 可以讓 BOT 回你現有圖片名稱的表格
 ''', content_type='text')
 
-        elif event.message.text == "--mode":
-            logging.debug('event.message.text == "--mode"') #debug
-            LineReplyMsg(event.reply_token, '當前模式為: ' + System.get('mode'), content_type='text')
+        elif event.message.text[:6] == "--mode" and group_id :
+            print('event.message.text == "--mode"') #debug
+            # --mode trigger_chat 1
+            if event.message.text[7:-2] == "trigger_chat":
+                try:
+                    mode = int(event.message.text[-2:].strip(' '))
+                except:
+                    LineReplyMsg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15', content_type='text')
+                    return
+                # 不允許使用者設置低於 2 或是大於 15 個字元
+                if mode < 2 or mode > 15:
+                    LineReplyMsg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15', content_type='text')
+                    return
+                update_params_dict = {
+                'group_id': group_id,
+                'trigger_chat': mode,
+                }
+                update_pre_sql = "UPDATE system SET trigger_chat=:trigger_chat \
+                                  WHERE group_id=:group_id"
+                update_from_db(update_pre_sql, update_params_dict)
+                LineReplyMsg(event.reply_token, '更改 trigger_chat 為 '+str(mode), content_type='text')
+            # --mode chat_mode 1
+            elif event.message.text[7:-2] == "chat_mode" and group_id :
+                try:
+                    mode = int(event.message.text[-1])
+                except:
+                    LineReplyMsg(event.reply_token, 'chat_mode 後需設定介於 0~2 的數字，如 --mode chat_mode 2', content_type='text')
+                    return
+                update_params_dict = {
+                'group_id': group_id,
+                'chat_mode': mode,
+                }
+                update_pre_sql = "UPDATE system SET chat_mode=:chat_mode \
+                                WHERE group_id=:group_id"
+                update_from_db(update_pre_sql, update_params_dict)
+                LineReplyMsg(event.reply_token, '更改 chat_mode 為 '+str(mode), content_type='text')
+            else:
+                select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
+                SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
+                if SystemConfig:
+                    group_id_list = [i[0] for i in SystemConfig]
+                    index = group_id_list.index(group_id)
+                    # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+                    # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
+                    #                        其中 chat_mode 的設定：0 = 不回圖
+                    #                                             1 = 隨機回所有 group 創的圖(預設)
+                    #                                             2 = 只回該 group 上傳的圖
+                    #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
+                    SystemConfig = SystemConfig[index]
+                    reply_content = '[當前模式為]  {}, {}, {} '.format(\
+                                    'chat_mode:'+str(SystemConfig[1]), 'retrieve_pic_mode:'+str(SystemConfig[2]), 'trigger_chat:'+str(SystemConfig[3]))
+                    LineReplyMsg(event.reply_token, reply_content, content_type='text')
 
         else:
-            # 根據模式決定要不要回話
-            select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name"
-            SystemConfig = select_from_db(select_pre_sql, select_params_dict)
-            if System.get('talk_mode') is False: return
-            logging.debug('CheckMsgContent(event.message.text)') #debug
-            PICLINK = CheckMsgContent(event.message.text)
-            if PICLINK:
-                print('PICLINK', PICLINK)
-                LineReplyMsg(event.reply_token, PICLINK, content_type='image')
-            PICLINK = None
-            logging.debug('clean PICLINK')
+            select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
+            SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
+            print('SystemConfig, group_id', SystemConfig, group_id)
+            if not SystemConfig and group_id is not 'NULL':
+                print('該群組於System中還沒有資料，建立一筆資料')
+                # 如果還沒有 SystemConfig 且有 group_id 那就創一個，只設定 group_id 其他用 default
+                insert_pre_sql = "INSERT INTO system (group_id) values (:group_id)"
+                insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
+            else:
+                print('該群組於System中有資料了，或是是非群組對話')
+                group_id_list = [i[0] for i in SystemConfig]
+                index = group_id_list.index(group_id)
+                print('group_id_list, index', group_id_list, index)
+                # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+                # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
+                SystemConfig = SystemConfig[index]
+                print('SystemConfig[index]', SystemConfig)
 
+                # trigger_chat 判斷
+                trigger_chat = SystemConfig[3]
+                print('trigger_chat', trigger_chat)
+                # chat_mode 判斷
+                # 0 = 不回圖
+                print('SystemConfig[1]', SystemConfig[1])
+                if SystemConfig[1] is 0 :
+                    print('chat_mode is 0')
+                    return
+                # 1 = 隨機回所有 group 創的圖(預設)
+                elif SystemConfig[1] is 1 :
+                    print('chat_mode is 1')
+                    PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=None)
+                    if PICLINK:
+                        print('PICLINK', PICLINK)
+                        LineReplyMsg(event.reply_token, PICLINK, content_type='image')
+                # 2 = 只回該 group 創的圖
+                elif SystemConfig[1] is 2 :
+                    # 搜尋時帶上 group_id 判斷是否符合同群組
+                    print('chat_mode is 2, group_id:', group_id)
+                    PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=group_id)
+                    if PICLINK:
+                        print('PICLINK', PICLINK)
+                        LineReplyMsg(event.reply_token, PICLINK, content_type='image')
 
 
 
