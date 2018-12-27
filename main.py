@@ -215,8 +215,9 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
         pic_name = match_list[-1]
         # 如果圖片名稱小於設定的字數，那就回沒匹配到
         if len(pic_name) >= trigger_chat:
-            select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name"
-            res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name})
+            group_id if group_id else 'NULL'  
+            select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name and group_id=:group_id"
+            res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name, 'group_id': group_id})
             print('CheckMsgContent res:', res)
             return res[0][0] if res else False
         else:
