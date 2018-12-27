@@ -478,7 +478,6 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
             LineReplyMsg(event.reply_token, '當前模式為: ' + System.get('mode'), content_type='text')
 
         else:
-            # 根據模式決定要不要回話
             select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
             SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
             print('SystemConfig', SystemConfig)
@@ -486,11 +485,20 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 # 如果還沒有 SystemConfig 那就創一個，只設定 group_id 其他用 default
                 insert_pre_sql = "INSERT INTO system (group_id) values (:group_id)"
                 res = insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
+            else:
+                group_id_list = [i[0] for i in SystemConfig]
+                index = group_id_list.index(group_id)
+                # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+                # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
+                SystemConfig = SystemConfig[index]
+
             print('SystemConfig:', SystemConfig)
-            # if System.get('talk_mode') is False: return
-            # print('CheckMsgContent(event.message.text)') #debug
-            # PICLINK = CheckMsgContent(event.message.text)
-            if PICLINK:
+            # chat_mode 判斷
+            if SystemConfig[1] == 0: return
+            # trigger_chat 判斷
+            trigger_chat = SystemConfig[3]
+            PICLINK = CheckMsgContent(event.message.text)
+            if PICLINK >= trigger_chat:
                 print('PICLINK', PICLINK)
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
             PICLINK = None
