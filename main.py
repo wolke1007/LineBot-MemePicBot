@@ -177,7 +177,7 @@ def UploadToImgur(Pic_Name, binary_pic):
 
 def CheckMsgContent(MsgContent, trigger_chat, group_id):
     print('CheckMsgContent, MsgContent, trigger_chat, group_id',MsgContent, trigger_chat, group_id)
-    select_pre_sql = "SELECT pic_name, group_id FROM pic_info"
+    select_pre_sql = "SELECT pic_name FROM pic_info"
     ########## 這邊有效能問題需要解決 ##########
     # 目前是每一句對話都去抓全部的 DB 回來，然後丟進 for loop 掃描全部的內容
     # 1. DB server 的運算部分目前已知要錢，所以不要讓它算，要靠 Cloud Function 那邊的資源
@@ -185,17 +185,25 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
     all_picname_in_db = select_from_db(select_pre_sql, select_params_dict={})
     match_list = []
     # 收到的格式為:  [('1','C123abc'), ('ABC','C456def')]
-    for pic_name in all_picname_in_db:
-        # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
-        # group_id 有指定的話則要符合條件的才會 pass 到後面
-        if group_id and group_id == pic_name[1]:
+    if group_id:
+        for pic_name in all_picname_in_db:
+            # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
+            # group_id 有指定的話則要符合條件的才會 pass 到後面
+            if group_id and group_id == pic_name[1]:
+                pic_name = pic_name[0]
+                # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
+                match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
+            if match:
+                match_list.append(pic_name)
+    else:
+        for pic_name in all_picname_in_db:
+            # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
+            # group_id 有指定的話則要符合條件的才會 pass 到後面
             pic_name = pic_name[0]
-        else:
-            pic_name = pic_name[0]
-        # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
-        match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
-        if match: 
-            match_list.append(pic_name)
+            # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
+            match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
+            if match:
+                match_list.append(pic_name)
     # 先確認 match_list 有沒有東西
     if match_list:        
         print('match_list:', match_list)
@@ -560,18 +568,18 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 # chat_mode 判斷
                 # 0 = 不回圖
                 print('SystemConfig[1]', SystemConfig[1])
-                if SystemConfig[1] is 0:
+                if SystemConfig[1] is 0 :
                     print('chat_mode is 0')
                     return
                 # 1 = 隨機回所有 group 創的圖(預設)
-                elif SystemConfig[1] is 1:
+                elif SystemConfig[1] is 1 :
                     print('chat_mode is 1')
                     PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=None)
                     if PICLINK:
                         print('PICLINK', PICLINK)
                         LineReplyMsg(event.reply_token, PICLINK, content_type='image')
                 # 2 = 只回該 group 創的圖
-                elif SystemConfig[1] is 2:
+                elif SystemConfig[1] is 2 :
                     if SystemConfig[0] is group_id:
                         print('SystemConfig[0] is group_id')
                     else:
