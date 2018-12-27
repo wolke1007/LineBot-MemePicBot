@@ -177,7 +177,7 @@ def UploadToImgur(Pic_Name, binary_pic):
 
 def CheckMsgContent(MsgContent, trigger_chat, group_id):
     print('CheckMsgContent, MsgContent, trigger_chat, group_id',MsgContent, trigger_chat, group_id)
-    select_pre_sql = "SELECT pic_name FROM pic_info"
+    select_pre_sql = "SELECT pic_name, group_id FROM pic_info"
     ########## 這邊有效能問題需要解決 ##########
     # 目前是每一句對話都去抓全部的 DB 回來，然後丟進 for loop 掃描全部的內容
     # 1. DB server 的運算部分目前已知要錢，所以不要讓它算，要靠 Cloud Function 那邊的資源
