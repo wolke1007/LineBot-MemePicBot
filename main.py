@@ -206,6 +206,7 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
             if match:
                 match_list.append(pic_name)
     # 先確認 match_list 有沒有東西
+    print('match_list', match_list)
     if match_list:        
         print('match_list:', match_list)
         # key 這邊解決了如果不同名字，會依照字串長度排序
