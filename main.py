@@ -494,8 +494,8 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
             if PICLINK:
                 print('PICLINK', PICLINK)
                 LineReplyMsg(event.reply_token, PICLINK, content_type='image')
-            PICLINK = None
-            print('clean PICLINK')
+                PICLINK = None
+                print('clean PICLINK')
 
 
 
