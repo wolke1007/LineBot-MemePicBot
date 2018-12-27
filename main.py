@@ -190,7 +190,7 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
         for pic_name in all_picname_in_db:
             # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
             # group_id 有指定的話則要符合條件的才會 pass 到後面
-            if group_id is pic_name[1]:
+            if group_id == pic_name[1]:
                 pic_name = pic_name[0]
                 # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
                 match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
