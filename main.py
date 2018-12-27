@@ -545,33 +545,38 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 insert_pre_sql = "INSERT INTO system (group_id) values (:group_id)"
                 insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
             else:
+                print('該群組於System中有資料了')
                 group_id_list = [i[0] for i in SystemConfig]
                 index = group_id_list.index(group_id)
+                print('group_id_list, index', group_id_list, index)
                 # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
                 # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
                 SystemConfig = SystemConfig[index]
-            # trigger_chat 判斷
-            trigger_chat = SystemConfig[3]
-            # chat_mode 判斷
-            # 0 = 不回圖
-            if SystemConfig[1] is 0:
-                print('chat_mode is 0')
-                return
-            # 1 = 隨機回所有 group 創的圖(預設)
-            elif SystemConfig[1] is 1:
-                print('chat_mode is 1')
-                PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=None)
-                if PICLINK:
-                    print('PICLINK', PICLINK)
-                    LineReplyMsg(event.reply_token, PICLINK, content_type='image')
-            # 2 = 只回該 group 創的圖
-            elif SystemConfig[1] is 2 and SystemConfig[0] is group_id :
-                # 搜尋時帶上 group_id 判斷是否符合同群組
-                print('chat_mode is 2, group_id:', group_id)
-                PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=group_id)
-                if PICLINK:
-                    print('PICLINK', PICLINK)
-                    LineReplyMsg(event.reply_token, PICLINK, content_type='image')
+                print('SystemConfig[index]', SystemConfig)
+                
+                # trigger_chat 判斷
+                trigger_chat = SystemConfig[3]
+                print('trigger_chat', trigger_chat)
+                # chat_mode 判斷
+                # 0 = 不回圖
+                if SystemConfig[1] is 0:
+                    print('chat_mode is 0')
+                    return
+                # 1 = 隨機回所有 group 創的圖(預設)
+                elif SystemConfig[1] is 1:
+                    print('chat_mode is 1')
+                    PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=None)
+                    if PICLINK:
+                        print('PICLINK', PICLINK)
+                        LineReplyMsg(event.reply_token, PICLINK, content_type='image')
+                # 2 = 只回該 group 創的圖
+                elif SystemConfig[1] is 2 and SystemConfig[0] is group_id :
+                    # 搜尋時帶上 group_id 判斷是否符合同群組
+                    print('chat_mode is 2, group_id:', group_id)
+                    PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=group_id)
+                    if PICLINK:
+                        print('PICLINK', PICLINK)
+                        LineReplyMsg(event.reply_token, PICLINK, content_type='image')
 
 
 
