@@ -538,7 +538,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
         else:
             select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
             SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
-            print('SystemConfig', SystemConfig)
+            print('SystemConfig, group_id', SystemConfig, group_id)
             if not SystemConfig and group_id is not 'NULL':
                 print('該群組於System中還沒有資料，建立一筆資料')
                 # 如果還沒有 SystemConfig 且有 group_id 那就創一個，只設定 group_id 其他用 default
@@ -553,7 +553,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
                 SystemConfig = SystemConfig[index]
                 print('SystemConfig[index]', SystemConfig)
-                
+
                 # trigger_chat 判斷
                 trigger_chat = SystemConfig[3]
                 print('trigger_chat', trigger_chat)
