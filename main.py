@@ -477,6 +477,9 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 index = group_id_list.index(group_id)
                 # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
                 # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
+                #                        其中 chat_mode 目前設定為：0 = 不回圖
+                #                                                1 = 隨機回所有 group 創的圖(預設)
+                #                                                2 = 只回該 group 創的圖
                 SystemConfig = SystemConfig[index]
                 reply_content = '[當前模式為]  {}, {}, {} '.format(\
                                 'chat_mode:'+SystemConfig[1], 'retrieve_pic_mode:'+SystemConfig[2], 'trigger_chat:'+SystemConfig[3])
@@ -496,19 +499,24 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
                 # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
                 SystemConfig = SystemConfig[index]
-
-            print('SystemConfig:', SystemConfig)
-            # chat_mode 判斷
-            if SystemConfig[1] == 0: return
             # trigger_chat 判斷
             trigger_chat = SystemConfig[3]
-            PICLINK = CheckMsgContent(event.message.text, trigger_chat)
-            if PICLINK:
-                print('PICLINK', PICLINK)
-                LineReplyMsg(event.reply_token, PICLINK, content_type='image')
-                PICLINK = None
-                print('clean PICLINK')
-
+            # chat_mode 判斷
+            # 0 = 不回圖
+            if SystemConfig[1] is 0:
+                return
+            # 1 = 隨機回所有 group 創的圖(預設)
+            elif SystemConfig[1] is 1:
+                PICLINK = CheckMsgContent(event.message.text, trigger_chat)
+                if PICLINK:
+                    print('PICLINK', PICLINK)
+                    LineReplyMsg(event.reply_token, PICLINK, content_type='image')
+            # 2 = 只回該 group 創的圖
+            elif SystemConfig[1] is 2 and SystemConfig[0] is group_id :
+                PICLINK = CheckMsgContent(event.message.text, trigger_chat)
+                if PICLINK:
+                    print('PICLINK', PICLINK)
+                    LineReplyMsg(event.reply_token, PICLINK, content_type='image')
 
 
 
