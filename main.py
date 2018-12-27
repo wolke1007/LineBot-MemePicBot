@@ -188,7 +188,6 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
     for pic_name in all_picname_in_db:
         # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
         # group_id 有指定的話則要符合條件的才會 pass 到後面
-        print('pic_name', pic_name)
         if group_id and group_id == pic_name[1]:
             pic_name = pic_name[0]
         else:
@@ -199,6 +198,7 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
             match_list.append(pic_name)
     # 先確認 match_list 有沒有東西
     if match_list:        
+        print('match_list:', match_list)
         # key 這邊解決了如果不同名字，會依照字串長度排序
         match_list.sort(key=lambda x: len(x))
         # 排序後取 match 字數最多的也就是右邊一個
