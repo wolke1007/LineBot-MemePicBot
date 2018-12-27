@@ -470,7 +470,17 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 
         elif event.message.text == "--mode":
             print('event.message.text == "--mode"') #debug
-            LineReplyMsg(event.reply_token, '當前模式為: ' + System.get('mode'), content_type='text')
+            select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
+            SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
+            if SystemConfig:
+                group_id_list = [i[0] for i in SystemConfig]
+                index = group_id_list.index(group_id)
+                # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+                # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
+                SystemConfig = SystemConfig[index]
+                reply_content = '[當前模式為]  {}, {}, {} '.format(\
+                                'chat_mode:'+SystemConfig[1], 'retrieve_pic_mode:'+SystemConfig[2], 'trigger_chat:'+SystemConfig[3])
+                LineReplyMsg(event.reply_token, reply_content, content_type='text')
 
         else:
             select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
