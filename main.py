@@ -176,6 +176,7 @@ def UploadToImgur(Pic_Name, binary_pic):
         return '', reply_msg
 
 def CheckMsgContent(MsgContent, trigger_chat, group_id):
+    print('CheckMsgContent, MsgContent, trigger_chat, group_id',MsgContent, trigger_chat, group_id)
     select_pre_sql = "SELECT pic_name, group_id FROM pic_info"
     ########## 這邊有效能問題需要解決 ##########
     # 目前是每一句對話都去抓全部的 DB 回來，然後丟進 for loop 掃描全部的內容
@@ -187,6 +188,7 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
     for pic_name in all_picname_in_db:
         # 到這邊變成 ('ABC','C123abc') 這樣，[0] 是 pic_name，[1] 是 group_id
         # group_id 有指定的話則要符合條件的才會 pass 到後面
+        print('pic_name', pic_name)
         if group_id and group_id == pic_name[1]:
             pic_name = pic_name[0]
         else:
@@ -461,12 +463,12 @@ step 2. 上傳圖片，系統會回傳上傳成功
 step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 
 設定教學：
---chat_mode 0~2
+--mode chat_mode 0~2
 0 = 不回圖
 1 = 隨機回所有群組創的圖(預設)
 2 = 只回該群組上傳的圖
 
---trigger_chat 2~15
+--mode trigger_chat 2~15
 設定在此群組裡超過幾字才回話，可以設為 2~15 
 
 備註:
@@ -487,11 +489,11 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 try:
                     mode = int(event.message.text[-2:].strip(' '))
                 except:
-                    LineReplyMsg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --trigger_chat 15', content_type='text')
+                    LineReplyMsg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15', content_type='text')
                     return
                 # 不允許使用者設置低於 2 或是大於 15 個字元
                 if mode < 2 or mode > 15:
-                    LineReplyMsg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --trigger_chat 15', content_type='text')
+                    LineReplyMsg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15', content_type='text')
                     return
                 update_params_dict = {
                 'group_id': group_id,
@@ -506,7 +508,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 try:
                     mode = int(event.message.text[-1])
                 except:
-                    LineReplyMsg(event.reply_token, 'chat_mode 後需設定介於 0~2 的數字，如 --chat_mode 2', content_type='text')
+                    LineReplyMsg(event.reply_token, 'chat_mode 後需設定介於 0~2 的數字，如 --mode chat_mode 2', content_type='text')
                     return
                 update_params_dict = {
                 'group_id': group_id,
@@ -563,6 +565,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
             # 2 = 只回該 group 創的圖
             elif SystemConfig[1] is 2 and SystemConfig[0] is group_id :
                 # 搜尋時帶上 group_id 判斷是否符合同群組
+                print('chat_mode is 2, group_id:', group_id)
                 PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=group_id)
                 if PICLINK:
                     print('PICLINK', PICLINK)
