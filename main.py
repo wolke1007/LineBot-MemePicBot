@@ -194,6 +194,7 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
                 pic_name = pic_name[0]
                 # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
                 match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
+                print('pic_name, match', pic_name, match)
                 if match:
                     match_list.append(pic_name)
     else:
@@ -203,6 +204,7 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
             pic_name = pic_name[0]
             # 這邊在解決如果 test 與 test2 同時存在，那 test2 將永遠不會被匹配到的問題，預期要取匹配到字數最長的
             match = re.search(str(pic_name), MsgContent, re.IGNORECASE)
+            print('pic_name, match', pic_name, match)
             if match:
                 match_list.append(pic_name)
     # 先確認 match_list 有沒有東西
