@@ -545,7 +545,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 insert_pre_sql = "INSERT INTO system (group_id) values (:group_id)"
                 insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
             else:
-                print('該群組於System中有資料了')
+                print('該群組於System中有資料了，或是是非群組對話')
                 group_id_list = [i[0] for i in SystemConfig]
                 index = group_id_list.index(group_id)
                 print('group_id_list, index', group_id_list, index)
@@ -559,6 +559,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 print('trigger_chat', trigger_chat)
                 # chat_mode 判斷
                 # 0 = 不回圖
+                print('SystemConfig[1]', SystemConfig[1])
                 if SystemConfig[1] is 0:
                     print('chat_mode is 0')
                     return
@@ -570,7 +571,12 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                         print('PICLINK', PICLINK)
                         LineReplyMsg(event.reply_token, PICLINK, content_type='image')
                 # 2 = 只回該 group 創的圖
-                elif SystemConfig[1] is 2 and SystemConfig[0] is group_id :
+                elif SystemConfig[1] is 2:
+                    if SystemConfig[0] is group_id:
+                        print('SystemConfig[0] is group_id')
+                    else:
+                        print('SystemConfig[0], group_id', SystemConfig[0], group_id)
+
                     # 搜尋時帶上 group_id 判斷是否符合同群組
                     print('chat_mode is 2, group_id:', group_id)
                     PICLINK = CheckMsgContent(event.message.text, trigger_chat, group_id=group_id)
