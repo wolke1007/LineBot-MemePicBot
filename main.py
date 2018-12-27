@@ -485,7 +485,7 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
                 #                                                2 = 只回該 group 創的圖
                 SystemConfig = SystemConfig[index]
                 reply_content = '[當前模式為]  {}, {}, {} '.format(\
-                                'chat_mode:'+SystemConfig[1], 'retrieve_pic_mode:'+SystemConfig[2], 'trigger_chat:'+SystemConfig[3])
+                                'chat_mode:'+str(SystemConfig[1]), 'retrieve_pic_mode:'+str(SystemConfig[2]), 'trigger_chat:'+str(SystemConfig[3]))
                 LineReplyMsg(event.reply_token, reply_content, content_type='text')
 
         else:
