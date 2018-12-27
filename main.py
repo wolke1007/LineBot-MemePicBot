@@ -474,8 +474,8 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
             select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
             SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
             print('SystemConfig', SystemConfig)
-            if not SystemConfig:
-                # 如果還沒有 SystemConfig 那就創一個，只設定 group_id 其他用 default
+            if not SystemConfig and group_id is not 'NULL':
+                # 如果還沒有 SystemConfig 且有 group_id 那就創一個，只設定 group_id 其他用 default
                 insert_pre_sql = "INSERT INTO system (group_id) values (:group_id)"
                 res = insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
             else:
