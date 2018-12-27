@@ -198,12 +198,14 @@ def CheckMsgContent(MsgContent, trigger_chat):
         match_list.sort(key=lambda x: len(x))
         # 排序後取 match 字數最多的也就是右邊一個
         pic_name = match_list[-1]
-        select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name"
-        res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name})
-        print('CheckMsgContent res:', res)
-        if res:
-            # 回傳 pic_link
-            return res[0][0] if res[0][0] >= trigger_chat else False
+        # 如果圖片名稱小於設定的字數，那就回沒匹配到
+        if len(pic_name) >= trigger_chat:
+            select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name"
+            res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name})
+            print('CheckMsgContent res:', res)
+            return res[0][0] if res else False
+        else:
+            return False
 
 def LineReplyMsg(to, content, content_type):
     if content_type is 'text':
