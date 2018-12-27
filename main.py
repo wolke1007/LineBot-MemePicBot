@@ -419,7 +419,7 @@ def handle_text(event):
         # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
         # 或是看看有沒有辦法只回覆擁有者
         # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
-        elif event.message.text[0:7] == "--debug":
+        elif event.message.text[0:7] == "--debug" :
             pass
             # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
             # print('enter debug')
@@ -460,6 +460,15 @@ step 1. 設定圖片名稱，例如 #我是帥哥#
 step 2. 上傳圖片，系統會回傳上傳成功
 step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 
+設定教學：
+--chat_mode 0~2
+0 = 不回圖
+1 = 隨機回所有群組創的圖(預設)
+2 = 只回該群組上傳的圖
+
+--trigger_chat 2~15
+設定在此群組裡超過幾字才回話，可以設為 2~15 
+
 備註:
 1. 圖片字數有限制，空白或是特殊符號皆算數
 2. 設定同圖片名稱則會蓋掉前面上傳的
@@ -471,31 +480,68 @@ step 3. 聊天時提到設定的圖片名稱便會觸發貼圖
 6. --list 可以讓 BOT 回你現有圖片名稱的表格
 ''', content_type='text')
 
-        elif event.message.text == "--mode":
+        elif event.message.text[:6] == "--mode" and group_id :
             print('event.message.text == "--mode"') #debug
-            select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
-            SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
-            if SystemConfig:
-                group_id_list = [i[0] for i in SystemConfig]
-                index = group_id_list.index(group_id)
-                # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
-                # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
-                #                        其中 chat_mode 目前設定為：0 = 不回圖
-                #                                                1 = 隨機回所有 group 創的圖(預設)
-                #                                                2 = 只回該 group 創的圖
-                SystemConfig = SystemConfig[index]
-                reply_content = '[當前模式為]  {}, {}, {} '.format(\
-                                'chat_mode:'+str(SystemConfig[1]), 'retrieve_pic_mode:'+str(SystemConfig[2]), 'trigger_chat:'+str(SystemConfig[3]))
-                LineReplyMsg(event.reply_token, reply_content, content_type='text')
+            # --mode trigger_chat 1
+            if event.message.text[7:-2] == "trigger_chat":
+                try:
+                    mode = int(event.message.text[-2:].strip(' '))
+                except:
+                    LineReplyMsg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --trigger_chat 15', content_type='text')
+                    return
+                # 不允許使用者設置低於 2 或是大於 15 個字元
+                if mode < 2 or mode > 15:
+                    LineReplyMsg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --trigger_chat 15', content_type='text')
+                    return
+                update_params_dict = {
+                'group_id': group_id,
+                'trigger_chat': mode,
+                }
+                update_pre_sql = "UPDATE system SET trigger_chat=:trigger_chat \
+                                  WHERE group_id=:group_id"
+                update_from_db(update_pre_sql, update_params_dict)
+                LineReplyMsg(event.reply_token, '更改 trigger_chat 為 '+str(mode), content_type='text')
+            # --mode chat_mode 1
+            elif event.message.text[7:-2] == "chat_mode" and group_id :
+                try:
+                    mode = int(event.message.text[-1])
+                except:
+                    LineReplyMsg(event.reply_token, 'chat_mode 後需設定介於 0~2 的數字，如 --chat_mode 2', content_type='text')
+                    return
+                update_params_dict = {
+                'group_id': group_id,
+                'chat_mode': mode,
+                }
+                update_pre_sql = "UPDATE system SET chat_mode=:chat_mode \
+                                WHERE group_id=:group_id"
+                update_from_db(update_pre_sql, update_params_dict)
+                LineReplyMsg(event.reply_token, '更改 chat_mode 為 '+str(mode), content_type='text')
+            else:
+                select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
+                SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
+                if SystemConfig:
+                    group_id_list = [i[0] for i in SystemConfig]
+                    index = group_id_list.index(group_id)
+                    # SystemConfig[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+                    # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
+                    #                        其中 chat_mode 的設定：0 = 不回圖
+                    #                                             1 = 隨機回所有 group 創的圖(預設)
+                    #                                             2 = 只回該 group 上傳的圖
+                    #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
+                    SystemConfig = SystemConfig[index]
+                    reply_content = '[當前模式為]  {}, {}, {} '.format(\
+                                    'chat_mode:'+str(SystemConfig[1]), 'retrieve_pic_mode:'+str(SystemConfig[2]), 'trigger_chat:'+str(SystemConfig[3]))
+                    LineReplyMsg(event.reply_token, reply_content, content_type='text')
 
         else:
             select_pre_sql = "SELECT * FROM system WHERE group_id = :group_id"
             SystemConfig = select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
             print('SystemConfig', SystemConfig)
             if not SystemConfig and group_id is not 'NULL':
+                print('該群組於System中還沒有資料，建立一筆資料')
                 # 如果還沒有 SystemConfig 且有 group_id 那就創一個，只設定 group_id 其他用 default
                 insert_pre_sql = "INSERT INTO system (group_id) values (:group_id)"
-                res = insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
+                insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
             else:
                 group_id_list = [i[0] for i in SystemConfig]
                 index = group_id_list.index(group_id)
