@@ -152,7 +152,10 @@ def isFileNameExist(pic_name, group_id):
 def UploadToImgur(Pic_Name, binary_pic=None, url=None):
     print('enter UploadToImgur')
     try:
-        payload = base64.b64encode(binary_pic) if binary_pic == True else url
+        if binary_pic == True :
+            payload = base64.b64encode(binary_pic)
+        else:
+            payload = url
         # upload_type = 'base64' if binary_pic == True else 'URL' 
         print('type(payload)', type(payload))
         ################################
