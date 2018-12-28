@@ -149,7 +149,7 @@ def isFileNameExist(pic_name, group_id):
     res = select_from_db(select_pre_sql, select_params_dict)
     return True if res else False
 
-def UploadToImgur(user_id, group_id, binary_pic=None, url=None):
+def UploadToImgur(user_id, binary_pic=None, url=None):
     print('enter UploadToImgur')
     select_params_dict = {
                 'user_id': user_id,
