@@ -393,7 +393,36 @@ def handle_text(event):
 
             print('add to pic_name done')
 
-        if event.message.text == "--help" or event.message.text == "-h" :
+        elif event.message.text[:4] == "http" and (event.message.text[-4:] == ".jpg" \
+                                               or event.message.text[-4:] == ".png" \
+                                               or event.message.text[-4:] == ".gif") :
+            select_params_dict = {
+            'user_id': user_id,
+            'group_id': group_id,
+            }
+            # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
+            select_pre_sql = "SELECT pic_name FROM pic_info WHERE \
+                                pic_link IS NULL AND user_id=:user_id AND group_id=:group_id"
+            # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
+            Pic_Name = select_from_db(select_pre_sql, select_params_dict)
+            Pic_Name = Pic_Name[0][0] if Pic_Name else None
+
+            if isFileNameExist(Pic_Name, group_id):
+                print('name already exist, start to upload') 
+                binary_pic = line_bot_api.get_message_content(message_id).content
+                pic_link, reply_msg = UploadToImgur(Pic_Name, binary_pic, url=event.message.text)
+                update_params_dict = {
+                    'user_id': user_id,
+                    'pic_link': pic_link,
+                    'group_id': group_id,
+                    }
+                # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
+                update_pre_sql = "UPDATE pic_info SET pic_link=:pic_link, group_id=:group_id WHERE \
+                                user_id=:user_id AND pic_link IS NULL"
+                update_from_db(update_pre_sql, update_params_dict)
+                LineReplyMsg(event.reply_token, reply_msg, content_type='text')
+
+        elif event.message.text == "--help" or event.message.text == "-h" :
             print('event.message.text == "--help or "-h"') #debug
             LineReplyMsg(event.reply_token, \
 # line 手機版莫約 15 個中文字寬度就會換行
