@@ -409,8 +409,7 @@ def handle_text(event):
 
             if isFileNameExist(Pic_Name, group_id):
                 print('name already exist, start to upload') 
-                binary_pic = line_bot_api.get_message_content(message_id).content
-                pic_link, reply_msg = UploadToImgur(Pic_Name, binary_pic, url=event.message.text)
+                pic_link, reply_msg = UploadToImgur(Pic_Name, url=event.message.text)
                 update_params_dict = {
                     'user_id': user_id,
                     'pic_link': pic_link,
