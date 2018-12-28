@@ -387,7 +387,8 @@ def handle_text(event):
             'user_id': user_id,
             'group_id': group_id,
             }
-            # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
+            # 名字設定好但還沒有 pic_link 的就是準備要上傳的 
+            # (只抓 user_id 符合的是為了避免設定名字後別人幫你上傳圖片的問題)
             select_pre_sql = "SELECT pic_name FROM pic_info WHERE \
                                 pic_link IS NULL AND user_id=:user_id AND group_id=:group_id"
             # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
