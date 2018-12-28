@@ -215,10 +215,20 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
         # 如果圖片名稱小於設定的字數，那就回沒匹配到
         if len(pic_name) >= trigger_chat:
             group_id = group_id if group_id else 'NULL'
-            select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name and group_id=:group_id"
-            res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name, 'group_id': group_id})
-            print('CheckMsgContent res:', res)
-            return res[0][0] if res else False
+            if group_id:
+                select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name and group_id=:group_id"
+                res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name, 'group_id': group_id})
+                print('CheckMsgContent group_id res:', group_id, res)
+                return res[0][0] if res else False
+            else:
+                # 若 chat_mode = 1，group_id 會設定為 None 則邏輯會走到這裡，select 的時候就不能把 group_id 丟進去
+                select_pre_sql = "SELECT pic_link FROM pic_info WHERE pic_name=:pic_name"
+                res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name})
+                from random import Random
+                random_index = Random()
+                random_index = index.choice(range(len(res)))
+                print('CheckMsgContent group_id res random_index res:', group_id, random_index, res)
+                return res[random_index][0] if res else False
         else:
             return False
 
