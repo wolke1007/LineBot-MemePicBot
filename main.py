@@ -461,37 +461,6 @@ def handle_text(event):
             update_from_db(update_pre_sql, update_params_dict)
             LineReplyMsg(event.reply_token, pic_link, content_type='image')
 
-        # debug mode 之後要拔掉，或是要經過驗證，否則 user id 會輕易曝光
-        # 或是看看有沒有辦法只回覆擁有者
-        # 這邊之後要改寫成一個獨立的檔案，並只 return 要回傳的字串，這邊則是負責幫忙送出
-        elif event.message.text[0:7] == "--debug" :
-            pass
-            # --debug 是 [7:]，從 8 開始是因為預期會有空白， e.g. '--debug -q'
-            # print('enter debug')
-            # command = event.message.text[8:]
-            # print('command: ', command)
-            # if not command :
-            #     select_params_dict = {}
-            #     res = select_from_db("SELECT user_id FROM pic_info", select_params_dict)
-            #     LinePushTextMsg(user_id, res)
-            #     res = select_from_db("SELECT pic_name FROM pic_info", select_params_dict)
-            #     LinePushTextMsg(user_id, res)
-            #     res = select_from_db("SELECT created_time FROM pic_info", select_params_dict)
-            #     LinePushTextMsg(user_id, res)
-
-            # elif command is 'help' :
-            #     LinePushTextMsg(user_id, '\
-            #             -q : quiet mode, for not talk back.\n \
-            #             ')
-            # elif command[5:] is '-q 0' :
-            #     System['talk_mode'] = False
-            #     LinePushTextMsg(user_id, 'set talk_mode to Quiet Mode')
-
-            # # 這邊要改寫成判斷最後一個字元來決定要做什麼事
-            # elif command[5:] is '-q 1' :
-            #     System['talk_mode'] = True
-            #     LinePushTextMsg(user_id, 'set talk_mode to Quiet Mode')
-
         elif event.message.text == "--help" or event.message.text == "-h" :
             print('event.message.text == "--help or "-h"') #debug
             LineReplyMsg(event.reply_token, \
