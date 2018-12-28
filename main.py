@@ -149,26 +149,13 @@ def isFileNameExist(pic_name, group_id):
     res = select_from_db(select_pre_sql, select_params_dict)
     return True if res else False
 
-def UploadToImgur(user_id, binary_pic=None, url=None):
+def UploadToImgur(Pic_Name, binary_pic=None, url=None):
     print('enter UploadToImgur')
-    select_params_dict = {
-                'user_id': user_id,
-                }
-    # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是準備要上傳的
-    select_pre_sql = "SELECT pic_name FROM pic_info WHERE pic_link IS NULL AND user_id = :user_id"
-    # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
-    res = select_from_db(select_pre_sql, select_params_dict)
-    print('UploadToImgur select res:', res) #debug
-    Pic_Name = res[0][0]
     try:
-        print('type binary_pic: '+str(type(binary_pic)))
-        print('type(base64 binary_pic): ', type(base64.b64encode(binary_pic)))
-        print('base64 binary_pic:', base64.b64encode(binary_pic))
-        if binary_pic == True: print('binary_pic is true')
         payload = base64.b64encode(binary_pic) if binary_pic == True else url
         # upload_type = 'base64' if binary_pic == True else 'URL' 
-        print('payload:', payload)
-        print('upload_type:', upload_type)
+        print('type(payload)', type(payload))
+        ################################
         data = {
             'image': payload,
             'album': Album_ID,
