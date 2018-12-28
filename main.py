@@ -226,7 +226,7 @@ def CheckMsgContent(MsgContent, trigger_chat, group_id):
                 res = select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name})
                 from random import Random
                 random_index = Random()
-                random_index = index.choice(range(len(res)))
+                random_index = random_index.choice(range(len(res)))
                 print('CheckMsgContent group_id res random_index res:', group_id, random_index, res)
                 return res[random_index][0] if res else False
         else:
