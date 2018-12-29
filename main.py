@@ -11,7 +11,6 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 import tempfile
-import os
 from imgur_auth import ImgurClient
 import re
 import requests
