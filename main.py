@@ -19,7 +19,7 @@ from base64 import b64encode
 import json
 from config import *
 from db_manipulate import DBManipulate as dbm
-from extension import PicNameList
+from extension import *
 
 app = Flask(__name__)
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
@@ -359,34 +359,7 @@ def handle_text(event):
 
         elif event.message.text == "--help" or event.message.text == "-h":
             print('event.message.text == "--help or "-h"')  # debug
-            help_content = (
-                "貼心提醒您請勿洩漏個資\n"
-                "嚴 禁 上 傳 色 情 圖 片\n"
-                "(作者: 我不想被 Imgur banned 拜託配合了ＱＡＱ\n"
-                "使用教學：\n"
-                "step 1. 設定圖片名稱，例如 #我是帥哥#\n"
-                "step 2. 上傳圖片，系統會回傳上傳成功\n"
-                "step 3. 聊天時提到設定的圖片名稱便會觸發貼圖\n"
-                "\n"
-                "設定教學：\n"
-                "--mode chat_mode 0~2\n"
-                "0 = 不回圖\n"
-                "1 = 隨機回所有群組創的圖(預設)\n"
-                "2 = 只回該群組上傳的圖\n"
-                "\n"
-                "--mode trigger_chat 2~15\n"
-                "設定在此群組裡超過幾字才回話，可以設為 2~15 \n"
-                "\n"
-                "備註:\n"
-                "1. 圖片字數有限制，空白或是特殊符號皆算數\n"
-                "2. 設定同圖片名稱則會蓋掉前面上傳的\n"
-                "3. 若上傳URL則必須為 http 開頭 .jpg .gif .png 結尾\n"
-                "(目前尚未實作完成)\n"
-                "4. 建議在 Line 設定將「自動下載照片」取消打勾\n"
-                "設定 > 照片。影片 > 自動下載照片\n"
-                "5. 如果設定多次名字再上傳圖片，則是多個關鍵字對應同一張圖片\n"
-                "6. --list 可以讓 BOT 回你現有圖片名稱的表格\n"
-            )  # line 手機版莫約 15 個中文字寬度就會換行
+            help_content = HelpText.get_help_content()
             line_reply_msg(event.reply_token, help_content, content_type='text')
 
         elif event.message.text[:6] == "--mode" and group_id:
@@ -463,7 +436,7 @@ def handle_text(event):
             }
             # 複寫名字為 'pic_name_list' 的 pic_link
             update_pre_sql = ("UPDATE pic_info SET pic_link=:pic_link "
-                                "WHERE pic_name = :pic_name")
+                              "WHERE pic_name = :pic_name")
             dbm.update_from_db(update_pre_sql, params_dict)
             line_reply_msg(event.reply_token, pic_link, content_type='image')
         else:
