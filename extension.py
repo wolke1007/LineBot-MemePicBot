@@ -11,7 +11,7 @@ from db_manipulate import DBManipulate as dbm
 
 class PicNameList():
     @staticmethod
-    def render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=12,
+    def _render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=12,
                          header_color='#40466e', row_colors=['#f1f1f2', 'w'],
                          edge_color='w', bbox=[0, 0, 1, 1], header_columns=0,
                          ax=None, **kwargs):
@@ -43,7 +43,7 @@ class PicNameList():
         return ax
 
     @staticmethod
-    def turn_table_into_pic(table_object):
+    def _turn_table_into_pic(table_object):
         print('enter turn_table_into_pic')
         pic = table_object
         plt_buf = BytesIO()
@@ -74,10 +74,10 @@ class PicNameList():
         res = [res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt)]
         print('debug res[-1]:', res[-1])
         pd_res = DataFrame(res)
-        table_object = self.render_mpl_table(pd_res, header_columns=0,
+        table_object = PicNameList._render_mpl_table(pd_res, header_columns=0,
                                              col_width=2.0)
         table_object = table_object.get_figure()
-        binary_pic = self.turn_table_into_pic(table_object)
+        binary_pic = PicNameList._turn_table_into_pic(table_object)
 
 
 class HelpText():
