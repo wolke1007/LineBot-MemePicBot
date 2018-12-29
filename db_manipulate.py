@@ -3,6 +3,7 @@ from config import *
 import pymysql
 from sqlalchemy import text
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 
 engine = create_engine(USER_INFO_CONNECT)
 
@@ -17,7 +18,7 @@ class DBManipulate():
                 rows = resproxy.fetchall()
                 ret = rows
                 return ret
-            except DatabaseError:
+            except SQLAlchemyError:
                 return False
 
     @classmethod
@@ -27,7 +28,7 @@ class DBManipulate():
             try:
                 resproxy = conn.execute(bind_sql, insert_params_dict)
                 return True
-            except DatabaseError:
+            except SQLAlchemyError:
                 return False
 
     @classmethod
@@ -37,7 +38,7 @@ class DBManipulate():
             try:
                 resproxy = conn.execute(bind_sql, update_params_dict)
                 return True
-            except DatabaseError:
+            except SQLAlchemyError:
                 return False
 
 
