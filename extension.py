@@ -57,21 +57,13 @@ class PicNameList():
         return byte_img
 
     @staticmethod
-    def get_binary_pic():
-        # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱
-        select_pre_sql = ("SELECT pic_name FROM pic_info "
-                          "WHERE pic_name != 'pic_name_list'")
-        res = dbm.select_from_db(select_pre_sql, params_dict={})
-        # res 格式為:  [('1',), ('ABC',)]
-        res = [_[0] for _ in res]
-        # 利用 set 將重複的字串給刪去
-        res = list(set(res))
+    def get_binary_pic(res):
         # 圖片中的 columns 數
         columns_cnt = 6
         # 取餘數用 None 補滿，讓每個 column 都有內如，pd.DataFrame 才不會變成只有一行
         res.extend([None for i in range(len(res) % columns_cnt)])
         # 將 list 包成 [[1,2,3], [1,2,3]] 這樣的格式再餵給 pd.DataFrame
-        # (注意，裡面每個 list 一定要數量一致喔)
+        # (注意，裡面每個 list 一定要數量一致)
         res = [res[i:i + columns_cnt] for i in range(0, len(res), columns_cnt)]
         print('debug res[-1]:', res[-1])
         pd_res = DataFrame(res)
@@ -79,6 +71,7 @@ class PicNameList():
                                              col_width=2.0)
         table_object = table_object.get_figure()
         binary_pic = PicNameList._turn_table_into_pic(table_object)
+        return binary_pic
 
 
 class HelpText():

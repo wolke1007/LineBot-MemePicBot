@@ -425,7 +425,7 @@ def handle_text(event):
             res = [_[0] for _ in res]
             # 利用 set 將重複的字串給刪去
             res = list(set(res))
-            binary_pic = PicNameList.get_binary_pic()
+            binary_pic = PicNameList.get_binary_pic(res)
             pic_link, reply_msg = upload_to_imgur(pic_name='pic_name_list', binary_pic=binary_pic)
             if reply_msg is not '上傳成功':
                 line_reply_msg(event.reply_token, reply_msg, content_type='text')
