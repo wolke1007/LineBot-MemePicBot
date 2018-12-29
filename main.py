@@ -51,35 +51,35 @@ def callback(event):
 
 def add_userid_if_not_exist(user_id):
     print('enter add_userid_if_not_exist')
-    select_params_dict = {
+    params_dict = {
         'user_id': user_id
     }
     select_pre_sql = ("SELECT user_id FROM user_info WHERE user_id=:user_id")
-    res = dbm.select_from_db(select_pre_sql, select_params_dict)
+    res = dbm.select_from_db(select_pre_sql, params_dict)
     # 回傳值應為 list type 裡面包著 tuple，但有可能沒有值所以不指定取第一個
     if res:
         # user_id 存在，不做事
         return
     else:
         # user_id 不存在，加入
-        insert_params_dict = {
+        params_dict = {
             'user_id': user_id,
             'banned': 0
         }
         insert_pre_sql = ("INSERT INTO user_info (user_id, banned) "
                           "VALUES (:user_id, :banned)")
-        dbm.insert_from_db(insert_pre_sql, insert_params_dict)
+        dbm.insert_from_db(insert_pre_sql, params_dict)
         return True
 
 
 def is_userid_banned(user_id):
     print('enter is_userid_banned')
-    select_params_dict = {
+    params_dict = {
         'user_id': user_id
     }
     select_pre_sql = ("SELECT banned FROM user_info WHERE user_id=:user_id")
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
-    res = dbm.select_from_db(select_pre_sql, select_params_dict)
+    res = dbm.select_from_db(select_pre_sql, params_dict)
     # 回傳值應為 list type 裡面包著 tuple，預期只有一個同名的使用者且一定有使用者 id 存在不怕沒取到噴錯，故直接取第一個
     if not res[0][0]:
         # 沒有被 banned
@@ -95,14 +95,14 @@ def is_filename_exist(pic_name, group_id):
     print('enter is_filename_exist')
     if not pic_name:
         return False
-    select_params_dict = {
+    params_dict = {
         'pic_name': pic_name,
         'group_id': group_id,
     }
     select_pre_sql = ("SELECT pic_name FROM pic_info WHERE "
                       "pic_name=:pic_name AND group_id=:group_id")
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
-    res = dbm.select_from_db(select_pre_sql, select_params_dict)
+    res = dbm.select_from_db(select_pre_sql, params_dict)
     return True if res else False
 
 
@@ -143,7 +143,7 @@ def check_msg_content(msg_content, trigger_chat, group_id):
     # 目前是每一句對話都去抓全部的 DB 回來，然後丟進 for loop 掃描全部的內容
     # 1. DB server 的運算部分目前已知要錢，所以不要讓它算，要靠 Cloud Function 那邊的資源
     # 2. 所以整個抓回來再算是一種方法，但需要思考能不能不要每次都跟 DB 拿，而是哪邊有 server cache 之類的
-    all_picname_in_db = dbm.select_from_db(select_pre_sql, select_params_dict={})
+    all_picname_in_db = dbm.select_from_db(select_pre_sql, params_dict={})
     print('all_picname_in_db', all_picname_in_db)
     match_list = []
     # 收到的格式為:  [('1','C123abc'), ('ABC','C456def')]
@@ -179,13 +179,13 @@ def check_msg_content(msg_content, trigger_chat, group_id):
             if group_id is not 'NULL':
                 select_pre_sql = ("SELECT pic_link FROM pic_info "
                                   "WHERE pic_name=:pic_name and group_id=:group_id")
-                res = dbm.select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name, 'group_id': group_id})
+                res = dbm.select_from_db(select_pre_sql, params_dict={'pic_name': pic_name, 'group_id': group_id})
                 print('check_msg_content group_id res:', group_id, res)
                 return res[0][0] if res else False
             else:
                 # 若 chat_mode = 1，group_id 會設定為 None 則邏輯會走到這裡，select 的時候就不能把 group_id 丟進去
                 select_pre_sql = ("SELECT pic_link FROM pic_info WHERE pic_name=:pic_name")
-                res = dbm.select_from_db(select_pre_sql, select_params_dict={'pic_name': pic_name})
+                res = dbm.select_from_db(select_pre_sql, params_dict={'pic_name': pic_name})
                 from random import Random
                 random_index = Random()
                 random_index = random_index.choice(range(len(res)))
@@ -247,7 +247,7 @@ def handle_image(event):
         except Exception:
             logging.warning('This user id' + str(user_id) + 'got banned, refuse to do anything!')
         return
-    select_params_dict = {
+    params_dict = {
         'user_id': user_id,
         'group_id': group_id,
     }
@@ -255,7 +255,7 @@ def handle_image(event):
     select_pre_sql = ("SELECT pic_name FROM pic_info "
                       "WHERE pic_link IS NULL AND user_id=:user_id AND group_id=:group_id")
     # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
-    pic_name = dbm.select_from_db(select_pre_sql, select_params_dict)
+    pic_name = dbm.select_from_db(select_pre_sql, params_dict)
     pic_name = pic_name[0][0] if pic_name else None
 
     if is_filename_exist(pic_name, group_id):
@@ -263,7 +263,7 @@ def handle_image(event):
         binary_pic = line_bot_api.get_message_content(message_id).content
         print('type(binary_pic)', type(binary_pic))
         pic_link, reply_msg = upload_to_imgur(pic_name, binary_pic=binary_pic)
-        update_params_dict = {
+        params_dict = {
             'user_id': user_id,
             'pic_link': pic_link,
             'group_id': group_id
@@ -271,7 +271,7 @@ def handle_image(event):
         # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
         update_pre_sql = ("UPDATE pic_info SET pic_link=:pic_link, group_id=:group_id "
                           "WHERE user_id=:user_id AND pic_link IS NULL")
-        dbm.update_from_db(update_pre_sql, update_params_dict)
+        dbm.update_from_db(update_pre_sql, params_dict)
         line_reply_msg(event.reply_token, reply_msg, content_type='text')
 
 
@@ -307,29 +307,29 @@ def handle_text(event):
                 if is_filename_exist(pic_name, group_id):
                     # 如果圖片重複了，對 user_id pic_link 欄位進行 update
                     print('圖片已經存在，更新 user_id pic_link')
-                    update_params_dict = {
+                    params_dict = {
                         'user_id': user_id,
                         'pic_name': pic_name,
                         'group_id': group_id
                     }
                     update_pre_sql = ("UPDATE pic_info SET user_id=:user_id, pic_link=NULL "
                                       "WHERE pic_name=:pic_name AND group_id=:group_id")
-                    res = dbm.update_from_db(update_pre_sql, update_params_dict)
-                    debug_res = dbm.select_from_db("SELECT pic_name, pic_link FROM pic_info", select_params_dict={})  # debug
+                    res = dbm.update_from_db(update_pre_sql, params_dict)
+                    debug_res = dbm.select_from_db("SELECT pic_name, pic_link FROM pic_info", params_dict={})  # debug
                     print('debug_res1: ', debug_res)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
                     # 如果沒重複直接 insert
                     print('新增 user_id pic_name')
-                    insert_params_dict = {
+                    params_dict = {
                         'user_id': user_id,
                         'pic_name': pic_name,
                         'group_id': group_id
                     }
                     insert_pre_sql = ("INSERT INTO pic_info (user_id, pic_name, group_id)"
                                       "values (:user_id, :pic_name, :group_id)")
-                    res = dbm.insert_from_db(insert_pre_sql, insert_params_dict)
-                    debug_res = dbm.select_from_db("SELECT pic_name, pic_link FROM pic_info", select_params_dict={})  # debug
+                    res = dbm.insert_from_db(insert_pre_sql, params_dict)
+                    debug_res = dbm.select_from_db("SELECT pic_name, pic_link FROM pic_info", params_dict={})  # debug
                     print('debug_res2: ', debug_res)
                     print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
@@ -345,7 +345,7 @@ def handle_text(event):
         elif event.message.text[:4] == "http" and (event.message.text[-4:] == ".jpg" or
                                                    event.message.text[-4:] == ".png" or
                                                    event.message.text[-4:] == ".gif"):
-            select_params_dict = {
+            params_dict = {
                 'user_id': user_id,
                 'group_id': group_id
             }
@@ -354,13 +354,13 @@ def handle_text(event):
             select_pre_sql = ("SELECT pic_name FROM pic_info "
                               "WHERE pic_link IS NULL AND user_id=:user_id AND group_id=:group_id")
             # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
-            pic_name = dbm.select_from_db(select_pre_sql, select_params_dict)
+            pic_name = dbm.select_from_db(select_pre_sql, params_dict)
             pic_name = pic_name[0][0] if pic_name else None
 
             if is_filename_exist(pic_name, group_id):
                 print('name already exist, start to upload')
                 pic_link, reply_msg = upload_to_imgur(pic_name, url=event.message.text)
-                update_params_dict = {
+                params_dict = {
                     'user_id': user_id,
                     'pic_link': pic_link,
                     'group_id': group_id
@@ -368,7 +368,7 @@ def handle_text(event):
                 # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
                 update_pre_sql = ("UPDATE pic_info SET pic_link=:pic_link, group_id=:group_id "
                                   "WHERE user_id=:user_id AND pic_link IS NULL")
-                dbm.update_from_db(update_pre_sql, update_params_dict)
+                dbm.update_from_db(update_pre_sql, params_dict)
                 line_reply_msg(event.reply_token, reply_msg, content_type='text')
 
         elif event.message.text == "--help" or event.message.text == "-h":
@@ -416,13 +416,13 @@ def handle_text(event):
                 if mode < 2 or mode > 15:
                     line_reply_msg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15', content_type='text')
                     return
-                update_params_dict = {
+                params_dict = {
                     'group_id': group_id,
                     'trigger_chat': mode
                 }
                 update_pre_sql = ("UPDATE system SET trigger_chat=:trigger_chat "
                                   "WHERE group_id=:group_id")
-                dbm.update_from_db(update_pre_sql, update_params_dict)
+                dbm.update_from_db(update_pre_sql, params_dict)
                 line_reply_msg(event.reply_token, '更改 trigger_chat 為 '+str(mode), content_type='text')
             # --mode chat_mode 1
             elif event.message.text[7:-2] == "chat_mode" and group_id:
@@ -431,17 +431,17 @@ def handle_text(event):
                 except ValueError:
                     line_reply_msg(event.reply_token, 'chat_mode 後需設定介於 0~2 的數字，如 --mode chat_mode 2', content_type='text')
                     return
-                update_params_dict = {
+                params_dict = {
                     'group_id': group_id,
                     'chat_mode': mode
                 }
                 update_pre_sql = ("UPDATE system SET chat_mode=:chat_mode "
                                   "WHERE group_id=:group_id")
-                dbm.update_from_db(update_pre_sql, update_params_dict)
+                dbm.update_from_db(update_pre_sql, params_dict)
                 line_reply_msg(event.reply_token, '更改 chat_mode 為 '+str(mode), content_type='text')
             else:
                 select_pre_sql = ("SELECT * FROM system WHERE group_id = :group_id")
-                system_config = dbm.select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
+                system_config = dbm.select_from_db(select_pre_sql, params_dict={'group_id': group_id})
                 if system_config:
                     group_id_list = [i[0] for i in system_config]
                     index = group_id_list.index(group_id)
@@ -462,7 +462,7 @@ def handle_text(event):
         elif event.message.text == "--list":
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱
             select_pre_sql = ("SELECT pic_name FROM pic_info WHERE pic_name != 'pic_name_list'")
-            res = dbm.select_from_db(select_pre_sql, select_params_dict={})
+            res = dbm.select_from_db(select_pre_sql, params_dict={})
             # res 格式為:  [('1',), ('ABC',)]
             res = [_[0] for _ in res]
             # 利用 set 將重複的字串給刪去
@@ -519,25 +519,25 @@ def handle_text(event):
             table_object = render_mpl_table(pd_res, header_columns=0, col_width=2.0).get_figure()
             binary_pic = turn_table_into_pic(table_object)
             pic_link, reply_msg = upload_to_imgur(pic_name='pic_name_list', binary_pic=binary_pic)
-            update_params_dict = {
+            params_dict = {
                 'pic_link': pic_link,
                 'pic_name': 'pic_name_list'
             }
             # 複寫名字為 'pic_name_list' 的 pic_link
             update_pre_sql = ("UPDATE pic_info SET pic_link=:pic_link "
                               "WHERE pic_name = :pic_name")
-            dbm.update_from_db(update_pre_sql, update_params_dict)
+            dbm.update_from_db(update_pre_sql, params_dict)
             line_reply_msg(event.reply_token, pic_link, content_type='image')
 
         else:
             select_pre_sql = ("SELECT * FROM system WHERE group_id = :group_id")
-            system_config = dbm.select_from_db(select_pre_sql, select_params_dict={'group_id': group_id})
+            system_config = dbm.select_from_db(select_pre_sql, params_dict={'group_id': group_id})
             print('system_config, group_id', system_config, group_id)
             if not system_config and group_id is not 'NULL':
                 print('該群組於System中還沒有資料，建立一筆資料')
                 # 如果還沒有 system_config 且有 group_id 那就創一個，只設定 group_id 其他用 default
                 insert_pre_sql = ("INSERT INTO system (group_id) values (:group_id)")
-                dbm.insert_from_db(insert_pre_sql, insert_params_dict={'group_id': group_id})
+                dbm.insert_from_db(insert_pre_sql, params_dict={'group_id': group_id})
             else:
                 print('該群組於System中有資料了，或是是非群組對話')
                 group_id_list = [i[0] for i in system_config]
