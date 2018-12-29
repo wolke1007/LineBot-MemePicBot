@@ -269,7 +269,7 @@ def handle_image(event):
 
 
 # -------------------------------------------------
-# -                   收到文字後邏輯                -
+# -                 收到文字後邏輯                  -
 # -------------------------------------------------
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text(event):
@@ -439,6 +439,9 @@ def handle_text(event):
                               "WHERE pic_name = :pic_name")
             dbm.update_from_db(update_pre_sql, params_dict)
             line_reply_msg(event.reply_token, pic_link, content_type='image')
+# -------------------------------------------------
+# -                一般對話處理邏輯                 -
+# -------------------------------------------------
         else:
             select_pre_sql = ("SELECT * FROM system WHERE group_id = :group_id")
             system_config = dbm.select_from_db(select_pre_sql, params_dict={'group_id': group_id})
