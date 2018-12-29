@@ -315,8 +315,6 @@ def handle_text(event):
                     update_pre_sql = ("UPDATE pic_info SET user_id=:user_id, pic_link=NULL "
                                       "WHERE pic_name=:pic_name AND group_id=:group_id")
                     res = dbm.update_from_db(update_pre_sql, params_dict)
-                    debug_res = dbm.select_from_db("SELECT pic_name, pic_link FROM pic_info", params_dict={})  # debug
-                    print('debug_res1: ', debug_res)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
                     # 如果沒重複直接 insert
@@ -329,8 +327,6 @@ def handle_text(event):
                     insert_pre_sql = ("INSERT INTO pic_info (user_id, pic_name, group_id)"
                                       "values (:user_id, :pic_name, :group_id)")
                     res = dbm.insert_from_db(insert_pre_sql, params_dict)
-                    debug_res = dbm.select_from_db("SELECT pic_name, pic_link FROM pic_info", params_dict={})  # debug
-                    print('debug_res2: ', debug_res)
                     print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
                     line_reply_msg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
@@ -339,8 +335,6 @@ def handle_text(event):
             else:
                 line_reply_msg(event.reply_token, '圖片名稱長度需介於 3~10 個字（中英文或數字皆可)', content_type='text')
                 return
-
-            print('add to pic_name done')
 
         elif event.message.text[:4] == "http" and (event.message.text[-4:] == ".jpg" or
                                                    event.message.text[-4:] == ".png" or
@@ -356,7 +350,6 @@ def handle_text(event):
             # 回傳為 list type 裡面包著 tuple 預期一定會拿到 pic_name 所以直接取第一個不怕噴錯
             pic_name = dbm.select_from_db(select_pre_sql, params_dict)
             pic_name = pic_name[0][0] if pic_name else None
-
             if is_filename_exist(pic_name, group_id):
                 print('name already exist, start to upload')
                 pic_link, reply_msg = upload_to_imgur(pic_name, url=event.message.text)
@@ -477,7 +470,7 @@ def handle_text(event):
                     size = (array(data.shape[::-1]) + array([0, 1])) * array([col_width, row_height])
                     fig, ax = subplots(figsize=size)
                     ax.axis('off')
-                # 取當前 main.py 的檔案位置，因為我上傳的字型檔跟他放一起
+                # 取當前 main.py 的檔案位置，因為我上傳的字型檔跟它放一起
                 dir_path = os.path.dirname(os.path.realpath(__file__))
                 # STHeitiMedium.ttc 是中文字型檔，有了它 matplotlib 才有辦法印出中文，我擔心 GCP 沒有內建就自己上傳了
                 font = FontProperties(fname=dir_path+"/STHeitiMedium.ttc", size=14)
@@ -572,6 +565,3 @@ def handle_text(event):
                     if pic_link:
                         print('pic_link', pic_link)
                         line_reply_msg(event.reply_token, pic_link, content_type='image')
-# SQL 參考：
-# 1. https://www.jianshu.com/p/e6bba189fcbd
-# 2. https://blog.csdn.net/slvher/article/details/47154363
