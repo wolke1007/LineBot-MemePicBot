@@ -138,7 +138,7 @@ def is_filename_exist(pic_name, group_id):
         'pic_name': pic_name,
         'group_id': group_id,
     }
-    select_pre_sql = ("SELECT pic_name FROM pic_info WHERE"
+    select_pre_sql = ("SELECT pic_name FROM pic_info WHERE "
                       "pic_name=:pic_name AND group_id=:group_id")
     # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
     res = select_from_db(select_pre_sql, select_params_dict)
