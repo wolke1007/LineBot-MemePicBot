@@ -34,6 +34,7 @@ handler = WebhookHandler(LINE_CHANNEL_SECRET)
 API_URL = 'https://api.imgur.com/'
 MASHAPE_URL = 'https://imgur-apiv3.p.mashape.com/'
 
+
 @app.route("/callback", methods=['POST'])
 def callback(event):
     # get X-Line-Signature header value
@@ -52,7 +53,7 @@ def add_userid_if_not_exist(user_id):
     print('enter add_userid_if_not_exist')
     select_params_dict = {
         'user_id': user_id
-                         }
+    }
     select_pre_sql = ("SELECT user_id FROM user_info WHERE user_id=:user_id")
     res = dbm.select_from_db(select_pre_sql, select_params_dict)
     # 回傳值應為 list type 裡面包著 tuple，但有可能沒有值所以不指定取第一個

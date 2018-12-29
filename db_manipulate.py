@@ -40,6 +40,7 @@ class DBManipulate():
             except DatabaseError:
                 return False
 
+
 if __name__ == '__main__':
     pass
 # SQL 參考：
