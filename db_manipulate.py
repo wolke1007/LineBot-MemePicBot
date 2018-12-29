@@ -9,7 +9,7 @@ engine = create_engine(USER_INFO_CONNECT)
 
 
 class DBManipulate():
-    @classmethod
+    @staticmethod
     def select_from_db(cls, pre_sql, params_dict):
         bind_sql = text(pre_sql)
         with engine.connect() as conn:
@@ -21,7 +21,7 @@ class DBManipulate():
             except SQLAlchemyError:
                 return False
 
-    @classmethod
+    @staticmethod
     def insert_from_db(cls, pre_sql, params_dict):
         bind_sql = text(pre_sql)
         with engine.connect() as conn:
@@ -31,7 +31,7 @@ class DBManipulate():
             except SQLAlchemyError:
                 return False
 
-    @classmethod
+    @staticmethod
     def update_from_db(cls, pre_sql, params_dict):
         bind_sql = text(pre_sql)
         with engine.connect() as conn:
