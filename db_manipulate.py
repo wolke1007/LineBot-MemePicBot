@@ -14,6 +14,7 @@ class DBManipulate():
         self.insert_params_dict = params_dict
         self.update_params_dict = params_dict
 
+    @classmethod
     def select_from_db(self):
         bind_sql = text(self.pre_sql)
         with engine.connect() as conn:
@@ -25,6 +26,7 @@ class DBManipulate():
             except DatabaseError:
                 return False
 
+    @classmethod
     def insert_from_db(self):
         bind_sql = text(self.pre_sql)
         with engine.connect() as conn:
@@ -34,6 +36,7 @@ class DBManipulate():
             except DatabaseError:
                 return False
 
+    @classmethod
     def update_from_db(self):
         bind_sql = text(self.pre_sql)
         with engine.connect() as conn:
