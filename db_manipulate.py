@@ -8,18 +8,12 @@ engine = create_engine(USER_INFO_CONNECT)
 
 
 class DBManipulate():
-    def __init__(self, pre_sql, params_dict):
-        self.pre_sql = pre_sql
-        self.select_params_dict = params_dict
-        self.insert_params_dict = params_dict
-        self.update_params_dict = params_dict
-
     @classmethod
-    def select_from_db(self):
-        bind_sql = text(self.pre_sql)
+    def select_from_db(pre_sql, params_dict):
+        bind_sql = text(pre_sql)
         with engine.connect() as conn:
             try:
-                resproxy = conn.execute(bind_sql, self.select_params_dict)
+                resproxy = conn.execute(bind_sql, select_params_dict)
                 rows = resproxy.fetchall()
                 ret = rows
                 return ret
@@ -27,21 +21,21 @@ class DBManipulate():
                 return False
 
     @classmethod
-    def insert_from_db(self):
-        bind_sql = text(self.pre_sql)
+    def insert_from_db(pre_sql, params_dict):
+        bind_sql = text(pre_sql)
         with engine.connect() as conn:
             try:
-                resproxy = conn.execute(self.bind_sql, self.insert_params_dict)
+                resproxy = conn.execute(bind_sql, insert_params_dict)
                 return True
             except DatabaseError:
                 return False
 
     @classmethod
-    def update_from_db(self):
-        bind_sql = text(self.pre_sql)
+    def update_from_db(pre_sql, params_dict):
+        bind_sql = text(pre_sql)
         with engine.connect() as conn:
             try:
-                resproxy = conn.execute(self.bind_sql, self.update_params_dict)
+                resproxy = conn.execute(bind_sql, update_params_dict)
                 return True
             except DatabaseError:
                 return False
