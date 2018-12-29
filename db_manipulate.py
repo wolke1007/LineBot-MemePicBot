@@ -14,7 +14,7 @@ class DBManipulate():
         bind_sql = text(pre_sql)
         with engine.connect() as conn:
             try:
-                resproxy = conn.execute(bind_sql, select_params_dict)
+                resproxy = conn.execute(bind_sql, params_dict)
                 rows = resproxy.fetchall()
                 ret = rows
                 return ret
@@ -26,7 +26,7 @@ class DBManipulate():
         bind_sql = text(pre_sql)
         with engine.connect() as conn:
             try:
-                resproxy = conn.execute(bind_sql, insert_params_dict)
+                resproxy = conn.execute(bind_sql, params_dict)
                 return True
             except SQLAlchemyError:
                 return False
@@ -36,7 +36,7 @@ class DBManipulate():
         bind_sql = text(pre_sql)
         with engine.connect() as conn:
             try:
-                resproxy = conn.execute(bind_sql, update_params_dict)
+                resproxy = conn.execute(bind_sql, params_dict)
                 return True
             except SQLAlchemyError:
                 return False
