@@ -145,7 +145,7 @@ class Mode():
             mode = int(msg_content[-1])
         except ValueError:
             reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
-                                "如 --mode chat_mode 2")
+                             "如 --mode chat_mode 2")
             params_dict, pre_sql = None
             return params_dict, pre_sql, reply_content
         params_dict = {
@@ -153,7 +153,7 @@ class Mode():
             'chat_mode': mode
         }
         update_pre_sql = ("UPDATE system SET chat_mode=:chat_mode "
-                            "WHERE group_id=:group_id")
+                          "WHERE group_id=:group_id")
         reply_content = '更改 chat_mode 為 ' + str(mode)
         return params_dict, update_pre_sql, reply_content
 
@@ -170,13 +170,13 @@ class Mode():
     #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
             system_config = system_config[index]
             reply_content = ("[當前模式為] "
-                                "chat_mode:" +
-                                str(system_config[1]) + " ,"
-                                "retrieve_pic_mode:" +
-                                str(system_config[2]) + " ,"
-                                "trigger_chat:" +
-                                str(system_config[3])
-                                )
+                             "chat_mode:" +
+                             str(system_config[1]) + " ,"
+                             "retrieve_pic_mode:" +
+                             str(system_config[2]) + " ,"
+                             "trigger_chat:" +
+                             str(system_config[3])
+                             )
             return reply_content
         else:
             reply_content = "尚無 mode 資料，請再試一次"

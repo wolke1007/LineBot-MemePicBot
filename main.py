@@ -329,7 +329,7 @@ def handle_text(event):
                 return
 
         elif event.message.text[:4] == "http" and (event.message.text[-4:] == ".jpg" or
-                                                   event.message.text[-4:] == ".jpeg" or        
+                                                   event.message.text[-4:] == ".jpeg" or
                                                    event.message.text[-4:] == ".png" or
                                                    event.message.text[-4:] == ".gif"):
             params_dict = {
@@ -381,7 +381,7 @@ def handle_text(event):
                 system_config = dbm.select_from_db(select_pre_sql, params_dict={'group_id': group_id})
                 reply_content = Mode.set_chat_mode(system_config, group_id)
                 line_reply_msg(event.reply_token, reply_content, content_type='text')
-                
+
         elif event.message.text == "--list":
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱
             select_pre_sql = ("SELECT pic_name FROM pic_info WHERE pic_name != 'pic_name_list'")
