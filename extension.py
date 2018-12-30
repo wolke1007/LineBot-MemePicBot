@@ -13,9 +13,9 @@ from db_manipulate import DBManipulate as dbm
 class PicNameList():
     @staticmethod
     def _render_mpl_table(data, col_width=3.0, row_height=0.625, font_size=12,
-                         header_color='#40466e', row_colors=['#f1f1f2', 'w'],
-                         edge_color='w', bbox=[0, 0, 1, 1], header_columns=0,
-                         ax=None, **kwargs):
+                          header_color='#40466e', row_colors=['#f1f1f2', 'w'],
+                          edge_color='w', bbox=[0, 0, 1, 1], header_columns=0,
+                          ax=None, **kwargs):
         print('enter render_mpl_table')
         if ax is None:
             size = (array(data.shape[::-1]) + array([0, 1])) * \
@@ -72,7 +72,7 @@ class PicNameList():
         print('debug res[-1]:', res[-1])
         pd_res = DataFrame(res)
         table_object = PicNameList._render_mpl_table(pd_res, header_columns=0,
-                                             col_width=2.0)
+                                                     col_width=2.0)
         table_object = table_object.get_figure()
         binary_pic = PicNameList._turn_table_into_pic(table_object)
         return binary_pic
@@ -120,18 +120,22 @@ class Mode():
         try:
             mode = int(msg_content[-2:].strip(' '))
         except ValueError:
-            reply_content = "trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15",
-            return params_dict=None, pre_sql=None, reply_content
+            reply_content = ("trigger_chat 後需設定介於 2~15 的數字"
+                             "，如 --mode trigger_chat 15")
+            params_dict, pre_sql = None
+            return params_dict, pre_sql, reply_content
         # 不允許使用者設置低於 2 或是大於 15 個字元
         if mode < PIC_NAME_LOW_LIMIT or mode > PIC_NAME_HIGH_LIMIT:
-            reply_content = 'trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15',
-            return params_dict=None, pre_sql=None, reply_content
+            reply_content = ("trigger_chat 後需設定介於 2~15 的數字，"
+                             "如 --mode trigger_chat 15")
+            params_dict, pre_sql = None
+            return params_dict, pre_sql, reply_content
         params_dict = {
             'group_id': group_id,
             'trigger_chat': mode
         }
         update_pre_sql = ("UPDATE system SET trigger_chat=:trigger_chat "
-                            "WHERE group_id=:group_id")
+                          "WHERE group_id=:group_id")
         reply_content = '更改 trigger_chat 為 ' + str(mode)
         return params_dict, update_pre_sql, reply_content
 
@@ -140,34 +144,39 @@ class Mode():
             try:
                 mode = int(msg_content[-1])
             except ValueError:
-                reply_content = 'chat_mode 後需設定介於 0~2 的數字，如 --mode chat_mode 2'
-                return params_dict=None, pre_sql=None, reply_content
+                reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
+                                 "如 --mode chat_mode 2")
+                params_dict, pre_sql = None
+                return params_dict, pre_sql, reply_content
             params_dict = {
                 'group_id': group_id,
                 'chat_mode': mode
             }
             update_pre_sql = ("UPDATE system SET chat_mode=:chat_mode "
-                                "WHERE group_id=:group_id")
+                              "WHERE group_id=:group_id")
             reply_content = '更改 chat_mode 為 ' + str(mode)
             return params_dict, update_pre_sql, reply_content
-       
+
         @staticmethod
         def get_mode_status(system_config, group_id):
             if system_config:
                 group_id_list = [i[0] for i in system_config]
                 index = group_id_list.index(group_id)
-                # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
-                # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
-                #                        其中 chat_mode 的設定：0 = 不回圖
-                #                                             1 = 隨機回所有 group 創的圖(預設)
-                #                                             2 = 只回該 group 上傳的圖
-                #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
+        # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+        # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
+        #                        其中 chat_mode 的設定：0 = 不回圖
+        #                                             1 = 隨機回所有 group 創的圖(預設)
+        #                                             2 = 只回該 group 上傳的圖
+        #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
                 system_config = system_config[index]
                 reply_content = ("[當前模式為] "
-                                    "chat_mode:" + str(system_config[1]) + " ,"
-                                    "retrieve_pic_mode:" + str(system_config[2]) + " ,"
-                                    "trigger_chat:" + str(system_config[3])
-                                    )
+                                 "chat_mode:" +
+                                 str(system_config[1]) + " ,"
+                                 "retrieve_pic_mode:" +
+                                 str(system_config[2]) + " ,"
+                                 "trigger_chat:" +
+                                 str(system_config[3])
+                                 )
                 return reply_content
             else:
                 reply_content = "尚無 mode 資料，請再試一次"

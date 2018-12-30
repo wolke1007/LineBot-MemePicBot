@@ -380,59 +380,7 @@ def handle_text(event):
                 system_config = dbm.select_from_db(select_pre_sql, params_dict={'group_id': group_id})
                 reply_content = Mode.set_chat_mode(system_config, group_id)
                 line_reply_msg(event.reply_token, reply_content, content_type='text')
-            # # --mode trigger_chat 1
-            # if event.message.text[7:-2] == "trigger_chat":
-            #     try:
-            #         mode = int(event.message.text[-2:].strip(' '))
-            #     except ValueError:
-            #         line_reply_msg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15', content_type='text')
-            #         return
-            #     # 不允許使用者設置低於 2 或是大於 15 個字元
-            #     if mode < 2 or mode > 15:
-            #         line_reply_msg(event.reply_token, 'trigger_chat 後需設定介於 2~15 的數字，如 --mode trigger_chat 15', content_type='text')
-            #         return
-            #     params_dict = {
-            #         'group_id': group_id,
-            #         'trigger_chat': mode
-            #     }
-            #     update_pre_sql = ("UPDATE system SET trigger_chat=:trigger_chat "
-            #                       "WHERE group_id=:group_id")
-            #     dbm.update_from_db(update_pre_sql, params_dict)
-            #     line_reply_msg(event.reply_token, '更改 trigger_chat 為 '+str(mode), content_type='text')
-            # # --mode chat_mode 1
-            # elif event.message.text[7:-2] == "chat_mode" and group_id:
-            #     try:
-            #         mode = int(event.message.text[-1])
-            #     except ValueError:
-            #         line_reply_msg(event.reply_token, 'chat_mode 後需設定介於 0~2 的數字，如 --mode chat_mode 2', content_type='text')
-            #         return
-            #     params_dict = {
-            #         'group_id': group_id,
-            #         'chat_mode': mode
-            #     }
-            #     update_pre_sql = ("UPDATE system SET chat_mode=:chat_mode "
-            #                       "WHERE group_id=:group_id")
-            #     dbm.update_from_db(update_pre_sql, params_dict)
-            #     reply_content = 
-            #     line_reply_msg(event.reply_token, reply_content, content_type='text')
-            # else:
-            #     select_pre_sql = ("SELECT * FROM system WHERE group_id = :group_id")
-            #     system_config = dbm.select_from_db(select_pre_sql, params_dict={'group_id': group_id})
-            #     if system_config:
-            #         group_id_list = [i[0] for i in system_config]
-            #         index = group_id_list.index(group_id)
-            #         # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
-            #         # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
-            #         #                        其中 chat_mode 的設定：0 = 不回圖
-            #         #                                             1 = 隨機回所有 group 創的圖(預設)
-            #         #                                             2 = 只回該 group 上傳的圖
-            #         #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
-            #         system_config = system_config[index]
-            #         reply_content = ("[當前模式為] "
-            #                          "chat_mode:" + str(system_config[1]) + " ,"
-            #                          "retrieve_pic_mode:" + str(system_config[2]) + " ,"
-            #                          "trigger_chat:" + str(system_config[3])
-            #                          )
+                
         elif event.message.text == "--list":
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱
             select_pre_sql = ("SELECT pic_name FROM pic_info WHERE pic_name != 'pic_name_list'")
