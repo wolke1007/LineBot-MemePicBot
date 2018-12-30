@@ -379,7 +379,8 @@ def handle_text(event):
             else:
                 select_pre_sql = ("SELECT * FROM system WHERE group_id = :group_id")
                 system_config = dbm.select_from_db(select_pre_sql, params_dict={'group_id': group_id})
-                reply_content = Mode.set_chat_mode(system_config, group_id)
+                print('system_config', system_config)  # debug
+                reply_content = Mode.get_mode_status(system_config, group_id)
                 line_reply_msg(event.reply_token, reply_content, content_type='text')
 
         elif event.message.text == "--list":

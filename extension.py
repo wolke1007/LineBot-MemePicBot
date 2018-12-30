@@ -180,6 +180,7 @@ class Mode():
             return reply_content
         else:
             reply_content = "尚無 mode 資料，請再試一次"
+            return reply_content
 
 
 if __name__ == '__main__':
