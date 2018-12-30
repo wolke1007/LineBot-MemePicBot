@@ -139,47 +139,47 @@ class Mode():
         reply_content = '更改 trigger_chat 為 ' + str(mode)
         return params_dict, update_pre_sql, reply_content
 
-        @staticmethod
-        def set_chat_mode(msg_content, group_id):
-            try:
-                mode = int(msg_content[-1])
-            except ValueError:
-                reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
-                                 "如 --mode chat_mode 2")
-                params_dict, pre_sql = None
-                return params_dict, pre_sql, reply_content
-            params_dict = {
-                'group_id': group_id,
-                'chat_mode': mode
-            }
-            update_pre_sql = ("UPDATE system SET chat_mode=:chat_mode "
-                              "WHERE group_id=:group_id")
-            reply_content = '更改 chat_mode 為 ' + str(mode)
-            return params_dict, update_pre_sql, reply_content
+    @staticmethod
+    def set_chat_mode(msg_content, group_id):
+        try:
+            mode = int(msg_content[-1])
+        except ValueError:
+            reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
+                                "如 --mode chat_mode 2")
+            params_dict, pre_sql = None
+            return params_dict, pre_sql, reply_content
+        params_dict = {
+            'group_id': group_id,
+            'chat_mode': mode
+        }
+        update_pre_sql = ("UPDATE system SET chat_mode=:chat_mode "
+                            "WHERE group_id=:group_id")
+        reply_content = '更改 chat_mode 為 ' + str(mode)
+        return params_dict, update_pre_sql, reply_content
 
-        @staticmethod
-        def get_mode_status(system_config, group_id):
-            if system_config:
-                group_id_list = [i[0] for i in system_config]
-                index = group_id_list.index(group_id)
-        # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
-        # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
-        #                        其中 chat_mode 的設定：0 = 不回圖
-        #                                             1 = 隨機回所有 group 創的圖(預設)
-        #                                             2 = 只回該 group 上傳的圖
-        #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
-                system_config = system_config[index]
-                reply_content = ("[當前模式為] "
-                                 "chat_mode:" +
-                                 str(system_config[1]) + " ,"
-                                 "retrieve_pic_mode:" +
-                                 str(system_config[2]) + " ,"
-                                 "trigger_chat:" +
-                                 str(system_config[3])
-                                 )
-                return reply_content
-            else:
-                reply_content = "尚無 mode 資料，請再試一次"
+    @staticmethod
+    def get_mode_status(system_config, group_id):
+        if system_config:
+            group_id_list = [i[0] for i in system_config]
+            index = group_id_list.index(group_id)
+    # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+    # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
+    #                        其中 chat_mode 的設定：0 = 不回圖
+    #                                             1 = 隨機回所有 group 創的圖(預設)
+    #                                             2 = 只回該 group 上傳的圖
+    #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
+            system_config = system_config[index]
+            reply_content = ("[當前模式為] "
+                                "chat_mode:" +
+                                str(system_config[1]) + " ,"
+                                "retrieve_pic_mode:" +
+                                str(system_config[2]) + " ,"
+                                "trigger_chat:" +
+                                str(system_config[3])
+                                )
+            return reply_content
+        else:
+            reply_content = "尚無 mode 資料，請再試一次"
 
 
 if __name__ == '__main__':
