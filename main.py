@@ -329,6 +329,7 @@ def handle_text(event):
                 return
 
         elif event.message.text[:4] == "http" and (event.message.text[-4:] == ".jpg" or
+                                                   event.message.text[-4:] == ".jpeg" or        
                                                    event.message.text[-4:] == ".png" or
                                                    event.message.text[-4:] == ".gif"):
             params_dict = {
