@@ -203,7 +203,7 @@ class DeletePic():
                 return "沒有此圖片名稱"
             update_pre_sql = ("DELETE FROM pic_info "
                               "WHERE pic_name=:pic_name "
-                              "AND group_id=NULL")
+                              "AND group_id=:group_id")
             db_res = dbm.delete_from_db(update_pre_sql, params_dict)
             return "刪除非群組圖片名稱成功" if db_res else "刪除失敗"
         else:
