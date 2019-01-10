@@ -400,6 +400,16 @@ def handle_text(event):
                               "WHERE pic_name = :pic_name")
             dbm.update_from_db(update_pre_sql, params_dict)
             line_reply_msg(event.reply_token, pic_link, content_type='image')
+
+        elif event.message.text[:8] == "--delete":
+            pic_name = event.message.text[9:]
+            pic_name = pic_name.lower()
+            if pic_name:
+                reply_content = DeletePic.del_pic(pic_name, group_id)
+                line_reply_msg(event.reply_token, reply_content, content_type='text')
+            else:
+                reply_content = "範例: --delete <檔案名稱>"
+                line_reply_msg(event.reply_token, reply_content, content_type='text')
 # -------------------------------------------------
 # -                一般對話處理邏輯                 -
 # -------------------------------------------------

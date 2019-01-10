@@ -41,6 +41,16 @@ class DBManipulate():
             except SQLAlchemyError:
                 return False
 
+    @staticmethod
+    def delete_from_db(pre_sql, params_dict):
+        bind_sql = text(pre_sql)
+        with engine.connect() as conn:
+            try:
+                resproxy = conn.execute(bind_sql, params_dict)
+                return True
+            except SQLAlchemyError:
+                return False
+
 
 if __name__ == '__main__':
     pass

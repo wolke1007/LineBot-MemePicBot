@@ -183,5 +183,36 @@ class Mode():
             return reply_content
 
 
+class DeletePic():
+    @staticmethod
+    # 基本上不在 extension.py 中做 DB 的操作
+    # 但這個刪除圖片的部分例外
+    def del_pic(pic_name, group_id=None):
+        print('enter del_pic')  # debug
+        if group_id is None:
+            print('group_id is None')
+            params_dict = {
+            'pic_name': pic_name
+            }
+            update_pre_sql = ("DELETE FROM pic_info "
+                              "WHERE pic_name=:pic_name "
+                              "AND group_id=NULL")
+            db_res = dbm.delete_from_db(update_pre_sql, params_dict)
+            reply_content = "刪除非群組圖片名稱成功" if db_res else "刪除失敗"
+            return reply_content
+        else:
+            print('group_id is exist')
+            params_dict = {
+            'pic_name': pic_name,
+            'group_id': group_id
+            }
+            update_pre_sql = ("DELETE FROM pic_info "
+                              "WHERE pic_name=:pic_name "
+                              "AND group_id=:group_id")
+            db_res = dbm.delete_from_db(update_pre_sql, params_dict)
+            reply_content = "刪除群組內的圖片名稱成功" if db_res else "刪除失敗"
+            return reply_content
+
+
 if __name__ == '__main__':
     pass
