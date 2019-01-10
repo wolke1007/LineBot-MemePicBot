@@ -5,7 +5,7 @@ from sqlalchemy import text
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
-engine = create_engine(USER_INFO_CONNECT)
+engine = create_engine(USER_INFO_CONNECT, echo=True)
 
 
 class DBManipulate():

@@ -402,8 +402,10 @@ def handle_text(event):
             line_reply_msg(event.reply_token, pic_link, content_type='image')
 
         elif event.message.text[:8] == "--delete":
+            print('enter --delete')
             pic_name = event.message.text[9:]
             pic_name = pic_name.lower()
+            print('delete pic_name:', pic_name)
             if pic_name:
                 reply_content = DeletePic.del_pic(pic_name, group_id)
                 line_reply_msg(event.reply_token, reply_content, content_type='text')
