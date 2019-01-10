@@ -62,9 +62,11 @@ class PicNameList():
         res = [_[0] for _ in res]
         # 利用 set 將重複的字串給刪去
         res = list(set(res))
+        # 字數從小到大排
+        res.sort(key=lambda x: len(x))
         # 圖片中的 columns 數
         columns_cnt = 6
-        # 取餘數用 None 補滿，讓每個 column 都有內如，pd.DataFrame 才不會變成只有一行
+        # 取餘數用 None 補滿，讓每個 column 都有內容，pd.DataFrame 才不會變成只有一行
         res.extend([None for i in range(len(res) % columns_cnt)])
         # 將 list 包成 [[1,2,3], [1,2,3]] 這樣的格式再餵給 pd.DataFrame
         # (注意，裡面每個 list 一定要數量一致)
