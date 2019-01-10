@@ -187,10 +187,11 @@ class DeletePic():
     @staticmethod
     # 基本上不在 extension.py 中做 DB 的操作
     # 但這個刪除圖片的部分例外
-    def del_pic(pic_name, group_id=None):
+    def del_pic(pic_name, group_id):
         print('enter del_pic')  # debug
+        group_id = None if group_id == 'NULL' else group_id
         if group_id is None:
-            print('group_id is None')
+            print('group_id is NULL')
             params_dict = {
             'pic_name': pic_name
             }
