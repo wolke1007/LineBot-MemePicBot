@@ -193,26 +193,35 @@ class DeletePic():
         if group_id is None:
             print('group_id is NULL')
             params_dict = {
-            'pic_name': pic_name
+            'pic_name': pic_name,
+            'group_id': 'NULL'
             }
+            select_pre_sql = ("SELECT pic_name FROM pic_info "
+                              "WHERE pic_name=:pic_name "
+                              "AND group_id=:group_id")
+            if not dbm.select_from_db(select_pre_sql, params_dict):
+                return "沒有此圖片名稱"
             update_pre_sql = ("DELETE FROM pic_info "
                               "WHERE pic_name=:pic_name "
                               "AND group_id=NULL")
             db_res = dbm.delete_from_db(update_pre_sql, params_dict)
-            reply_content = "刪除非群組圖片名稱成功" if db_res else "刪除失敗"
-            return reply_content
+            return "刪除非群組圖片名稱成功" if db_res else "刪除失敗"
         else:
             print('group_id is exist')
             params_dict = {
             'pic_name': pic_name,
             'group_id': group_id
             }
+            select_pre_sql = ("SELECT pic_name FROM pic_info "
+                              "WHERE pic_name=:pic_name "
+                              "AND group_id=:group_id")
+            if not dbm.select_from_db(select_pre_sql, params_dict):
+                return "沒有此圖片名稱"
             update_pre_sql = ("DELETE FROM pic_info "
                               "WHERE pic_name=:pic_name "
                               "AND group_id=:group_id")
             db_res = dbm.delete_from_db(update_pre_sql, params_dict)
-            reply_content = "刪除群組內的圖片名稱成功" if db_res else "刪除失敗"
-            return reply_content
+            return "刪除群組內的圖片名稱成功" if db_res else "刪除失敗"
 
 
 if __name__ == '__main__':
