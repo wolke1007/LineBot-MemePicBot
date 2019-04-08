@@ -164,7 +164,7 @@ class Mode():
         if system_config:
             group_id_list = [i[0] for i in system_config]
             index = group_id_list.index(group_id)
-    # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+    # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
     # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
     #                        其中 chat_mode 的設定：0 = 不回圖
     #                                             1 = 隨機回所有 group 創的圖(預設)

@@ -227,7 +227,7 @@ def line_push_text_msg(to, content):
 # 接下來我們有其他作法可以考慮:
 # 1. 先存圖片到 DB 再上傳
 #    但那將會增加 DB Server 傳輸負擔跟流量成本
-# 2. 只要收到圖片一律上傳，如果仍未命名但又有收到圖片，就刪除前一張後再上傳，直到有命名則修改最後一張上傳圖片的名稱為正式名稱
+# 2. 只要收到圖片一律上傳，如果仍未命名但又有收到圖片，就刪除前一張後再上傳，直到有命名則修改最後一張上傳圖片的名稱為正式名稱
 #    但這會增加上傳的成本，依據 Imgur 免費的流量只能上傳 10,000 張圖片每月，就算花 25 鎂也是 60,000 每月，並不能這樣玩
 # 最後決定，只能確認使用者有先命名完才做上傳動作，確保每一次有確定要上傳才做
 # 與此同時，有考慮每個人是不是要設定 quota 來限制是不是一天只能上傳幾張圖片
@@ -320,12 +320,12 @@ def handle_text(event):
             print(
                 'enter event.message.text[0] == "#" and event.message.text[-1] == "#"')
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
-            # 圖片名稱長度在此設定門檻，目前設定為 3~15 個字
+            # 圖片名稱長度在此設定門檻，目前設定為 3~15 個字
             pic_name = line_msg_text[1:-1].lower()
             if len(pic_name) >= PIC_NAME_LOW_LIMIT and len(
                     pic_name) <= PIC_NAME_HIGH_LIMIT:
                 if is_filename_exist(pic_name, group_id):
-                    # 如果圖片重複了，對 user_id pic_link 欄位進行 update
+                    # 如果圖片重複了，對 user_id pic_link 欄位進行 update
                     print('圖片已經存在，更新 user_id pic_link')
                     params_dict = {
                         'user_id': user_id,
@@ -520,16 +520,16 @@ def handle_text(event):
                 group_id_list = [i[0] for i in system_config]
                 index = group_id_list.index(group_id)
                 print('group_id_list, index', group_id_list, index)
-                # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
+                # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
                 # 從左至右分別對應: group_id,     chat_mode, retrieve_pic_mode,
                 # trigger_chat
                 system_config = system_config[index]
                 print('system_config[index]', system_config)
 
-                # trigger_chat 判斷
+                # trigger_chat 判斷
                 trigger_chat = system_config[3]
                 print('trigger_chat', trigger_chat)
-                # chat_mode 判斷
+                # chat_mode 判斷
                 # 0 = 不回圖
                 print('system_config[1]', system_config[1])
                 if system_config[1] is 0:
@@ -544,7 +544,7 @@ def handle_text(event):
                         print('pic_link', pic_link)
                         line_reply_msg(
                             event.reply_token, pic_link, content_type='image')
-                # 2 = 只回該 group 創的圖
+                # 2 = 只回該 group 創的圖
                 elif system_config[1] is 2:
                     # 搜尋時帶上 group_id 判斷是否符合同群組
                     print('chat_mode is 2, group_id:', group_id)
