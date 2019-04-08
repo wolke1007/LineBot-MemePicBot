@@ -105,7 +105,6 @@ class ImgurClient(object):
 
         return headers
 
-
     def make_request(self, method, route, data=None, force_anon=False):
         method = method.lower()
         method_to_call = getattr(requests, method)
