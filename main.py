@@ -399,7 +399,7 @@ def handle_text(event):
                     reply_msg,
                     content_type='text')
 
-        elif event.message.text == "--help" or event.message.text == "-h":
+        def ext_help():
             print('event.message.text == "--help or "-h"')  # debug
             help_content = HelpText.get_help_content()
             line_reply_msg(
@@ -407,7 +407,7 @@ def handle_text(event):
                 help_content,
                 content_type='text')
 
-        elif event.message.text[:6] == "--mode" and group_id:
+        def ext_mode():
             print('event.message.text == "--mode"')  # debug
             if event.message.text[7:-2] == "trigger_chat":
                 params_dict, update_pre_sql, reply_content \
@@ -440,7 +440,7 @@ def handle_text(event):
                     reply_content,
                     content_type='text')
 
-        elif event.message.text == "--list":
+        def ext_list():
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱
             select_pre_sql = (
                 "SELECT pic_name FROM pic_info WHERE pic_name != 'pic_name_list'")
@@ -463,7 +463,7 @@ def handle_text(event):
             dbm.iud_from_db(update_pre_sql, params_dict)
             line_reply_msg(event.reply_token, pic_link, content_type='image')
 
-        elif event.message.text[:8] == "--delete":
+        def ext_delete():
             print('enter --delete')
             pic_name = event.message.text[9:]
             pic_name = pic_name.lower()
@@ -480,6 +480,22 @@ def handle_text(event):
                     event.reply_token,
                     reply_content,
                     content_type='text')
+
+        ext_dict = {'--help':ext_help, '--mode':ext_mode,
+                    '--list':ext_list, '--delete':ext_delete}
+        # 使用 dict 將實作抽離至上方，方便觀察 if else 邏輯
+
+        elif event.message.text == "--help" or event.message.text == "-h":
+            ext_dict.get('--help')()
+
+        elif event.message.text[:6] == "--mode" and group_id:
+            ext_dict.get('--mode')()
+
+        elif event.message.text == "--list":
+            ext_dict.get('--list')()
+
+        elif event.message.text[:8] == "--delete":
+            ext_dict.get('--delete')()
 # -------------------------------------------------
 # -                一般對話處理邏輯                 -
 # -------------------------------------------------
