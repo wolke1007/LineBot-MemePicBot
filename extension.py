@@ -171,11 +171,11 @@ class Mode():
     #                                             2 = 只回該 group 上傳的圖
     #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
             system_config = system_config[index]
-            reply_content = ("[當前模式為] "
+            reply_content = ("[當前模式為]\n" +
                              "chat_mode:" +
-                             str(system_config[1]) + " ,"
+                             str(system_config[1]) + "\n"
                              "retrieve_pic_mode:" +
-                             str(system_config[2]) + " ,"
+                             str(system_config[2]) + "\n"
                              "trigger_chat:" +
                              str(system_config[3])
                              )
