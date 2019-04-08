@@ -206,7 +206,7 @@ class DeletePic():
             update_pre_sql = ("DELETE FROM pic_info "
                               "WHERE pic_name=:pic_name "
                               "AND group_id=:group_id")
-            db_res = dbm.delete_from_db(update_pre_sql, params_dict)
+            db_res = dbm.iud_from_db(update_pre_sql, params_dict)
             return "刪除非群組圖片名稱成功" if db_res else "刪除失敗"
         else:
             print('group_id is exist')
@@ -222,7 +222,7 @@ class DeletePic():
             update_pre_sql = ("DELETE FROM pic_info "
                               "WHERE pic_name=:pic_name "
                               "AND group_id=:group_id")
-            db_res = dbm.delete_from_db(update_pre_sql, params_dict)
+            db_res = dbm.iud_from_db(update_pre_sql, params_dict)
             return "刪除群組內的圖片名稱成功" if db_res else "刪除失敗"
 
 

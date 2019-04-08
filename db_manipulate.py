@@ -22,27 +22,8 @@ class DBManipulate():
                 return False
 
     @staticmethod
-    def insert_from_db(pre_sql, params_dict):
-        bind_sql = text(pre_sql)
-        with engine.connect() as conn:
-            try:
-                resproxy = conn.execute(bind_sql, params_dict)
-                return True
-            except SQLAlchemyError:
-                return False
-
-    @staticmethod
-    def update_from_db(pre_sql, params_dict):
-        bind_sql = text(pre_sql)
-        with engine.connect() as conn:
-            try:
-                resproxy = conn.execute(bind_sql, params_dict)
-                return True
-            except SQLAlchemyError:
-                return False
-
-    @staticmethod
-    def delete_from_db(pre_sql, params_dict):
+    def iud_from_db(pre_sql, params_dict):
+        # iud 代表 Insert Update Delete
         bind_sql = text(pre_sql)
         with engine.connect() as conn:
             try:

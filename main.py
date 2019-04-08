@@ -60,7 +60,7 @@ def add_userid_if_not_exist(user_id):
         }
         insert_pre_sql = ("INSERT INTO user_info (user_id, banned) "
                           "VALUES (:user_id, :banned)")
-        dbm.insert_from_db(insert_pre_sql, params_dict)
+        dbm.iud_from_db(insert_pre_sql, params_dict)
         return True
 
 
@@ -263,7 +263,7 @@ def handle_image(event):
         # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
         update_pre_sql = ("UPDATE pic_info SET pic_link=:pic_link, group_id=:group_id "
                           "WHERE user_id=:user_id AND pic_link IS NULL")
-        dbm.update_from_db(update_pre_sql, params_dict)
+        dbm.iud_from_db(update_pre_sql, params_dict)
         line_reply_msg(event.reply_token, reply_msg, content_type='text')
 
 
@@ -306,7 +306,7 @@ def handle_text(event):
                     }
                     update_pre_sql = ("UPDATE pic_info SET user_id=:user_id, pic_link=NULL "
                                       "WHERE pic_name=:pic_name AND group_id=:group_id")
-                    res = dbm.update_from_db(update_pre_sql, params_dict)
+                    res = dbm.iud_from_db(update_pre_sql, params_dict)
                     print('user_id pic_link 已經淨空，準備接收新圖片')
                 else:
                     # 如果沒重複直接 insert
@@ -318,7 +318,7 @@ def handle_text(event):
                     }
                     insert_pre_sql = ("INSERT INTO pic_info (user_id, pic_name, group_id)"
                                       "values (:user_id, :pic_name, :group_id)")
-                    res = dbm.insert_from_db(insert_pre_sql, params_dict)
+                    res = dbm.iud_from_db(insert_pre_sql, params_dict)
                     print('user_id pic_name 已經新增，準備接收新圖片')
                 if res is True:
                     line_reply_msg(event.reply_token, '圖片名稱已設定完畢，請上傳圖片', content_type='text')
@@ -354,7 +354,7 @@ def handle_text(event):
                 # 名字設定好但還沒有 pic_link 的且 user_id 符合的就是剛上傳好的
                 update_pre_sql = ("UPDATE pic_info SET pic_link=:pic_link, group_id=:group_id "
                                   "WHERE user_id=:user_id AND pic_link IS NULL")
-                dbm.update_from_db(update_pre_sql, params_dict)
+                dbm.iud_from_db(update_pre_sql, params_dict)
                 line_reply_msg(event.reply_token, reply_msg, content_type='text')
 
         elif event.message.text == "--help" or event.message.text == "-h":
@@ -368,13 +368,13 @@ def handle_text(event):
                 params_dict, update_pre_sql, reply_content \
                     = Mode.set_trigger_chat(event.message.text, group_id)
                 if update_pre_sql:
-                    dbm.update_from_db(update_pre_sql, params_dict)
+                    dbm.iud_from_db(update_pre_sql, params_dict)
                 line_reply_msg(event.reply_token, reply_content, content_type='text')
             elif event.message.text[7:-2] == "chat_mode":
                 params_dict, update_pre_sql, reply_content \
                     = Mode.set_chat_mode(event.message.text, group_id)
                 if update_pre_sql:
-                    dbm.update_from_db(update_pre_sql, params_dict)
+                    dbm.iud_from_db(update_pre_sql, params_dict)
                 line_reply_msg(event.reply_token, reply_content, content_type='text')
             else:
                 select_pre_sql = ("SELECT * FROM system WHERE group_id = :group_id")
@@ -398,7 +398,7 @@ def handle_text(event):
             # 複寫名字為 'pic_name_list' 的 pic_link
             update_pre_sql = ("UPDATE pic_info SET pic_link=:pic_link "
                               "WHERE pic_name = :pic_name")
-            dbm.update_from_db(update_pre_sql, params_dict)
+            dbm.iud_from_db(update_pre_sql, params_dict)
             line_reply_msg(event.reply_token, pic_link, content_type='image')
 
         elif event.message.text[:8] == "--delete":
@@ -423,7 +423,7 @@ def handle_text(event):
                 print('該群組於System中還沒有資料，建立一筆資料')
                 # 如果還沒有 system_config 且有 group_id 那就創一個，只設定 group_id 其他用 default
                 insert_pre_sql = ("INSERT INTO system (group_id) values (:group_id)")
-                dbm.insert_from_db(insert_pre_sql, params_dict={'group_id': group_id})
+                dbm.iud_from_db(insert_pre_sql, params_dict={'group_id': group_id})
             else:
                 print('該群組於System中有資料了，或是是非群組對話')
                 group_id_list = [i[0] for i in system_config]
