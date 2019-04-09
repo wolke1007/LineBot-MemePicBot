@@ -1,4 +1,4 @@
-Meme Pic Line Bot (BETA v3.1.3)
+Meme Pic Line Bot (BETA v3.1.4)
 ========
 此 Line Bot 設計宗旨為增進聊天樂趣用
 
@@ -29,7 +29,6 @@ e.g. trigger_chat = 3
 ##### 2. 上傳圖片或是貼上圖片的 URL，系統會回傳上傳成功 (註4)
     2-1. 若上傳URL則必須為 http 開頭(https亦可) .jpg .gif .png 結尾（其餘副檔名不支援)
 ##### 3. 聊天時提到設定的圖片名稱便會觸發貼圖
---------
 
 聊天室設定
 --------
