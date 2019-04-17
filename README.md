@@ -3,7 +3,7 @@
 
 若想試玩此 BOT 請搜尋 Line ID "@srh5401g"
 或掃描以下 QR Code 加入好友
-![Alt text](QRcode.png?raw=true "QR Code")
+![QR Code](intro_data/QRcode.png?raw=true)
 
 # 功能
 1. 機器人根據聊天中的關鍵字回覆已設定的圖片給該聊天群組
@@ -22,7 +22,7 @@ e.g. trigger_chat = 3
 # 使用教學
 ## 一般使用
 ##### 1. 設定圖片名稱，例如 #我是帥哥# (註1 2 3)
-![Alt text](intro_data/set_keyword.png "Set Keyword")
+![Set Keyword](intro_data/set_keyword.png?raw=true)
     1-1. 圖片字數有限制，空白或是特殊符號皆算數
     1-2. 設定同圖片名稱則會蓋掉前面上傳的
     1-3. 如果設定多次名字再上傳圖片，則是多個關鍵字對應同一張圖片
