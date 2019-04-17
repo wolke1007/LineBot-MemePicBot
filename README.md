@@ -3,7 +3,7 @@
 
 若想試玩此 BOT 請搜尋 Line ID "@srh5401g"
 或掃描以下 QR Code 加入好友
-![Alt text](QRcode.png "QR Code")
+![Alt text](QRcode.png?raw=true "QR Code")
 
 # 功能
 1. 機器人根據聊天中的關鍵字回覆已設定的圖片給該聊天群組
