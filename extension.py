@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from config import *
 from pandas import DataFrame
 from numpy import array
 from matplotlib.pyplot import subplots
@@ -131,7 +132,7 @@ class Mode():
                              "，如 --mode trigger_chat 15")
             params_dict, pre_sql = None
             return params_dict, pre_sql, reply_content
-        # 不允許使用者設置低於 2 或是大於 15 個字元
+        # 不允許使用者設置低於 2 或是大於 15 個字元，於 config 中設定
         if threshold < PIC_NAME_LOW_LIMIT or threshold > PIC_NAME_HIGH_LIMIT:
             reply_content = ("trigger_chat 後需設定介於 2~15 的數字，"
                              "如 --mode trigger_chat 15")
