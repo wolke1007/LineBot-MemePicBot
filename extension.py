@@ -151,6 +151,11 @@ class Mode():
     def set_chat_mode(msg_content, group_id):
         try:
             chat_mode = int(msg_content[-1])
+            if chat_mode not in [0, 1, 2]:
+                reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
+                             "如 --mode chat_mode 2")
+                params_dict, pre_sql = None
+                return params_dict, pre_sql, reply_content
         except ValueError:
             reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
                              "如 --mode chat_mode 2")
@@ -191,7 +196,7 @@ class Mode():
                                 "retrieve_pic_mode:" +
                                 str(system_config[2]) + "\n"
                                 "trigger_chat:" +
-                                str(system_config[3])
+                                str(system_config03])
                                 )
             return reply_content
         else:
