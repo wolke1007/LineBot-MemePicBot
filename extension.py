@@ -130,13 +130,13 @@ class Mode():
         except ValueError:
             reply_content = ("trigger_chat 後需設定介於 2~15 的數字"
                              "，如 --mode trigger_chat 15")
-            params_dict, pre_sql = None
+            params_dict, pre_sql = None, None
             return params_dict, pre_sql, reply_content
         # 不允許使用者設置低於 2 或是大於 15 個字元，於 config 中設定
         if threshold < PIC_NAME_LOW_LIMIT or threshold > PIC_NAME_HIGH_LIMIT:
             reply_content = ("trigger_chat 後需設定介於 2~15 的數字，"
                              "如 --mode trigger_chat 15")
-            params_dict, pre_sql = None
+            params_dict, pre_sql = None, None
             return params_dict, pre_sql, reply_content
         params_dict = {
             'group_id': group_id,
@@ -153,13 +153,13 @@ class Mode():
             chat_mode = int(msg_content[-1])
             if chat_mode not in [0, 1, 2]:
                 reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
-                             "如 --mode chat_mode 2")
-                params_dict, pre_sql = None
+                                 "如 --mode chat_mode 2")
+                params_dict, pre_sql = None, None
                 return params_dict, pre_sql, reply_content
         except ValueError:
             reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
                              "如 --mode chat_mode 2")
-            params_dict, pre_sql = None
+            params_dict, pre_sql = None, None
             return params_dict, pre_sql, reply_content
         params_dict = {
             'group_id': group_id,
