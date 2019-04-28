@@ -165,9 +165,9 @@ class Mode():
         return params_dict, update_pre_sql, reply_content
 
     @staticmethod
-    def get_system_config(system_config, group_id):
-        if system_config:
-            group_id_list = [i[0] for i in system_config]
+    def get_system_config(raw_system_config, group_id):
+        if raw_system_config:
+            group_id_list = [i[0] for i in raw_system_config]
             index = group_id_list.index(group_id)
     # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
     # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
@@ -175,20 +175,23 @@ class Mode():
     #                                             1 = 隨機回所有 group 創的圖(預設)
     #                                             2 = 只回該 group 上傳的圖
     #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
-            system_config = system_config[index]
+            system_config = raw_system_config[index]
             return system_config
+        else:
+            return None
 
     @staticmethod
-    def get_mode_status(system_config, group_id):
-        system_config = Mode.get_system_config(system_config, group_id)
+    def get_mode_status(raw_system_config, group_id):
+        system_config = Mode.get_system_config(raw_system_config, group_id)
+        if system_config:
             reply_content = ("[當前模式為]\n" +
-                             "chat_mode:" +
-                             str(system_config[1]) + "\n"
-                             "retrieve_pic_mode:" +
-                             str(system_config[2]) + "\n"
-                             "trigger_chat:" +
-                             str(system_config[3])
-                             )
+                                "chat_mode:" +
+                                str(system_config[1]) + "\n"
+                                "retrieve_pic_mode:" +
+                                str(system_config[2]) + "\n"
+                                "trigger_chat:" +
+                                str(system_config[3])
+                                )
             return reply_content
         else:
             reply_content = "尚無 mode 資料，請再試一次"
