@@ -196,7 +196,7 @@ class Mode():
                                 "retrieve_pic_mode:" +
                                 str(system_config[2]) + "\n"
                                 "trigger_chat:" +
-                                str(system_config03])
+                                str(system_config[3])
                                 )
             return reply_content
         else:
