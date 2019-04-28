@@ -325,7 +325,7 @@ def handle_text(event):
 
         def ext_mode():
             print('event.message.text == "--mode"')  # debug
-            if event.message.text[7:-2] == "trigger_chat":
+            if event.message.text[7:-2].strip(' ') == "trigger_chat":
                 params_dict, update_pre_sql, reply_content \
                     = Mode.set_trigger_chat(event.message.text, group_id)
                 if update_pre_sql:
