@@ -408,7 +408,10 @@ def handle_text(event):
             # 因為會覆寫，所以直接再 Add 一次不用刪除，且統一用小寫儲存
             # 圖片名稱長度在此設定門檻，目前設定為 3~15 個字
             pic_name = line_msg_text[1:-1].lower()
-            if len(pic_name) >= PIC_NAME_LOW_LIMIT and len(
+            system_config = Mode.get_system_config
+            pic_name_low_limit = str(system_config[3])
+            print('pic_name_low_limit: ', pic_name_low_limit)
+            if len(pic_name) >= pic_name_low_limit and len(
                     pic_name) <= PIC_NAME_HIGH_LIMIT:
                 if is_filename_exist(pic_name, group_id):
                     # 如果圖片重複了，對 user_id pic_link 欄位進行 update

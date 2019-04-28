@@ -125,21 +125,21 @@ class Mode():
         print('msg_content == "--mode"')  # debug
         # --mode trigger_chat 1
         try:
-            mode = int(msg_content[-2:].strip(' '))
+            threshold = int(msg_content[-2:].strip(' '))
         except ValueError:
             reply_content = ("trigger_chat 後需設定介於 2~15 的數字"
                              "，如 --mode trigger_chat 15")
             params_dict, pre_sql = None
             return params_dict, pre_sql, reply_content
         # 不允許使用者設置低於 2 或是大於 15 個字元
-        if mode < PIC_NAME_LOW_LIMIT or mode > PIC_NAME_HIGH_LIMIT:
+        if threshold < PIC_NAME_LOW_LIMIT or threshold > PIC_NAME_HIGH_LIMIT:
             reply_content = ("trigger_chat 後需設定介於 2~15 的數字，"
                              "如 --mode trigger_chat 15")
             params_dict, pre_sql = None
             return params_dict, pre_sql, reply_content
         params_dict = {
             'group_id': group_id,
-            'trigger_chat': mode
+            'trigger_chat': threshold
         }
         update_pre_sql = ("UPDATE system SET trigger_chat=:trigger_chat "
                           "WHERE group_id=:group_id")
@@ -165,7 +165,7 @@ class Mode():
         return params_dict, update_pre_sql, reply_content
 
     @staticmethod
-    def get_mode_status(system_config, group_id):
+    def get_system_config(system_config, group_id):
         if system_config:
             group_id_list = [i[0] for i in system_config]
             index = group_id_list.index(group_id)
@@ -176,6 +176,11 @@ class Mode():
     #                                             2 = 只回該 group 上傳的圖
     #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
             system_config = system_config[index]
+            return system_config
+
+    @staticmethod
+    def get_mode_status(system_config, group_id):
+        system_config = Mode.get_system_config(system_config, group_id)
             reply_content = ("[當前模式為]\n" +
                              "chat_mode:" +
                              str(system_config[1]) + "\n"
