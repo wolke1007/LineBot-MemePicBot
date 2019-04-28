@@ -414,7 +414,7 @@ def handle_text(event):
                 select_pre_sql, params_dict={
                     'group_id': group_id})
             system_config = Mode.get_system_config(raw_system_config, group_id)
-            pic_name_low_limit = str(system_config[3])
+            pic_name_low_limit = int(system_config[3])
             print('pic_name_low_limit: ', pic_name_low_limit)
             if len(pic_name) >= pic_name_low_limit and len(
                     pic_name) <= PIC_NAME_HIGH_LIMIT:
