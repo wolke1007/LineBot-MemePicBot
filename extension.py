@@ -144,13 +144,13 @@ class Mode():
         }
         update_pre_sql = ("UPDATE system SET trigger_chat=:trigger_chat "
                           "WHERE group_id=:group_id")
-        reply_content = '更改 trigger_chat 為 ' + str(mode)
+        reply_content = '更改 trigger_chat 為 ' + str(threshold)
         return params_dict, update_pre_sql, reply_content
 
     @staticmethod
     def set_chat_mode(msg_content, group_id):
         try:
-            mode = int(msg_content[-1])
+            chat_mode = int(msg_content[-1])
         except ValueError:
             reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
                              "如 --mode chat_mode 2")
@@ -158,11 +158,11 @@ class Mode():
             return params_dict, pre_sql, reply_content
         params_dict = {
             'group_id': group_id,
-            'chat_mode': mode
+            'chat_mode': chat_mode
         }
         update_pre_sql = ("UPDATE system SET chat_mode=:chat_mode "
                           "WHERE group_id=:group_id")
-        reply_content = '更改 chat_mode 為 ' + str(mode)
+        reply_content = '更改 chat_mode 為 ' + str(chat_mode)
         return params_dict, update_pre_sql, reply_content
 
     @staticmethod
