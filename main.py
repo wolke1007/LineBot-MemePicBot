@@ -325,7 +325,7 @@ def handle_text(event):
 
         def ext_mode():
             print('event.message.text == "--mode"')  # debug
-            if event.message.text[7:-2] == "trigger_chat":
+            if event.message.text[7:-2].strip(' ') == "trigger_chat":
                 params_dict, update_pre_sql, reply_content \
                     = Mode.set_trigger_chat(event.message.text, group_id)
                 if update_pre_sql:
@@ -346,11 +346,11 @@ def handle_text(event):
             else:
                 select_pre_sql = (
                     "SELECT * FROM system WHERE group_id = :group_id")
-                system_config = dbm.select_from_db(
+                raw_system_config = dbm.select_from_db(
                     select_pre_sql, params_dict={
                         'group_id': group_id})
-                print('system_config', system_config)  # debug
-                reply_content = Mode.get_mode_status(system_config, group_id)
+                print('raw_system_config', raw_system_config)  # debug
+                reply_content = Mode.get_mode_status(raw_system_config, group_id)
                 line_reply_msg(
                     event.reply_token,
                     reply_content,

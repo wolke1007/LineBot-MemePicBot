@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from config import *
 from pandas import DataFrame
 from numpy import array
 from matplotlib.pyplot import subplots
@@ -84,32 +85,37 @@ class HelpText():
     @staticmethod
     def get_help_content():
         help_content = (
-            "貼心提醒您請勿洩漏個資\n"
+            "貼心提醒您，請勿洩漏個資\n"
             "嚴 禁 上 傳 色 情 圖 片\n"
-            "(作者: 我不想被 Imgur banned 拜託配合了ＱＡＱ\n"
-            "使用教學：\n"
-            "step 1. 設定圖片名稱，例如 #我是帥哥#\n"
-            "step 2. 上傳圖片，系統會回傳上傳成功\n"
-            "step 3. 聊天時提到設定的圖片名稱便會觸發貼圖\n"
+            "(作者: 我圖床不想被 banned 拜託配合ＱＡＱ\n"
             "\n"
-            "聊天室設定教學：\n"
-            "--mode chat_mode 0~2\n"
-            "0 = 不回圖\n"
-            "1 = 隨機回所有群組創的圖(預設)\n"
-            "2 = 只回該群組上傳的圖\n"
+            "[使用教學]\n"
+            "  step 1. 設定圖片名稱，例如 #我是帥哥# (註1 2 3)\n"
+            "  step 2. 上傳圖片或是貼上圖片的 URL，系統會回傳上傳成功 (註4)\n"
+            "  step 3. 聊天時提到設定的圖片名稱便會觸發貼圖\n"
             "\n"
-            "--mode trigger_chat 2~15\n"
-            "設定在此群組裡超過幾字才回話，可以設為 2~15 \n"
+            "[聊天室設定教學]\n"
+            "  --mode chat_mode 0~2\n"
+            "    0 = 不回圖\n"
+            "    1 = 隨機回所有群組創的圖(預設)\n"
+            "    2 = 只回該群組上傳的圖\n"
+            "  --mode trigger_chat 2~15\n"
+            "    設定在此群組裡關鍵字超過幾字才回話，可以設為 2~15\n"
+            "    e.g. trigger_chat 設為 3 的話，那 2 字的關鍵字就不會被觸發\n"
+            "         關鍵字\"帥哥\"會在設定後就算聊天中提到也不會被觸發\n"
+            "         但如果關鍵字為\"我是帥哥\"則不影響，因為超過 3 個字\n"
+            "\n"
+            "[其他功能]\n"
+            "  --list 可以讓 BOT 回你現有圖片名稱的表格\n"
+            "  --delete <圖片名稱>  刪除自己群組內的圖片名稱\n"
             "\n"
             "備註:\n"
-            "1. 圖片字數有限制，空白或是特殊符號皆算數\n"
-            "2. 設定同圖片名稱則會蓋掉前面上傳的\n"
-            "3. 若上傳URL則必須為 http 開頭 .jpg .gif .png 結尾\n"
-            "4. 建議在 Line 設定將「自動下載照片」取消打勾\n"
-            "設定 > 照片。影片 > 自動下載照片\n"
-            "5. 如果設定多次名字再上傳圖片，則是多個關鍵字對應同一張圖片\n"
-            "6. --list 可以讓 BOT 回你現有圖片名稱的表格\n"
-            "7. --delete <圖片名稱>  刪除自己群組內的圖片名稱"
+            "  1. 圖片字數有限制，空白或是特殊符號皆算數\n"
+            "  2. 設定同圖片名稱則會蓋掉前面上傳的\n"
+            "  3. 如果設定多次名字再上傳圖片，則是多個關鍵字對應同一張圖片\n"
+            "  4. 若上傳URL則必須為 http 開頭 .jpg .gif .png 結尾\n"
+            "  5. 建議在 Line 設定將「自動下載照片」取消打勾\n"
+            "    設定 > 照片。影片 > 自動下載照片\n"
         )  # line 手機版莫約 15 個中文字寬度就會換行
         return help_content
 
@@ -120,49 +126,54 @@ class Mode():
         print('msg_content == "--mode"')  # debug
         # --mode trigger_chat 1
         try:
-            mode = int(msg_content[-2:].strip(' '))
+            threshold = int(msg_content[-2:].strip(' '))
         except ValueError:
             reply_content = ("trigger_chat 後需設定介於 2~15 的數字"
                              "，如 --mode trigger_chat 15")
-            params_dict, pre_sql = None
+            params_dict, pre_sql = None, None
             return params_dict, pre_sql, reply_content
-        # 不允許使用者設置低於 2 或是大於 15 個字元
-        if mode < PIC_NAME_LOW_LIMIT or mode > PIC_NAME_HIGH_LIMIT:
+        # 不允許使用者設置低於 2 或是大於 15 個字元，於 config 中設定
+        if threshold < PIC_NAME_LOW_LIMIT or threshold > PIC_NAME_HIGH_LIMIT:
             reply_content = ("trigger_chat 後需設定介於 2~15 的數字，"
                              "如 --mode trigger_chat 15")
-            params_dict, pre_sql = None
+            params_dict, pre_sql = None, None
             return params_dict, pre_sql, reply_content
         params_dict = {
             'group_id': group_id,
-            'trigger_chat': mode
+            'trigger_chat': threshold
         }
         update_pre_sql = ("UPDATE system SET trigger_chat=:trigger_chat "
                           "WHERE group_id=:group_id")
-        reply_content = '更改 trigger_chat 為 ' + str(mode)
+        reply_content = '更改 trigger_chat 為 ' + str(threshold)
         return params_dict, update_pre_sql, reply_content
 
     @staticmethod
     def set_chat_mode(msg_content, group_id):
         try:
-            mode = int(msg_content[-1])
+            chat_mode = int(msg_content[-1])
+            if chat_mode not in [0, 1, 2]:
+                reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
+                                 "如 --mode chat_mode 2")
+                params_dict, pre_sql = None, None
+                return params_dict, pre_sql, reply_content
         except ValueError:
             reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
                              "如 --mode chat_mode 2")
-            params_dict, pre_sql = None
+            params_dict, pre_sql = None, None
             return params_dict, pre_sql, reply_content
         params_dict = {
             'group_id': group_id,
-            'chat_mode': mode
+            'chat_mode': chat_mode
         }
         update_pre_sql = ("UPDATE system SET chat_mode=:chat_mode "
                           "WHERE group_id=:group_id")
-        reply_content = '更改 chat_mode 為 ' + str(mode)
+        reply_content = '更改 chat_mode 為 ' + str(chat_mode)
         return params_dict, update_pre_sql, reply_content
 
     @staticmethod
-    def get_mode_status(system_config, group_id):
-        if system_config:
-            group_id_list = [i[0] for i in system_config]
+    def get_system_config(raw_system_config, group_id):
+        if raw_system_config:
+            group_id_list = [i[0] for i in raw_system_config]
             index = group_id_list.index(group_id)
     # system_config[index] 會回傳一個 tuple 類似像 ('Cxxxxxx', 1, 1, 3)
     # 從左至右分別對應: group_id,	chat_mode, retrieve_pic_mode, trigger_chat
@@ -170,15 +181,23 @@ class Mode():
     #                                             1 = 隨機回所有 group 創的圖(預設)
     #                                             2 = 只回該 group 上傳的圖
     #                        其中 trigger_chat 預設為 3 個以上的字才回話，可以設為 2~15
-            system_config = system_config[index]
+            system_config = raw_system_config[index]
+            return system_config
+        else:
+            return None
+
+    @staticmethod
+    def get_mode_status(raw_system_config, group_id):
+        system_config = Mode.get_system_config(raw_system_config, group_id)
+        if system_config:
             reply_content = ("[當前模式為]\n" +
-                             "chat_mode:" +
-                             str(system_config[1]) + "\n"
-                             "retrieve_pic_mode:" +
-                             str(system_config[2]) + "\n"
-                             "trigger_chat:" +
-                             str(system_config[3])
-                             )
+                                "chat_mode:" +
+                                str(system_config[1]) + "\n"
+                                "retrieve_pic_mode:" +
+                                str(system_config[2]) + "\n"
+                                "trigger_chat:" +
+                                str(system_config[3])
+                                )
             return reply_content
         else:
             reply_content = "尚無 mode 資料，請再試一次"
