@@ -17,7 +17,7 @@ DB_NAME = getenv("DB_NAME", "<YOUR DB NAME>")
 DB_USER = getenv("DB_USER", "<YOUR DB USER>")
 DB_PASSWORD = getenv("DB_PASSWORD", "<YOUR DB PASSWORD>")
 DB_PORT = getenv("DB_PORT", "<YOUR DB SEVER PORT>")
-CONNECTION_INFO = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_DOMAIN}/{DB_NAME}?host={DB_DOMAIN}?port={DB_PORT}"
+CONNECTION_INFO = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_DOMAIN}:{DB_PORT}/{DB_NAME}"
 
 # 設定圖片名稱的字數的長度在此控制
 PIC_NAME_LOW_LIMIT = 2
