@@ -5,7 +5,7 @@ from numpy import array
 from matplotlib.pyplot import subplots
 from io import BytesIO
 from six import iteritems
-from PIL import Image
+# from PIL import Image
 from matplotlib.font_manager import FontProperties
 import os
 from db_manipulate import DBManipulate as dbm
@@ -44,18 +44,18 @@ class PicNameList():
                 cell.set_text_props(fontproperties=font)
         return ax
 
-    @staticmethod
-    def _turn_table_into_pic(table_object):
-        print('enter turn_table_into_pic')
-        pic = table_object
-        plt_buf = BytesIO()
-        pil_buf = BytesIO()
-        pic.savefig(plt_buf, format='png')
-        Image.open(plt_buf).save(pil_buf, format="png")
-        plt_buf.close()
-        byte_img = pil_buf.getvalue()
-        pil_buf.close()
-        return byte_img
+    # @staticmethod
+    # def _turn_table_into_pic(table_object):
+    #     print('enter turn_table_into_pic')
+    #     pic = table_object
+    #     plt_buf = BytesIO()
+    #     pil_buf = BytesIO()
+    #     pic.savefig(plt_buf, format='png')
+    #     Image.open(plt_buf).save(pil_buf, format="png")
+    #     plt_buf.close()
+    #     byte_img = pil_buf.getvalue()
+    #     pil_buf.close()
+    #     return byte_img
 
     @staticmethod
     def get_binary_pic(res):

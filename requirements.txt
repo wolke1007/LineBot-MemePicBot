@@ -4,5 +4,4 @@ pymysql
 Flask-SQLAlchemy 
 pandas
 numpy
-pillow
 matplotlib
