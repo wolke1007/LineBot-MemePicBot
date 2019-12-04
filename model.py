@@ -54,7 +54,7 @@ class Chat():
     def __is_user_id_banned(self, user_id):
         chat_user = UserInfo(user_id=self.user_id)
         session = Session()
-        ret = session.query(UserInfo).filter(UserInfo.user_id == chat_user)
+        ret = session.query(UserInfo).filter(UserInfo.user_id == chat_user.user_id)
         session.close()
         print('ret.all().banned: ', ret.all().banned)
         return True if ret.all().banned == 1 else False
