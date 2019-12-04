@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from config import *
 from pandas import DataFrame
-from numpy import array
-from matplotlib.pyplot import subplots
+# from numpy import array
+# from matplotlib.pyplot import subplots
 from io import BytesIO
 from six import iteritems
 # from PIL import Image

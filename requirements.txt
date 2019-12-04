@@ -2,6 +2,3 @@ Flask
 line-bot-sdk
 pymysql
 Flask-SQLAlchemy 
-pandas
-numpy
-matplotlib
