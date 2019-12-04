@@ -17,7 +17,6 @@ import requests
 from base64 import b64encode
 import json
 from config import *
-# from db_manipulate import DBManipulate as dbm
 from extension import *
 from model import Chat
 

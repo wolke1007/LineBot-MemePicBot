@@ -8,7 +8,6 @@ from six import iteritems
 # from PIL import Image
 from matplotlib.font_manager import FontProperties
 import os
-from db_manipulate import DBManipulate as dbm
 
 
 class PicNameList():
