@@ -6,7 +6,7 @@ from config import *
 from io import BytesIO
 from six import iteritems
 # from PIL import Image
-from matplotlib.font_manager import FontProperties
+# from matplotlib.font_manager import FontProperties
 import os
 
 
