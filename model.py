@@ -56,8 +56,10 @@ class Chat():
         session = Session()
         ret = session.query(UserInfo).filter(UserInfo.user_id == chat_user.user_id)
         session.close()
-        print('ret.all().banned: ', ret.all().banned)
-        return True if ret.all().banned == 1 else False
+        for i in ret:
+            print('i.banned: ', i.banned)
+        return True
+        # return True if ret.all().banned == 1 else False
 
     # def __add_user_id_if_not_exist(user_id):
     #     print('enter add_userid_if_not_exist')
