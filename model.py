@@ -51,11 +51,7 @@ class Chat():
         self.message_id = event.message.id
         self.is_user_id_banned = self.__is_user_id_banned(self.user_id)
 
-    def __is_user_id_banned(user_id):
-        # params_dict = {
-        #     'user_id': user_id
-        # }
-        # select_pre_sql = ("SELECT banned FROM user_info WHERE user_id=:user_id")
+    def __is_user_id_banned(self, user_id):
         chat_user = UserInfo(user_id=self.user_id)
         ret = session.query(UserInfo).filter(UserInfo.user_id == chat_user)
         session.close()
