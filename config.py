@@ -22,3 +22,7 @@ CONNECTION_INFO = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_DOMAIN}:{DB_PORT
 # 設定圖片名稱的字數的長度在此控制
 PIC_NAME_LOW_LIMIT = 2
 PIC_NAME_HIGH_LIMIT = 15
+
+
+if __name__ == '__main__':
+    pass

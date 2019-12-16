@@ -168,3 +168,7 @@ class ImgurClient(object):
             account_data['created'],
             account_data['pro_expiration'],
         )
+
+
+if __name__ == '__main__':
+    pass

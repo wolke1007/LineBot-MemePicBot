@@ -5,3 +5,5 @@ channel_token.py
 *pycache*
 sql-test.py
 *.pyc
+config_for_test.py
+test.py
