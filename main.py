@@ -6,12 +6,8 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from config import *
-from sys import path
-from os import getcwd
-path.append(getcwd())
-print(path)
 from models.bot.bot import Bot
-from models.chat import Chat
+from models.bot.chat import Chat
 
 
 app = Flask(__name__)
