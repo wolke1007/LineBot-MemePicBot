@@ -52,7 +52,7 @@ def handle_image(event):
     del chat, bot
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_text(event, is_image_event=False):
-    chat = Chat(event)
+def handle_text(event):
+    chat = Chat(event, is_image_event=False)
     bot = Bot(chat)
     del chat, bot
