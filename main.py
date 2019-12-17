@@ -7,7 +7,7 @@ from linebot.exceptions import (
 )
 from config import *
 from models.bot.bot import Bot
-from models.bot.chat import Chat
+from models.chat import Chat
 
 
 app = Flask(__name__)
