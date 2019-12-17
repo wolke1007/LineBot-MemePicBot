@@ -28,6 +28,7 @@ class Imgur():
             headers = InstanceClient.prepare_headers()
             response = post('https://api.imgur.com/3/image', headers=headers, data=data)
             pic_link = loads(response.text)['data']['link']
+            session = Session()
             session.query(PicInfo)\
                 .filter(PicInfo.user_id == self.chat.event.source.user_id)\
                 .filter(PicInfo.group_id == self.chat.group_id)\
@@ -40,6 +41,7 @@ class Imgur():
             self.reply_content = False
         finally:
             return self.reply_content
+            session.close()
 
     def upload_to_imgur_with_image(self):
         if self.chat.is_image_event:
@@ -48,6 +50,7 @@ class Imgur():
                 .filter(PicInfo.user_id == self.chat.event.source.user_id)\
                 .filter(PicInfo.group_id == self.chat.group_id)\
                 .filter(PicInfo.pic_link == 'NULL').all()
+            session.close()
             if had_named_pic_with_NULL_link:
                 payload = b64encode(self.chat.binary_pic)
                 pic_name = had_named_pic_with_NULL_link[0].pic_name
