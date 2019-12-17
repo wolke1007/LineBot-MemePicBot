@@ -7,7 +7,7 @@ from ..ORM import PicInfo, System, UserInfo, Session
 class Mode():
 
     def get_chat_mode(self):
-        if self.is_image_event:
+        if self.chat.is_image_event:
             return
         if self.chat.event.message.text == '--mode':
             self.reply_content = ("[當前模式為]\n" +
@@ -25,7 +25,7 @@ class Mode():
             pass
 
     def set_trigger_chat(self):
-        if self.is_image_event:
+        if self.chat.is_image_event:
             return
         if self.chat.event.message.text[:20] == '--mode trigger_chat ':
             try:
@@ -56,7 +56,7 @@ class Mode():
         1 = 隨機回所有群組創的圖(預設)
         2 = 只回該群組上傳的圖
         '''
-        if self.is_image_event:
+        if self.chat.is_image_event:
             return
         if self.chat.event.message.text[:17] == '--mode chat_mode ':
             try:
