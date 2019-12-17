@@ -1,13 +1,26 @@
 # -*- coding: utf-8 -*-
 from config import *
+# from config_for_test import *  # debug
 from .ORM import PicInfo, System, UserInfo, Session
 from sqlalchemy.orm.exc import NoResultFound
+from linebot import LineBotApi
+
+
+line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
 
 class Chat():
 
-    def __init__(self, event):
+    def __init__(self, event, is_image_event=None):
         self.event = event
+        self.event.message.text = self.event.message.text.lower()
+        # 統一使用小寫的文字做後續處理，儲存進 DB 與撈出來比對時都會是小寫，增加命中率
+        # 若未來有考慮大小寫分開儲存則要改這邊
+        self.is_image_event = is_image_event
+        if self.is_image_event:
+            self.binary_pic = line_bot_api.get_message_content(self.chat.event.message_id).content
+        else:
+            self.binary_pic = None
         try:
             self.group_id = event.source.group_id
         except AttributeError as e:
@@ -18,8 +31,7 @@ class Chat():
         self.user_banned,\
         self.chat_mode,\
         self.retrieve_pic_mode,\
-        self.trigger_chat,\
-        self.pic_name = self.get_chat_metadata()
+        self.trigger_chat = self.get_chat_metadata()
 
     def add_user_id_if_not_exist(self):
         session = Session()
@@ -34,9 +46,9 @@ class Chat():
     def add_group_id_if_not_exist(self):
         session = Session()
         try:
-            session.query(System).filter(System.group_id == self.event.source.group_id).one()
+            session.query(System).filter(System.group_id == self.group_id).one()
         except NoResultFound:
-            session.add(System(group_id=self.event.source.group_id, chat_mode=1, retrieve_pic_mode=1, trigger_chat=3))
+            session.add(System(group_id=self.group_id, chat_mode=1, retrieve_pic_mode=1, trigger_chat=3))
             session.commit()
         finally:
             session.close()
@@ -49,27 +61,19 @@ class Chat():
         3. 需只有 pic_name 存在，但 pic_link 為 NULL
         '''
         session = Session()
-        ret1 = session.query(UserInfo, System)\
+        ret = session.query(UserInfo, System)\
                     .filter(UserInfo.user_id == self.event.source.user_id)\
-                    .filter(System.group_id == self.event.source.group_id)\
+                    .filter(System.group_id == self.group_id)\
                     .one()
-        # 有設定圖片名稱，但是還沒上傳所以沒有 pic_link
-        ret2 = session.query(PicInfo)\
-                    .filter(PicInfo.user_id == self.event.source.user_id)\
-                    .filter(PicInfo.group_id == self.event.source.group_id)\
-                    .filter(PicInfo.pic_link == 'NULL').all()
-        ret2 = ret2.pic_name if ret2 else None
-        session.close()
-        print('ret1.UserInfo.banned: ', ret1.UserInfo.banned,\
-              'ret1.System.chat_mode: ', ret1.System.chat_mode,\
-              'ret1.System.retrieve_pic_mode: ', ret1.System.retrieve_pic_mode,\
-              'ret1.System.trigger_chat: ', ret1.System.trigger_chat,\
-              'ret2: ', ret2)
-        return ret1.UserInfo.banned,\
-               ret1.System.chat_mode,\
-               ret1.System.retrieve_pic_mode,\
-               ret1.System.trigger_chat,\
-               ret2
+
+        # print('ret.UserInfo.banned: ', ret.UserInfo.banned,\
+        #       'ret.System.chat_mode: ', ret.System.chat_mode,\
+        #       'ret.System.retrieve_pic_mode: ', ret.System.retrieve_pic_mode,\
+        #       'ret.System.trigger_chat: ', ret.System.trigger_chat)
+        return ret.UserInfo.banned,\
+               ret.System.chat_mode,\
+               ret.System.retrieve_pic_mode,\
+               ret.System.trigger_chat
 
 
 if __name__ == '__main__':

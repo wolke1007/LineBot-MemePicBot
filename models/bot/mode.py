@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from config import *
+# from config_for_test import *  # debug
 from ..ORM import PicInfo, System, UserInfo, Session
 
 
@@ -16,9 +17,8 @@ class Mode():
                                   str(self.chat.trigger_chat)
                                   )
             self._reply_msg(
-                    self.chat.event.reply_token,
-                    self.reply_content,
-                    content_type='text')
+                    content_type='text',
+                    function_name=self.get_chat_mode.__name__)
         else:
             pass
 
@@ -41,9 +41,8 @@ class Mode():
                                       "，如 --mode trigger_chat 15")
             finally:
                 self._reply_msg(
-                    self.chat.event.reply_token,
-                    self.reply_content,
-                    content_type='text')
+                    content_type='text',
+                    function_name=self.set_trigger_chat.__name__)
         else:
             pass
 
@@ -70,11 +69,9 @@ class Mode():
                 self.reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
                                       "如 --mode chat_mode 2")
             finally:
-                print('self.reply_content: ', self.reply_content)
                 self._reply_msg(
-                    self.chat.event.reply_token,
-                    self.reply_content,
-                    content_type='text')
+                    content_type='text',
+                    function_name=self.set_chat_mode.__name__)
         else:
             pass
 
