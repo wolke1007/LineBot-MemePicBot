@@ -162,6 +162,7 @@ class Skill(Imgur):
             session.query(PicInfo.pic_link).filter(PicInfo.pic_name == '--pic_name_list').update({PicInfo.pic_link: 'NULL', PicInfo.group_id: self.chat.group_id})
             session.commit()
             session.close()
+            all_pic_name_in_db = [ pic.pic_name for pic in all_pic_info ]
             self.chat.binary_pic = self.__get_binary_pic(all_pic_name_in_db)
             upload_result = self._upload_to_imgur(payload=self.chat.binary_pic, pic_name='--pic_name_list')
             if  upload_result:
