@@ -5,6 +5,9 @@ from linebot import WebhookHandler
 from linebot.exceptions import (
     InvalidSignatureError
 )
+from linebot.models import (
+    MessageEvent, TextMessage, ImageMessage
+)
 from config import *
 from models.bot.bot import Bot
 from models.chat import Chat

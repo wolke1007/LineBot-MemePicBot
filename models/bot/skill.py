@@ -9,9 +9,7 @@ from six import iteritems
 from PIL import Image
 from matplotlib.font_manager import FontProperties
 from linebot import LineBotApi
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
-)
+from linebot.models import TextSendMessage
 from ..ORM import PicInfo, System, UserInfo, Session
 from .imgur import Imgur
 import re
