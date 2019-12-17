@@ -157,13 +157,12 @@ class Skill(Imgur):
             session.query(PicInfo.pic_link).filter(PicInfo.pic_name == '--pic_name_list').update({PicInfo.pic_link: 'NULL', PicInfo.group_id: self.chat.group_id})
             session.commit()
             session.close()
-            all_pic_name_in_db = [ pic.pic_name for pic in all_pic_info ]
             self.chat.binary_pic = self.__get_binary_pic(all_pic_name_in_db)
-            self.chat.is_image_event = True
-            pic_link = self.upload_to_imgur_with_image()
-            if self.reply_content == '上傳成功':
+            upload_result = self._upload_to_imgur(payload=self.chat.binary_pic, pic_name='--pic_name_list')
+            if  upload_result:
                 # 複寫名字為 'pic_name_list' 的 pic_link
                 print('上傳成功')
+                pic_link = upload_result
                 session = Session()
                 session.query(PicInfo.pic_link).filter(PicInfo.pic_name == 'pic_name_list').update({PicInfo.pic_link: pic_link})
                 session.commit()
@@ -174,6 +173,7 @@ class Skill(Imgur):
                     function_name=self.reply_pic_name_list.__name__)
             else:
                 print('上傳失敗')
+                self.reply_content = 'Imgur 上傳失敗'
                 self._reply_msg(
                     content_type='text',
                     function_name=self.reply_pic_name_list.__name__)

@@ -13,14 +13,14 @@ class Chat():
 
     def __init__(self, event, is_image_event=None):
         self.event = event
-        self.event.message.text = self.event.message.text.lower()
-        # 統一使用小寫的文字做後續處理，儲存進 DB 與撈出來比對時都會是小寫，增加命中率
-        # 若未來有考慮大小寫分開儲存則要改這邊
         self.is_image_event = is_image_event
         if self.is_image_event:
             self.binary_pic = line_bot_api.get_message_content(self.chat.event.message_id).content
         else:
             self.binary_pic = None
+            # 統一使用小寫的文字做後續處理，儲存進 DB 與撈出來比對時都會是小寫，增加命中率
+            # 若未來有考慮大小寫分開儲存則要改這邊
+            self.event.message.text = self.event.message.text.lower()
         try:
             self.group_id = event.source.group_id
         except AttributeError as e:
