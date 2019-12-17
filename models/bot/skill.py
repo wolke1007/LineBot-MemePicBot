@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from config import *
-# from config_for_test import *  # debug
+from config_for_test import *  # debug
 from pandas import DataFrame
 from numpy import array
 from matplotlib.pyplot import subplots
@@ -154,7 +154,7 @@ class Skill(Imgur):
             session = Session()
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱後做成表
             all_pic_info = session.query(PicInfo.pic_name, PicInfo.pic_link, PicInfo.group_id).filter(PicInfo.pic_name != '--pic_name_list').all()
-            session.query(PicInfo.pic_link).filter(PicInfo.pic_name == '--pic_name_list').update({PicInfo.pic_link: 'NULL'})
+            session.query(PicInfo.pic_link).filter(PicInfo.pic_name == '--pic_name_list').update({PicInfo.pic_link: 'NULL', PicInfo.group_id: self.chat.group_id})
             session.commit()
             session.close()
             all_pic_name_in_db = [ pic.pic_name for pic in all_pic_info ]
