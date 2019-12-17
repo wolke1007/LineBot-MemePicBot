@@ -225,7 +225,7 @@ class Skill(Imgur):
                     picinfo_to_add = PicInfo(user_id=self.chat.event.source.user_id,\
                                              pic_name=pic_name,\
                                              pic_link='NULL',\
-                                             group_id=self.chat.event.source.group_id)
+                                             group_id=self.chat.group_id)
                     session.add(picinfo_to_add)
                     self.reply_content = f'圖片名稱已設定: {pic_name}，請上傳圖片或圖片連結'
                     session.commit()
