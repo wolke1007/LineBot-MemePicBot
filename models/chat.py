@@ -15,7 +15,7 @@ class Chat():
         self.event = event
         self.is_image_event = is_image_event
         if self.is_image_event:
-            self.binary_pic = line_bot_api.get_message_content(self.chat.event.message_id).content
+            self.binary_pic = line_bot_api.get_message_content(self.event.message_id).content
         else:
             self.binary_pic = None
             # 統一使用小寫的文字做後續處理，儲存進 DB 與撈出來比對時都會是小寫，增加命中率
@@ -65,11 +65,6 @@ class Chat():
                     .filter(UserInfo.user_id == self.event.source.user_id)\
                     .filter(System.group_id == self.group_id)\
                     .one()
-
-        # print('ret.UserInfo.banned: ', ret.UserInfo.banned,\
-        #       'ret.System.chat_mode: ', ret.System.chat_mode,\
-        #       'ret.System.retrieve_pic_mode: ', ret.System.retrieve_pic_mode,\
-        #       'ret.System.trigger_chat: ', ret.System.trigger_chat)
         return ret.UserInfo.banned,\
                ret.System.chat_mode,\
                ret.System.retrieve_pic_mode,\
