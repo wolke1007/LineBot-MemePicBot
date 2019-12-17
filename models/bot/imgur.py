@@ -60,7 +60,7 @@ class Imgur():
             pass
 
     def upload_to_imgur_with_link(self):
-        if self.chat.is_image_event == False and \
+         if self.chat.is_image_event == False and \
             (self.chat.event.message.text[:4] == "http" and
              self.chat.event.message.text[:5] == "https") and \
             (self.chat.event.message.text[-4:] == ".jpg" or \

@@ -116,6 +116,8 @@ class Skill(Imgur):
         return binary_pic
 
     def get_help(self):
+        if self.chat.is_image_event:
+            return
         if self.chat.event.message.text == '--help' or self.chat.event.message.text == '-h':
             self.reply_content = HELP_CONTENT
             self._reply_msg(
@@ -128,7 +130,8 @@ class Skill(Imgur):
         '''
         目前僅讓使用者刪除該聊天室且為自己創的圖片
         '''
-        #TODO 這邊改用 ORM 直接進行 delete 操作
+        if self.chat.is_image_event:
+            return
         if self.chat.event.message.text[:9] == '--delete ':
             pic_name = self.chat.event.message.text[9:]
             session = Session()
@@ -150,6 +153,8 @@ class Skill(Imgur):
             pass
 
     def reply_pic_name_list(self):
+        if self.chat.is_image_event:
+            return
         if self.chat.event.message.text == '--list':
             session = Session()
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱後做成表
@@ -187,6 +192,8 @@ class Skill(Imgur):
         2. 皆以小寫儲存圖片名字，增加未來比對命中率
         3. 禁止使用者使用 '--' 開頭的字串當作命名避免系統用關鍵字被命名
         '''
+        if self.chat.is_image_event:
+            return
         if self.chat.event.message.text[0] == '#' and self.chat.event.message.text[-1] == '#':
             pic_name = self.chat.event.message.text[1:-1]
             print(pic_name)
@@ -237,6 +244,8 @@ class Skill(Imgur):
             pass
 
     def send_pic_back(self):
+        if self.chat.is_image_event:
+            return
         if self.chat.chat_mode == 0:
             return 'chat mode is 0, no talking'
         if (self.chat.event.message.text[0] == '#' and self.chat.event.message.text[-1] == '#') or \
