@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from config import *
-from config_for_test import *  # debug
 import pymysql
 from sqlalchemy import create_engine, Table, MetaData, Column, String, Integer, ForeignKey
 from sqlalchemy.orm import sessionmaker

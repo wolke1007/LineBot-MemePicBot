@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from config import *
-# from config_for_test import *  # debug
 from json import loads
 from requests import post
 from base64 import b64encode

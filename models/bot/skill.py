@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from config import *
-from config_for_test import *  # debug
 from pandas import DataFrame
 from numpy import array
 from matplotlib.pyplot import subplots
@@ -67,7 +66,6 @@ class Skill(Imgur):
         # 取當前 main.py 的檔案位置，因為我上傳的字型檔跟它放一起
 
         dir_path = path.dirname(path.realpath('STHeitiMedium.ttc'))
-        print(dir_path)
         # STHeitiMedium.ttc 是中文字型檔，有了它 matplotlib 才有辦法印出中文，我擔心 GCP 沒有內建就自己上傳了
         font = FontProperties(fname=dir_path + "/STHeitiMedium.ttc", size=14)
         mpl_table = ax.table(cellText=data.values, bbox=bbox,
@@ -263,8 +261,6 @@ class Skill(Imgur):
             elif match and self.chat.chat_mode == 2 and self.chat.group_id == pic.group_id and len(pic.pic_name) >= self.chat.trigger_chat:
                 match_list.append(pic)
         if match_list:
-            print('match_list: ', match_list)
-            # pic_name_list = [ pic.pic_name for pic in match_list ]
             # key 這邊解決了如果 match 多組 pic_name，會依照 pic_name 長度排序
             match_list.sort(key=lambda x: len(x.pic_name))
             # 排序後取 match 字數最多的也就是最右邊的
@@ -283,7 +279,7 @@ class Skill(Imgur):
     def test_func(self):
         if self.debug:
             if self.echo:
-                # print(self.reply_content)
+                print(self.reply_content)
                 return self.reply_content
             return self.reply_content
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from config import *
-from config_for_test import *  # debug
 from ..ORM import PicInfo, System, UserInfo, Session
 
 
