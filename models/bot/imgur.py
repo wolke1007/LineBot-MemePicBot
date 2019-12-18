@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from config import *
-# from config_for_test import *  # debug
+from config_for_test import *  # debug
 from json import loads
 from requests import post
 from base64 import b64encode
@@ -37,29 +37,29 @@ class Imgur():
     
     def __upload_to_imgur_with(self, payload_type, function_name):
         session = Session()
-            had_named_pic_with_NULL_link = session.query(PicInfo)\
-                .filter(PicInfo.user_id == self.chat.event.source.user_id)\
-                .filter(PicInfo.group_id == self.chat.group_id)\
-                .filter(PicInfo.pic_link == 'NULL')
-            if had_named_pic_with_NULL_link.all():
-                payload = b64encode(self.chat.binary_pic) if payload_type == 'image' else self.chat.event.message.text
-                pic_name = had_named_pic_with_NULL_link[0].pic_name
-                upload_result = self._upload_to_imgur(payload, pic_name)
-                if upload_result:
-                    pic_link = upload_result
-                    had_named_pic_with_NULL_link.update({PicInfo.pic_link: pic_link})
-                    session.commit()
-                    self.reply_content = '上傳成功'
-                else:
-                    self.reply_content = '上傳失敗'
-                self._reply_msg(
-                    content_type='text',
-                    function_name=function_name)
-            session.close()
+        had_named_pic_with_NULL_link = session.query(PicInfo)\
+            .filter(PicInfo.user_id == self.chat.event.source.user_id)\
+            .filter(PicInfo.group_id == self.chat.group_id)\
+            .filter(PicInfo.pic_link == 'NULL')
+        if had_named_pic_with_NULL_link.all():
+            payload = b64encode(self.chat.binary_pic) if payload_type == 'image' else self.chat.event.message.text
+            pic_name = had_named_pic_with_NULL_link[0].pic_name
+            upload_result = self._upload_to_imgur(payload, pic_name)
+            if upload_result:
+                pic_link = upload_result
+                had_named_pic_with_NULL_link.update({PicInfo.pic_link: pic_link})
+                session.commit()
+                self.reply_content = '上傳成功'
+            else:
+                self.reply_content = '上傳失敗'
+            self._reply_msg(
+                content_type='text',
+                function_name=function_name)
+        session.close()
 
     def upload_to_imgur_with_image(self):
         if self.chat.is_image_event:
-            __upload_to_imgur_with('image', self.upload_to_imgur_with_image.__name__)
+            self.__upload_to_imgur_with('image', self.upload_to_imgur_with_image.__name__)
         else:
             pass
 
@@ -71,7 +71,7 @@ class Imgur():
              self.chat.event.message.text[-5:] == ".jpeg" or \
              self.chat.event.message.text[-4:] == ".png" or \
              self.chat.event.message.text[-4:] == ".gif"):
-            __upload_to_imgur_with('image', self.upload_to_imgur_with_link.__name__)
+            self.__upload_to_imgur_with('link', self.upload_to_imgur_with_link.__name__)
         else:
             pass
 

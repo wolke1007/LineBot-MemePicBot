@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from config import *
-# from config_for_test import *  # debug
+from config_for_test import *  # debug
 from .skill import Skill
 from .mode import Mode
 from ..ORM import PicInfo, System, UserInfo, Session

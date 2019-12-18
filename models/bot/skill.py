@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from config import *
-# from config_for_test import *  # debug
+from config_for_test import *  # debug
 from pandas import DataFrame
 from numpy import array
 from matplotlib.pyplot import subplots
