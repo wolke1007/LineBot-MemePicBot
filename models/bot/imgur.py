@@ -28,20 +28,12 @@ class Imgur():
             headers = InstanceClient.prepare_headers()
             response = post('https://api.imgur.com/3/image', headers=headers, data=data)
             pic_link = loads(response.text)['data']['link']
-            session = Session()
-            session.query(PicInfo)\
-                .filter(PicInfo.user_id == self.chat.event.source.user_id)\
-                .filter(PicInfo.group_id == self.chat.group_id)\
-                .filter(PicInfo.pic_name == pic_name)\
-                .update({PicInfo.pic_link: pic_link})
-            session.commit()
             self.reply_content = pic_link
         except Exception as e:
             print('upload_to_imgur Exception e:', e)
             self.reply_content = False
         finally:
             return self.reply_content
-            session.close()
 
     def upload_to_imgur_with_image(self):
         if self.chat.is_image_event:
@@ -54,11 +46,23 @@ class Imgur():
             if had_named_pic_with_NULL_link:
                 payload = b64encode(self.chat.binary_pic)
                 pic_name = had_named_pic_with_NULL_link[0].pic_name
-                self._upload_to_imgur(payload, pic_name)
-                self.reply_content = '上傳成功' if self.reply_content else '上傳失敗'
-                self._reply_msg(
-                        content_type='text',
-                        function_name=self.upload_to_imgur_with_image.__name__)
+                upload_result = self._upload_to_imgur(payload, pic_name)
+                if upload_result:
+                    pic_link = upload_result
+                    session = Session()
+                    session.query(PicInfo)\
+                        .filter(PicInfo.user_id == self.chat.event.source.user_id)\
+                        .filter(PicInfo.group_id == self.chat.group_id)\
+                        .filter(PicInfo.pic_name == pic_name)\
+                        .update({PicInfo.pic_link: pic_link})
+                    session.commit()
+                    session.close()
+                    self.reply_content = '上傳成功'
+                else:
+                    self.reply_content = '上傳失敗'
+                    self._reply_msg(
+                            content_type='text',
+                            function_name=self.upload_to_imgur_with_image.__name__)
         else:
             pass
 
@@ -80,7 +84,19 @@ class Imgur():
                 pic_name = had_named_pic_with_NULL_link[0].pic_name
                 payload = self.chat.event.message.text
                 self._upload_to_imgur(payload, pic_name)
-                self.reply_content = '上傳成功' if self.reply_content else '上傳失敗'
+                if upload_result:
+                    pic_link = upload_result
+                    session = Session()
+                    session.query(PicInfo)\
+                        .filter(PicInfo.user_id == self.chat.event.source.user_id)\
+                        .filter(PicInfo.group_id == self.chat.group_id)\
+                        .filter(PicInfo.pic_name == pic_name)\
+                        .update({PicInfo.pic_link: pic_link})
+                    session.commit()
+                    session.close()
+                    self.reply_content = '上傳成功'
+                else:
+                    self.reply_content = '上傳失敗'
                 self._reply_msg(
                         content_type='text',
                         function_name=self.upload_to_imgur_with_link.__name__)

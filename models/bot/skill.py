@@ -21,28 +21,28 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
 class Skill(Imgur):
 
-    def _reply_msg(self, content_type, function_name=None):
+    def _reply_msg(self, content_type, reply_content=self.reply_content, function_name=None):
         '''
         1. 使用者主動敲 Bot，Bot 回覆人叫做 reply
-        2. 這種需要 reply_token 才知道要回誰，
+        2. 這種回覆模式需要 reply_token 才知道要回誰也才有回覆權限，
            且 reply_token 過一小段時間後會自動過期(或許是幾秒鐘後，沒文件明說)
            所以機器人不能太晚回話
         3. 可回文字 or 圖片
         '''
         if self.debug:
             if self.echo:
-                print(f'function name:{function_name}, self.reply_content: {self.reply_content}')
-            return self.reply_content
+                print(f'function name:{function_name}, reply_content: {reply_content}')
+            return reply_content
         else:
             if content_type is 'text':
                 line_bot_api.reply_message(
                     self.chat.event.reply_token,
-                    TextSendMessage(text=self.reply_content))
+                    TextSendMessage(text=reply_content))
             elif content_type is 'image':
                 line_bot_api.reply_message(
                     self.chat.event.reply_token,
-                    ImageSendMessage(preview_image_url=self.reply_content,
-                                    original_content_url=self.reply_content))
+                    ImageSendMessage(preview_image_url=reply_content,
+                                    original_content_url=reply_content))
 
     def __line_push_text_msg(to, content):
         '''
@@ -159,28 +159,22 @@ class Skill(Imgur):
             session = Session()
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱後做成表
             all_pic_info = session.query(PicInfo.pic_name, PicInfo.pic_link, PicInfo.group_id).filter(PicInfo.pic_name != '--pic_name_list').all()
-            session.query(PicInfo.pic_link).filter(PicInfo.pic_name == '--pic_name_list').update({PicInfo.pic_link: 'NULL', PicInfo.group_id: self.chat.group_id})
-            session.commit()
             session.close()
             all_pic_name_in_db = [ pic.pic_name for pic in all_pic_info ]
             self.chat.binary_pic = self.__get_binary_pic(all_pic_name_in_db)
             upload_result = self._upload_to_imgur(payload=self.chat.binary_pic, pic_name='--pic_name_list')
-            if  upload_result:
-                # 複寫名字為 'pic_name_list' 的 pic_link
-                print('上傳成功')
+            if upload_result:
                 pic_link = upload_result
                 session = Session()
-                session.query(PicInfo.pic_link).filter(PicInfo.pic_name == 'pic_name_list').update({PicInfo.pic_link: pic_link})
+                session.query(PicInfo)\
+                    .filter(PicInfo.pic_name == '--pic_name_list')\
+                    .update({PicInfo.pic_link: pic_link})
                 session.commit()
                 session.close()
-                self.reply_content = pic_link
-                self._reply_msg(
-                    content_type='image',
-                    function_name=self.reply_pic_name_list.__name__)
+                self.reply_content = '上傳成功'
             else:
-                print('上傳失敗')
-                self.reply_content = 'Imgur 上傳失敗'
-                self._reply_msg(
+                self.reply_content = '上傳失敗'
+            self._reply_msg(
                     content_type='text',
                     function_name=self.reply_pic_name_list.__name__)
         else:
