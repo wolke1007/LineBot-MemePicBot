@@ -21,7 +21,7 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
 class Skill(Imgur):
 
-    def _reply_msg(self, content_type, reply_content=self.reply_content, function_name=None):
+    def _reply_msg(self, content_type, reply_content=None, function_name=None):
         '''
         1. 使用者主動敲 Bot，Bot 回覆人叫做 reply
         2. 這種回覆模式需要 reply_token 才知道要回誰也才有回覆權限，
@@ -29,6 +29,8 @@ class Skill(Imgur):
            所以機器人不能太晚回話
         3. 可回文字 or 圖片
         '''
+        if not reply_content:
+            reply_content = self.reply_content
         if self.debug:
             if self.echo:
                 print(f'function name:{function_name}, reply_content: {reply_content}')
@@ -174,9 +176,9 @@ class Skill(Imgur):
                 self.reply_content = '上傳成功'
             else:
                 self.reply_content = '上傳失敗'
-            self._reply_msg(
-                    content_type='text',
-                    function_name=self.reply_pic_name_list.__name__)
+                self._reply_msg(
+                        content_type='text',
+                        function_name=self.reply_pic_name_list.__name__)
         else:
             pass
 
