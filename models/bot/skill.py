@@ -195,12 +195,12 @@ class Skill(Imgur):
         if self.chat.event.message.text[0] == '#' and self.chat.event.message.text[-1] == '#':
             pic_name = self.chat.event.message.text[1:-1]
             print(pic_name)
-            # if pic_name[:2] == '--':
-            #     self.reply_content = '-- 開頭的名字為系統保留禁止使用'
-            #     self._reply_msg(
-            #         content_type='text',
-            #         function_name=self.set_pic_name.__name__)
-            #     return 'forbid user to use name with -- prefix'
+            if pic_name[:2] == '--':
+                self.reply_content = '-- 開頭的名字為系統保留禁止使用'
+                self._reply_msg(
+                    content_type='text',
+                    function_name=self.set_pic_name.__name__)
+                return 'forbid user to use name with -- prefix'
             session = Session()
             had_named_pic_with_NULL_link = session.query(PicInfo)\
                 .filter(PicInfo.user_id == self.chat.event.source.user_id)\
@@ -250,7 +250,10 @@ class Skill(Imgur):
             self.chat.event.message.text[:2] == '--':
             return 'this chat could be a command, no need to send pic'
         session = Session()
-        all_pic_info = session.query(PicInfo.pic_name, PicInfo.pic_link, PicInfo.group_id).filter(PicInfo.pic_name != 'pic_name_list').all()
+        all_pic_info = session.query(PicInfo.pic_name, PicInfo.pic_link, PicInfo.group_id)\
+                              .filter(PicInfo.pic_name != '--pic_name_list')\
+                              .filter(PicInfo.pic_name != 'NULL')\
+                              .all()
         session.close()
         # --------- 這邊有效能問題需要解決 ---------
         # 目前是每一句對話都去抓全部的 DB 回來，然後丟進 for loop 掃描全部的內容
