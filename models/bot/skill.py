@@ -194,7 +194,7 @@ class Skill(Imgur):
             return
         if self.chat.event.message.text[0] == '#' and self.chat.event.message.text[-1] == '#':
             pic_name = self.chat.event.message.text[1:-1]
-            print(pic_name)
+            print(f'set pic_name: {pic_name}')
             if pic_name[:2] == '--':
                 self.reply_content = '-- 開頭的名字為系統保留禁止使用'
                 self._reply_msg(
@@ -205,25 +205,18 @@ class Skill(Imgur):
             had_named_pic_with_NULL_link = session.query(PicInfo)\
                 .filter(PicInfo.user_id == self.chat.event.source.user_id)\
                 .filter(PicInfo.group_id == self.chat.group_id)\
-                .filter(PicInfo.pic_link == 'NULL').all()
-            if had_named_pic_with_NULL_link:
-                session.query(PicInfo.pic_link)\
-                    .filter(PicInfo.user_id == self.chat.event.source.user_id)\
-                    .filter(PicInfo.pic_link == 'NULL')\
-                    .update({PicInfo.pic_name: pic_name})
+                .filter(PicInfo.pic_link == 'NULL')
+            if had_named_pic_with_NULL_link.all():
+                had_named_pic_with_NULL_link.update({PicInfo.pic_name: pic_name})
                 self.reply_content = f'圖片名稱已更新: {pic_name}，請上傳圖片或圖片連結'
                 session.commit()
             else:
                 had_pic_with_this_name = session.query(PicInfo)\
                     .filter(PicInfo.user_id == self.chat.event.source.user_id)\
                     .filter(PicInfo.group_id == self.chat.group_id)\
-                    .filter(PicInfo.pic_name == pic_name).all()
-                if had_pic_with_this_name:
-                    session.query(PicInfo.pic_link)\
-                        .filter(PicInfo.user_id == self.chat.event.source.user_id)\
-                        .filter(PicInfo.group_id == self.chat.group_id)\
-                        .filter(PicInfo.pic_name == pic_name)\
-                        .update({PicInfo.pic_link: 'NULL'})
+                    .filter(PicInfo.pic_name == pic_name)
+                if had_pic_with_this_name.all():
+                    had_pic_with_this_name.update({PicInfo.pic_link: 'NULL'})
                     self.reply_content = f'{pic_name} 的舊圖片連結已清除，請重新上傳圖片或圖片連結'
                     session.commit()
                 else:
