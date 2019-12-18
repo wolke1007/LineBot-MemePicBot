@@ -173,11 +173,11 @@ class Skill(Imgur):
                     .update({PicInfo.pic_link: pic_link})
                 session.commit()
                 session.close()
-                self.reply_content = '上傳成功'
+                self.reply_content = pic_link
             else:
                 self.reply_content = '上傳失敗'
                 self._reply_msg(
-                        content_type='text',
+                        content_type='image',
                         function_name=self.reply_pic_name_list.__name__)
         else:
             pass
