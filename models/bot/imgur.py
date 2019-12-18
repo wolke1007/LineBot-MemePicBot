@@ -42,14 +42,12 @@ class Imgur():
                 .filter(PicInfo.user_id == self.chat.event.source.user_id)\
                 .filter(PicInfo.group_id == self.chat.group_id)\
                 .filter(PicInfo.pic_link == 'NULL')
-            # session.close()
             if had_named_pic_with_NULL_link.all():
                 payload = b64encode(self.chat.binary_pic)
                 pic_name = had_named_pic_with_NULL_link[0].pic_name
                 upload_result = self._upload_to_imgur(payload, pic_name)
                 if upload_result:
                     pic_link = upload_result
-                    session = Session()
                     had_named_pic_with_NULL_link.update({PicInfo.pic_link: pic_link})
                     session.commit()
                     self.reply_content = '上傳成功'
@@ -87,8 +85,8 @@ class Imgur():
                 else:
                     self.reply_content = '上傳失敗'
                 self._reply_msg(
-                        content_type='text',
-                        function_name=self.upload_to_imgur_with_link.__name__)
+                    content_type='text',
+                    function_name=self.upload_to_imgur_with_link.__name__)
             session.close()
         else:
             pass
