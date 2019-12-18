@@ -6,4 +6,4 @@ channel_token.py
 sql-test.py
 *.pyc
 config_for_test.py
-test.py
+manual_test.py
