@@ -45,14 +45,15 @@ def callback(event):
 #    但這會增加上傳的成本，依據 Imgur 免費的流量只能上傳 10,000 張圖片每月，就算花 25 鎂也是 60,000 每月，並不能這樣玩
 # 最後決定，只能確認使用者有先命名完才做上傳動作，確保每一次有確定要上傳才做
 # 與此同時，有考慮每個人是不是要設定 quota 來限制是不是一天只能上傳幾張圖片(目前沒此設計)
+
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image(event):
     chat = Chat(event, is_image_event=True)
-    bot = Bot(chat)
-    del chat, bot
+    Bot(chat)
+    del chat
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text(event):
     chat = Chat(event, is_image_event=False)
-    bot = Bot(chat)
-    del chat, bot
+    Bot(chat)
+    del chat

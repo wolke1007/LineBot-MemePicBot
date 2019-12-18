@@ -161,24 +161,25 @@ class Skill(Imgur):
             session = Session()
             # 撈出除了 pic_name_list 這張圖片以外的所有圖片名稱後做成表
             all_pic_info = session.query(PicInfo.pic_name, PicInfo.pic_link, PicInfo.group_id).filter(PicInfo.pic_name != '--pic_name_list').all()
-            session.close()
             all_pic_name_in_db = [ pic.pic_name for pic in all_pic_info ]
             self.chat.binary_pic = self.__get_binary_pic(all_pic_name_in_db)
             upload_result = self._upload_to_imgur(payload=self.chat.binary_pic, pic_name='--pic_name_list')
             if upload_result:
                 pic_link = upload_result
-                session = Session()
                 session.query(PicInfo)\
                     .filter(PicInfo.pic_name == '--pic_name_list')\
                     .update({PicInfo.pic_link: pic_link})
                 session.commit()
-                session.close()
                 self.reply_content = pic_link
-            else:
-                self.reply_content = '上傳失敗'
                 self._reply_msg(
                         content_type='image',
                         function_name=self.reply_pic_name_list.__name__)
+            else:
+                self.reply_content = '上傳失敗'
+                self._reply_msg(
+                        content_type='text',
+                        function_name=self.reply_pic_name_list.__name__)
+            session.close()
         else:
             pass
 
