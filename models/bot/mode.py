@@ -9,13 +9,18 @@ class Mode():
         if self.chat.is_image_event:
             return
         if self.chat.event.message.text == '--mode':
-            self.reply_content = ("[當前模式為]\n" +
-                                  "chat_mode:" +
-                                  str(self.chat.chat_mode) + "\n"
-                                  "retrieve_pic_mode:" +
-                                  str(self.chat.retrieve_pic_mode) + "\n"
-                                  "trigger_chat:" +
-                                  str(self.chat.trigger_chat)
+            chat_mode_mean = {'0':'不回圖',
+                              '1':'隨機回所有群組創的圖(此為預設)',
+                              '2':'只回該群組上傳的圖'}
+            retrieve_pic_mode = '此功能尚未實作'
+            trigger_chat = f'僅回覆字數大於等於 {self.chat.trigger_chat} 的圖片'
+            self.reply_content = ("[當前模式為]\n"
+                                  "chat_mode: " +
+                                  chat_mode_mean.get(str(self.chat.chat_mode)) + "\n"
+                                  "retrieve_pic_mode: " +
+                                  retrieve_pic_mode + "\n"
+                                  "trigger_chat: " +
+                                  trigger_chat
                                   )
             self._reply_msg(
                     content_type='text',
@@ -35,7 +40,7 @@ class Mode():
                     session.query(System.trigger_chat).filter(System.group_id == self.chat.group_id).update({System.trigger_chat: threshold})
                     session.commit()
                     session.close()
-                    self.reply_content = '更改 trigger_chat 為 ' + str(threshold)
+                    self.reply_content = f'僅回覆字數大於等於 {str(threshold)} 的圖片'
                 else:
                     raise ValueError
             except ValueError:
@@ -58,9 +63,12 @@ class Mode():
         if self.chat.is_image_event:
             return
         if self.chat.event.message.text[:17] == '--mode chat_mode ':
+            chat_mode_mean = {'0':'不回圖',
+                              '1':'隨機回所有群組創的圖(此為預設)',
+                              '2':'只回該群組上傳的圖'}
             try:
-                chat_mode = int(self.chat.event.message.text[-1])
-                if chat_mode not in [0, 1, 2]:
+                chat_mode = self.chat.event.message.text[-1]
+                if int(chat_mode) not in [0, 1, 2]:
                     self.reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
                                           "如 --mode chat_mode 2")
                 else:
@@ -68,7 +76,7 @@ class Mode():
                     res = session.query(System.chat_mode).filter(System.group_id == self.chat.group_id).update({System.chat_mode: chat_mode})
                     session.commit()
                     session.close()
-                    self.reply_content = '更改 chat_mode 為 ' + str(chat_mode)
+                    self.reply_content = '更改聊天模式為: ' + chat_mode_mean.get(chat_mode)
             except ValueError:
                 self.reply_content = ("chat_mode 後需設定介於 0~2 的數字，"
                                       "如 --mode chat_mode 2")
