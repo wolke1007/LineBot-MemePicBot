@@ -1,50 +1,48 @@
 # Meme Pic Line Bot
 ---------------------------------------
-此 Line Bot 可設定關鍵字與圖片，若聊天中提及該關鍵字會回覆的所設定之圖片
-[Youtube 介紹影片播放清單請點此](https://www.youtube.com/watch?v=eaLdnCgfywE&list=PLG-U6LloaLMsfdx8MqBBefKgCFYVfavAf)(也可觀看下方功能介紹影片)
-若想試玩此 BOT 請搜尋 Line ID "@srh5401g"
-或掃描以下 QR Code 加入好友
+此 Line Bot 可設定關鍵字與圖片，若聊天中提及該關鍵字會回覆的所設定之圖片  
+[Youtube 介紹影片播放清單請點此](https://www.youtube.com/watch?v=eaLdnCgfywE&list=PLG-U6LloaLMsfdx8MqBBefKgCFYVfavAf)  
+(也可觀看下方功能介紹影片)  
+若想試玩此 BOT 請搜尋 Line ID "@srh5401g"  
+或掃描以下 QR Code 加入好友  
 ![QR Code](intro_data/QRcode.png?raw=true)
 
 ---------------------------------------
 # 功能介紹
-> 讓使用者設定關鍵字與圖片組合
-> 機器人根據聊天中的關鍵字回覆已設定的圖片給該聊天群組
-> <iframe width="560" height="315" src="https://www.youtube.com/embed/eaLdnCgfywE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-> 列出目前已設定過的關鍵字
-> 刪除已設定過的關鍵字
-> <iframe width="560" height="315" src="https://www.youtube.com/embed/Womg857wDws" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-> 設定機器人在該聊天群組的回圖行為:
->>不回圖 or 隨機回所有群組創的圖(預設) or 只回該群組上傳的圖
->
-> 設定機器人在該聊天群組裡關鍵字符合超過(大於等於)幾字才回話，可以設為 2~15
->> e.g. trigger_chat = 3
->> "帥哥" -> 不會被觸發
+> [讓使用者設定關鍵字與圖片組合  
+機器人根據聊天中的關鍵字回覆已設定的圖片給該聊天群組](https://www.youtube.com/embed/eaLdnCgfywE)  
+>  
+> [列出目前已設定過的關鍵字  
+刪除已設定過的關鍵字](https://www.youtube.com/embed/Womg857wDws)  
+>  
+> [設定機器人在該聊天群組的回圖行為:  
+>>不回圖 or 隨機回所有群組創的圖(預設) or 只回該群組上傳的圖  
+>  
+> [設定機器人在該聊天群組裡關鍵字符合超過(大於等於)幾字才回話，可以設為 2~15](https://www.youtube.com/embed/xT4adktk3C8)  
+>> e.g. trigger_chat = 3  
+>> "帥哥" -> 不會被觸發  
 >> "我是帥哥" -> 會被觸發
-> <iframe width="560" height="315" src="https://www.youtube.com/embed/xT4adktk3C8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ---------------------------------------
 
 # 使用教學
 ## 一般使用
-##### 1. 設定圖片名稱，例如 #我是帥哥# (註1 2 3)
-![Set Keyword](intro_data/set_keyword.png)
+##### 1. 設定圖片名稱，例如 #我是帥哥#
+![Set Keyword](intro_data/set_keyword.png)  
 
     1-1. 圖片字數有限制，空白或是特殊符號皆算數
     1-2. 設定同圖片名稱則會蓋掉前面上傳的
     1-3. 如果設定多次名字，以最後一個命名為主
 ##### 2. 上傳圖片或是貼上圖片的 URL，系統會回傳上傳成功
-![Set Keyword](intro_data/upload_pic.png)
-![Set Keyword](intro_data/upload_pic_with_url.png)
+![Set Keyword](intro_data/upload_pic.png)  
+![Set Keyword](intro_data/upload_pic_with_url.png)  
 
     2-1. 若上傳URL則必須為 http 開頭(https亦可) .jpg .jpeg .gif .png 結尾（其餘副檔名不支援)
 
 ##### 3. 聊天時提到設定的圖片名稱便會觸發貼圖
-![Set Keyword](intro_data/keyword_appear_in_chat.png)
-    
-    3-1. 若命名上有重疊，則會觸發命中字數較多的那個
+![Set Keyword](intro_data/keyword_appear_in_chat.png)  
+
+    3-1. 若命名上有重疊，則會觸發命中字數較多的那個 
         e.g. 圖片1: 帥哥
              圖片2: 我是帥哥
              聊天內容: 你在問我我是帥哥嗎?
@@ -53,34 +51,34 @@
 ## 聊天室設定
 #### 設定機器人在該聊天群組的回圖行為
 ##### `--mode`
-返回當前聊天群組的設定
-![Set Keyword](intro_data/get_current_mode.png)
+返回當前聊天群組的設定  
+![Set Keyword](intro_data/get_current_mode.png)  
 
 ##### `--mode chat_mode 0~2` 
 * 0 = 不回圖
 * 1 = 隨機回所有群組創的圖(此為預設)
 * 2 = 只回該群組上傳的圖
-(只回該群組上傳的圖，當不想看到其他群組設定的圖片時可使用
-畢竟有時別人的梗我們不一定懂，或是有人放廣告之類的騷擾訊息)
+(只回該群組上傳的圖，當不想看到其他群組設定的圖片時可使用  
+畢竟有時別人的梗我們不一定懂，或是有人放廣告之類的騷擾訊息)  
 #### 設定機器人在該聊天群組裡關鍵字符合超過(大於等於)幾字才回話
 ##### `--mode trigger_chat 2~15`
 ```
-e.g. trigger_chat = 3
-     "帥哥" -> 不會被觸發
+e.g. trigger_chat = 3  
+     "帥哥" -> 不會被觸發  
      "我是帥哥" -> 會被觸發
 ```
 ## 其他功能
 #### 列出目前已設定過的關鍵字
 ##### `--list` 
-![Set Keyword](intro_data/pic_name_list.png)
+![Set Keyword](intro_data/pic_name_list.png)  
 
 #### 刪除已設定過的關鍵字
 ##### `--delete <圖片名稱>` 
 ```
 e.g. --delete 我是帥哥
 ```
-    1. 只能刪除自己的上傳的圖片(此部分可議)
-    2. 只能刪除於該聊天室所創的圖片
+    1. 只能刪除自己的上傳的圖片(此部分可議)  
+    2. 只能刪除於該聊天室所創的圖片  
 
 ---------------------------------------
 
@@ -104,7 +102,5 @@ e.g. --delete 我是帥哥
     * 使用最高權限直接無條件刪除圖片
 
 ## 備註
-* 圖片字數有限制，空白或是特殊符號皆算數
-* 設定同圖片名稱則會蓋掉前面上傳的
 * 建議在 Line 設定將「自動下載照片」取消打勾
    設定 > 照片。影片 > 自動下載照片
