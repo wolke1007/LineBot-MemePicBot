@@ -128,13 +128,35 @@ class MemeBotTestCase(unittest.TestCase):
         bot = Bot(chat, debug=True)
         self.assertEqual(bot.test_func(), 'https://i.imgur.com/ri8FJaY.jpg')
 
-    def test_mode_change(self):
+    def test_show_current_mode(self):
         self.event.source.user_id = 'test_123'
         self.event.source.group_id = 'test_group'
+        self.event.message.text = '--mode'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(),
+                         ("[當前模式為]\n"+
+                          "chat_mode: 隨機回所有群組創的圖(此為預設)\n"
+                          "retrieve_pic_mode: 此功能尚未實作\n"
+                          "trigger_chat: 僅回覆字數大於等於 3 的圖片"))
+
+    def test_chat_mode_change(self):
+        self.event.source.user_id = 'test_123'
+        self.event.source.group_id = 'test_group'
+        self.event.message.text = '--mode chat_mode A'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(), ("chat_mode 後需設定介於 0~2 的數字，"
+                                           "如 --mode chat_mode 2"))
+        self.event.message.text = '--mode chat_mode 3'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(), ("chat_mode 後需設定介於 0~2 的數字，"
+                                           "如 --mode chat_mode 2"))
         self.event.message.text = '--mode chat_mode 0'
         chat = Chat(self.event, is_image_event=False)
         bot = Bot(chat, debug=True)
-        self.assertEqual(bot.test_func(), '更改 chat_mode 為 0')
+        self.assertEqual(bot.test_func(), '更改聊天模式為: 不回圖')
         self.event.message.text = 'I will find you'
         chat = Chat(self.event, is_image_event=False)
         bot = Bot(chat, debug=True)
@@ -142,7 +164,7 @@ class MemeBotTestCase(unittest.TestCase):
         self.event.message.text = '--mode chat_mode 2'
         chat = Chat(self.event, is_image_event=False)
         bot = Bot(chat, debug=True)
-        self.assertEqual(bot.test_func(), '更改 chat_mode 為 2')
+        self.assertEqual(bot.test_func(), '更改聊天模式為: 只回該群組上傳的圖')
         self.event.message.text = 'I will find you'
         chat = Chat(self.event, is_image_event=False)
         bot = Bot(chat, debug=True)
@@ -150,11 +172,41 @@ class MemeBotTestCase(unittest.TestCase):
         self.event.message.text = '--mode chat_mode 1'
         chat = Chat(self.event, is_image_event=False)
         bot = Bot(chat, debug=True)
-        self.assertEqual(bot.test_func(), '更改 chat_mode 為 1')
+        self.assertEqual(bot.test_func(), '更改聊天模式為: 隨機回所有群組創的圖(此為預設)')
         self.event.message.text = 'I will find you'
         chat = Chat(self.event, is_image_event=False)
         bot = Bot(chat, debug=True)
         self.assertEqual(bot.test_func(), 'https://i.imgur.com/ri8FJaY.jpg')
+
+    def test_trigger_chat_change(self):
+        self.event.source.user_id = 'test_123'
+        self.event.source.group_id = 'test_group'
+        self.event.message.text = '--mode trigger_chat 1'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(), ("trigger_chat 後需設定介於 2~15 的數字"
+                                           "，如 --mode trigger_chat 15"))
+        self.event.message.text = '--mode trigger_chat ABC'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(), ("trigger_chat 後需設定介於 2~15 的數字"
+                                           "，如 --mode trigger_chat 15"))
+        self.event.message.text = '--mode trigger_chat 4'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(), ("僅回覆字數大於等於 4 的圖片"))
+        self.event.message.text = 'wtf'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(), None)
+        self.event.message.text = '--mode trigger_chat 3'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(), ("僅回覆字數大於等於 3 的圖片"))
+        self.event.message.text = 'wtf'
+        chat = Chat(self.event, is_image_event=False)
+        bot = Bot(chat, debug=True)
+        self.assertEqual(bot.test_func(), 'https://i.imgur.com/mv07XhN.jpg')
 
 
 if __name__ == '__main__':
@@ -172,5 +224,7 @@ if __name__ == '__main__':
     suite.addTest(MemeBotTestCase("test_delete_pic_with_same_user_same_group"))
     suite.addTest(MemeBotTestCase("test_reply_pic_name_list"))
     suite.addTest(MemeBotTestCase("test_send_pic_back"))
-    suite.addTest(MemeBotTestCase("test_mode_change"))
+    suite.addTest(MemeBotTestCase("test_show_current_mode"))
+    suite.addTest(MemeBotTestCase("test_chat_mode_change"))
+    suite.addTest(MemeBotTestCase("test_trigger_chat_change"))
     runner.run(suite)
