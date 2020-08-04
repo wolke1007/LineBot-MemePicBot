@@ -1,5 +1,37 @@
 # Meme Pic Line Bot
+
 ---------------------------------------
+
+# 技術介紹
+
+## 使用到的技術
+
+* Python + Flask + SQLAlchemy
+* GCP - cloud function
+
+## 程式設計
+
+1. 在機器人所在的聊天室有人講話時便會透過 webhook 觸發此程式，並會依照以下邏輯開始動作:
+    * new 出新 bot 實體
+    * new 出新 chat 實體，並去資料庫撈資料
+     (如該使用者使用權限、該聊天室設定、機器人設定等等)
+    * 將 chat 餵給 bot，bot 依據該 chat 的設定檔決定該怎麼做事
+    * ***將所有的 skill class 與 mode class 的方法輪巡過一遍，執行所有不為 private 的功能
+    而是否符合執行的條件則在各 skill、mode 中判斷
+    如此能做到如果新增新的機器人技能或是新的行為模式時
+    可以不用在主邏輯中增加 if else 去判斷要做什麼而是獨立判斷進而方便後續維護***
+2. 程式進入點在 [main.py](https://github.com/wolke1007/LineBot-MemePicBot/blob/master/main.py) (Controller)
+3. 每筆獨立的聊天訊息在傳進來時會被包裝成自定義的 [chat class](https://github.com/wolke1007/LineBot-MemePicBot/blob/master/models/chat.py)，並設定其 metadata 例如:
+    * 該使用者是否已被 banned 所以機器人不用理會該使用者
+    * 該聊天室的設定(回話長度、是否為不回話的靜音模式等)
+    * 機器人當下是否設定為要接收新圖片
+4. 機器人所有設定皆寫在 [bot](https://github.com/wolke1007/LineBot-MemePicBot/tree/master/models/bot) 資料夾中方便維護
+    * [bot](https://github.com/wolke1007/LineBot-MemePicBot/blob/master/models/bot/bot.py) 機器人功能進入點
+    * [skill](https://github.com/wolke1007/LineBot-MemePicBot/blob/master/models/bot/skill.py) 如有新功能則新增在這邊，並用非 private 方法的方式撰寫就會被執行
+    * [mode](https://github.com/wolke1007/LineBot-MemePicBot/blob/master/models/bot/mode.py) 回不回話、是否只回該群組所上傳的圖 等回話設定在這邊維護
+
+---------------------------------------
+
 此 Line Bot 可設定關鍵字與圖片，若聊天中提及該關鍵字會回覆的所設定之圖片  
 [Youtube 介紹影片播放清單請點此](https://www.youtube.com/watch?v=eaLdnCgfywE&list=PLG-U6LloaLMsfdx8MqBBefKgCFYVfavAf)  
 (也可觀看下方功能介紹影片)  
