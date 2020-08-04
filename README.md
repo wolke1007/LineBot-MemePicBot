@@ -1,5 +1,11 @@
 # Meme Pic Line Bot
 
+此 Line Bot 可設定關鍵字與圖片，若聊天中提及該關鍵字會回覆的所設定之圖片  
+[Youtube 介紹影片播放清單請點此](https://www.youtube.com/watch?v=eaLdnCgfywE&list=PLG-U6LloaLMsfdx8MqBBefKgCFYVfavAf)  
+若想試玩此 BOT 請搜尋 Line ID "@srh5401g"  
+或掃描以下 QR Code 加入好友  
+![QR Code](intro_data/QRcode.png?raw=true)
+
 ---------------------------------------
 
 # 技術介紹
@@ -29,15 +35,6 @@
     * [bot](https://github.com/wolke1007/LineBot-MemePicBot/blob/master/models/bot/bot.py) 機器人功能進入點
     * [skill](https://github.com/wolke1007/LineBot-MemePicBot/blob/master/models/bot/skill.py) 如有新功能則新增在這邊，並用非 private 方法的方式撰寫就會被執行
     * [mode](https://github.com/wolke1007/LineBot-MemePicBot/blob/master/models/bot/mode.py) 回不回話、是否只回該群組所上傳的圖 等回話設定在這邊維護
-
----------------------------------------
-
-此 Line Bot 可設定關鍵字與圖片，若聊天中提及該關鍵字會回覆的所設定之圖片  
-[Youtube 介紹影片播放清單請點此](https://www.youtube.com/watch?v=eaLdnCgfywE&list=PLG-U6LloaLMsfdx8MqBBefKgCFYVfavAf)  
-(也可觀看下方功能介紹影片)  
-若想試玩此 BOT 請搜尋 Line ID "@srh5401g"  
-或掃描以下 QR Code 加入好友  
-![QR Code](intro_data/QRcode.png?raw=true)
 
 ---------------------------------------
 # 功能介紹
